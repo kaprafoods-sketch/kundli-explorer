@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kundli Explorer
 
-## Getting Started
+> **"Learn astrology through your own kundli."**  
+> An educational Vedic astrology tool — not a prediction service.
 
-First, run the development server:
+## Tech stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **Next.js 16** (App Router) + TypeScript
+- **Tailwind CSS 4** + CSS custom properties design token layer
+- **Prisma** + **Supabase Postgres** (single provider)
+- **Swiss Ephemeris** (`sweph` 2.10) — server-side only, Lahiri ayanamsha
+- `geo-tz` + `luxon` — timezone/DST-correct UTC conversion
+- Open-Meteo geocoding API — free city search
+- **Anthropic** `claude-sonnet-4-6` — streamed AI tutor grounded in the chart
+
+## Setup
+
+### 1. Prerequisites
+
+- Node 20+
+- Supabase project `kundli-explorer` (already provisioned: id `wquhomkjpqzzpysvmoaz`, region `ap-south-1`)
+
+### 2. Get your database password
+
+Go to [Supabase Dashboard](https://supabase.com/dashboard) → kundli-explorer project → **Settings → Database → Connection string**.
+
+Copy the password and fill in `.env`:
+
+```
+DATABASE_URL="postgresql://postgres.wquhomkjpqzzpysvmoaz:[YOUR_DB_PASSWORD]@aws-0-ap-south-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1"
+DIRECT_URL="postgresql://postgres:[YOUR_DB_PASSWORD]@db.wquhomkjpqzzpysvmoaz.supabase.co:5432/postgres"
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The database schema is **already applied** via Supabase MCP. You only need `migrate dev` if you change the Prisma schema.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. AI Tutor (optional)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Add to `.env`:
+```
+ANTHROPIC_API_KEY=sk-ant-...
+```
+Without it, the tutor shows a friendly "add your API key" message instead of erroring.
 
-## Learn More
+### 4. Run
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm install
+npx prisma generate
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Engine validation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+npm test
+```
 
-## Deploy on Vercel
+Asserts:
+- (a) Every sidereal longitude differs from tropical by **23–25°** — proves Lahiri is applied (the #1 silent bug is shipping a tropical chart).
+- (b) Reference birth placements match precomputed expected values.
+- (c) Full D1 is printed to stdout for manual spot-check.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+**Manual verification:** compare the printed reference chart against [AstroSage](https://www.astrosage.com/free/online-birth-chart.asp) with Lahiri ayanamsha.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Reference chart (engine spot-check)
+
+| Field | Value |
+|-------|-------|
+| Name | Reference |
+| Date | 1985-01-01 |
+| Time | 08:00 |
+| Place | New Delhi (28.6139°N, 77.2090°E) |
+
+## Route map
+
+| Route | Description |
+|-------|-------------|
+| `/` | Landing + birth-data form |
+| `/chart/[id]` | Chart Explorer — Chart · Learn · Transits · Tutor |
+| `/explore-3d` | **[STUB]** Phase-2 three.js orbital hook |
+
+## Licensing
+
+See `LICENSING.md` — Swiss Ephemeris is AGPL/commercial dual-licensed. Resolve before monetising.
+
+## Architecture notes
+
+- Engine runs **server-side only** — client never sees `sweph`.
+- Interpretations are **composed at runtime** from `jyotish-knowledge-base.json`. No canned 1296-combination lookup.
+- Ephemeris data files (`ephe/*.se1`) are bundled into Vercel functions via `outputFileTracingIncludes`.

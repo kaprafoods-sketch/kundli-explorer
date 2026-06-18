@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Chart {
+  id        String   @id @default(cuid())
+  name      String
+  dob       String
+  lat       Float
+  lon       Float
+  tz        String
+  ayanamsha String   @default("LAHIRI")
+  data      Json
+  createdAt DateTime @default(now())
+
+  messages TutorMessage[]
+}
+
+model TutorMessage {
+  id        String   @id @default(cuid())
+  chartId   String
+  role      String
+  content   String
+  createdAt DateTime @default(now())
+
+  chart Chart @relation(fields: [chartId], references: [id], onDelete: Cascade)
+
+  @@index([chartId])
+}
+
+// TODO [STUB] User model + auth — Phase 2

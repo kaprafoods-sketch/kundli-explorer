@@ -1,26 +1,157 @@
 @import "tailwindcss";
 
+/* ── Kundli Explorer design tokens ─────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Core palette — celestial observatory / Jantar Mantar at night */
+  --bg: #0A0F24;
+  --panel: #111733;
+  --panel-2: #0E1430;
+  --brass: #C8A24A;
+  --brass-bright: #F0CE7A;
+  --parchment: #ECE7D7;
+  --muted: #8E97B8;
+  --faint: #5B648C;
+
+  /* Semantic states */
+  --whatif: #5FB0B7;      /* simulate/what-if mode ONLY — teal = "not real" */
+  --weak: #D98C6A;        /* debilitated / strained dignity */
+  --success: #6EBF8B;
+  --error: #E07070;
+
+  /* Backgrounds (always dark — no light mode for this product) */
+  --background: var(--bg);
+  --foreground: var(--parchment);
+
+  /* Typography vars */
+  --font-display: var(--font-cormorant), Georgia, serif;
+  --font-ui: var(--font-inter), system-ui, sans-serif;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-ui);
+  --font-serif: var(--font-display);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Base styles ────────────────────────────────────────────────── */
+html {
+  background: var(--bg);
+  color: var(--parchment);
+  height: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--parchment);
+  font-family: var(--font-ui);
+  min-height: 100%;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Selection */
+::selection {
+  background: var(--brass);
+  color: var(--bg);
+}
+
+/* Focus rings — visible, brass-tinted */
+:focus-visible {
+  outline: 2px solid var(--brass);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--panel); }
+::-webkit-scrollbar-thumb { background: var(--faint); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+/* ── Reduced motion ─────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ── Form fields ────────────────────────────────────────────────── */
+.input-field {
+  width: 100%;
+  background: var(--panel-2);
+  border: 1px solid var(--faint);
+  border-radius: 6px;
+  color: var(--parchment);
+  padding: 10px 14px;
+  font-size: 0.9rem;
+  font-family: var(--font-ui);
+  transition: border-color 0.15s;
+}
+.input-field:focus {
+  outline: none;
+  border-color: var(--brass);
+}
+.input-field::placeholder { color: var(--faint); }
+/* date/time inputs */
+.input-field::-webkit-calendar-picker-indicator { filter: invert(0.7); cursor: pointer; }
+
+.field-label {
+  font-size: 0.8rem;
+  font-family: var(--font-ui);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* ── Utility classes ────────────────────────────────────────────── */
+.font-display { font-family: var(--font-display); }
+.text-brass   { color: var(--brass); }
+.text-brass-bright { color: var(--brass-bright); }
+.text-muted   { color: var(--muted); }
+.text-faint   { color: var(--faint); }
+.text-whatif  { color: var(--whatif); }
+.text-weak    { color: var(--weak); }
+.text-parchment { color: var(--parchment); }
+
+.bg-panel   { background: var(--panel); }
+.bg-panel-2 { background: var(--panel-2); }
+.border-brass { border-color: var(--brass); }
+.border-faint { border-color: var(--faint); }
+
+/* Panel card */
+.card {
+  background: var(--panel);
+  border: 1px solid var(--faint);
+  border-radius: 8px;
+}
+
+/* Dignity badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  font-family: var(--font-ui);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.badge-exalted      { background: rgba(200,162,74,0.18); color: var(--brass-bright); border: 1px solid var(--brass); }
+.badge-own          { background: rgba(110,191,139,0.15); color: var(--success); border: 1px solid var(--success); }
+.badge-moolatrikona { background: rgba(200,162,74,0.12); color: var(--brass); border: 1px solid var(--faint); }
+.badge-friend       { background: rgba(142,151,184,0.15); color: var(--muted); border: 1px solid var(--faint); }
+.badge-neutral      { background: rgba(91,100,140,0.2); color: var(--faint); border: 1px solid var(--faint); }
+.badge-enemy        { background: rgba(224,112,112,0.12); color: var(--error); border: 1px solid rgba(224,112,112,0.4); }
+.badge-debilitated  { background: rgba(208,140,106,0.18); color: var(--weak); border: 1px solid var(--weak); }
+
+/* What-if mode banner */
+.whatif-banner {
+  background: rgba(95,176,183,0.12);
+  border: 1px solid var(--whatif);
+  color: var(--whatif);
 }
