@@ -1,0 +1,5 @@
+{
+  "name": "kundli-explorer",
+  "buildCommand": "prisma generate && next build",
+  "framework": "nextjs"
+}
