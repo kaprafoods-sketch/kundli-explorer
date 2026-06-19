@@ -2,25 +2,13 @@
 
 import { useMemo, useState, useRef, useEffect, useCallback } from "react";
 import type { Placement } from "@/lib/astro/computeChart";
-import { GRAHA_GLYPHS, kb, type GrahaId } from "@/lib/kb";
+import { GRAHA_GLYPHS, kb, getName, signFromNumber, type GrahaId } from "@/lib/kb";
 import { GRAHA_COLORS } from "@/lib/grahaColors";
+import { useLang } from "@/components/i18n/LanguageProvider";
 
 // ── Animation config ──────────────────────────────────────────────────────────
 // Change this one constant to switch animation modes globally.
 const CHART_ANIMATION: "in-place" | "orbit-ring-only" | "off" = "in-place";
-
-// ── Planet display names (short Sanskrit, matches the app's aesthetic) ────────
-const GRAHA_SHORT: Record<string, string> = {
-  sun:     "Surya",
-  moon:    "Chandra",
-  mars:    "Mangal",
-  mercury: "Budha",
-  jupiter: "Guru",
-  venus:   "Shukra",
-  saturn:  "Shani",
-  rahu:    "Rahu",
-  ketu:    "Ketu",
-};
 
 // ── Geometry constants ────────────────────────────────────────────────────────
 
@@ -99,6 +87,7 @@ export default function NorthIndianChart({
   selectedHouse, selectedBody, onHouseClick, onBodyClick,
   size = 440,
 }: Props) {
+  const { lang } = useLang();
   const PAD = size * 0.018;
   const S = size - PAD * 2;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -309,6 +298,15 @@ export default function NorthIndianChart({
           {Object.entries(HOUSE_POLYS).map(([hStr, poly]) => {
             const h = Number(hStr);
             const signNum = signForHouse(lagnaSign, h);
+            // Compact, language-aware sign label for the dense diagram:
+            // Hindi names are naturally short (मेष); English/Sanskrit use the
+            // 3-letter abbreviations so cells don't overflow.
+            const signLabel =
+              lang === "hi"
+                ? getName(kb.rashis[signFromNumber(signNum)], "hi")
+                : lang === "sa"
+                  ? SIGN_SANSKRIT_SHORT[signNum]
+                  : SIGN_EN_SHORT[signNum];
             const sel = selectedHouse === h;
             const isAsc = h === 1;
             const [cxPct, cyPct] = centroidPct(h);
@@ -361,7 +359,7 @@ export default function NorthIndianChart({
                 }}>
                   <span className="house-label-pill">
                     <span className="h-num">{h}</span>
-                    <span className="h-sign">{SIGN_SANSKRIT_SHORT[signNum]}</span>
+                    <span className="h-sign">{signLabel}</span>
                   </span>
                   {sel && (
                     <span style={{
@@ -405,8 +403,8 @@ export default function NorthIndianChart({
             return planets.map((p, i) => {
               const gid = p.body as GrahaId;
               const glyph = GRAHA_GLYPHS[gid] ?? "?";
-              const shortName = GRAHA_SHORT[gid] ?? gid;
               const graha = kb.grahas[gid];
+              const shortName = getName(graha, lang) || gid; // name in active language
               const isSel = selectedBody === p.body;
 
               // Color from GRAHA_COLORS (single source of truth)
@@ -503,7 +501,6 @@ export default function NorthIndianChart({
           const gid = tooltip.body as GrahaId;
           const graha = kb.grahas[gid];
           const pl = placements.find((p) => p.body === tooltip.body);
-          const signNum = pl?.sign ? Number(pl.sign) : 0;
           const color = GRAHA_COLORS[gid as keyof typeof GRAHA_COLORS]?.core ?? "#C8A24A";
           return (
             <div
@@ -525,11 +522,11 @@ export default function NorthIndianChart({
             >
               <p style={{ fontSize: 12, color: "var(--parchment)", fontFamily: "var(--font-ui,system-ui)", margin: 0, fontWeight: 700 }}>
                 <span style={{ color, marginRight: 5 }}>{GRAHA_GLYPHS[gid]}</span>
-                {graha?.sanskrit} / {graha?.en}
+                {getName(graha, lang)}
               </p>
               {pl && (
                 <p style={{ fontSize: 10, color: "var(--muted)", fontFamily: "var(--font-ui,system-ui)", margin: "3px 0 0", lineHeight: 1.4 }}>
-                  House {pl.house} · {SIGN_EN_SHORT[signNum]}
+                  House {pl.house} · {getName(kb.rashis[pl.sign], lang)}
                   {pl.retrograde && <span style={{ color: "var(--weak)", marginLeft: 4 }}>℞</span>}
                   {pl.dignity && (
                     <span style={{ color, marginLeft: 5, textTransform: "capitalize", opacity: 0.8 }}>

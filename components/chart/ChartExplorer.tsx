@@ -10,6 +10,8 @@ import GrahaAIDock from "./GrahaAIDock";
 import ClientPlanetsTab from "./ClientPlanetsTab";
 import { type ChartPlacements } from "@/components/GrahaAI";
 import type { SuggestedQuestion } from "@/lib/suggestQuestions";
+import { useLang } from "@/components/i18n/LanguageProvider";
+import type { MessageKey } from "@/lib/i18n/messages";
 
 type Tab = "chart" | "planets" | "transits";
 
@@ -22,13 +24,14 @@ interface Props {
   suggested?: SuggestedQuestion[];
 }
 
-const TABS: { id: Tab; label: string; glyph: string }[] = [
-  { id: "chart",    label: "Chart",    glyph: "✦" },
-  { id: "planets",  label: "Planets",  glyph: "🪐" },
-  { id: "transits", label: "Transits", glyph: "☄" },
+const TABS: { id: Tab; labelKey: MessageKey; glyph: string }[] = [
+  { id: "chart",    labelKey: "nav.chart",    glyph: "✦" },
+  { id: "planets",  labelKey: "nav.planets",  glyph: "🪐" },
+  { id: "transits", labelKey: "nav.transits", glyph: "☄" },
 ];
 
 export default function ChartExplorer({ chart, chartId, interests = [], suggested }: Props) {
+  const { t } = useLang();
   const [tab, setTab] = useState<Tab>("chart");
   const [selectedHouse, setSelectedHouse] = useState<number | null>(null);
   const [selectedBody, setSelectedBody] = useState<string | null>(null);
@@ -132,16 +135,16 @@ export default function ChartExplorer({ chart, chartId, interests = [], suggeste
 
       {/* Tab bar */}
       <div className="ce-tabbar">
-        {TABS.map((t) => (
+        {TABS.map((tb) => (
           <button
-            key={t.id}
-            onClick={() => setTab(t.id)}
+            key={tb.id}
+            onClick={() => setTab(tb.id)}
             className="ce-tab press"
-            data-active={tab === t.id}
-            aria-pressed={tab === t.id}
+            data-active={tab === tb.id}
+            aria-pressed={tab === tb.id}
           >
-            <span className="ce-tab-glyph" aria-hidden>{t.glyph}</span>
-            {t.label}
+            <span className="ce-tab-glyph" aria-hidden>{tb.glyph}</span>
+            {t(tb.labelKey)}
           </button>
         ))}
       </div>

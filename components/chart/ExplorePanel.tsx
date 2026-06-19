@@ -7,8 +7,9 @@ import {
   composeHouseReading,
   composeLagnaReading,
 } from "@/lib/interpret";
-import { kb, GRAHA_GLYPHS, type GrahaId } from "@/lib/kb";
+import { kb, GRAHA_GLYPHS, getName, signFromNumber, type GrahaId } from "@/lib/kb";
 import GrahaAIChat from "./GrahaAIChat";
+import { useLang } from "@/components/i18n/LanguageProvider";
 
 interface Props {
   chart: NatalChart;
@@ -22,6 +23,7 @@ interface Props {
 export default function ExplorePanel({
   chart, placements, selectedBody, selectedHouse, chartId, interests,
 }: Props) {
+  const { t, lang } = useLang();
   const result = useMemo(() => {
     if (selectedBody === "lagna" || selectedBody === null && selectedHouse === null) {
       if (selectedBody === "lagna") {
@@ -56,14 +58,14 @@ export default function ExplorePanel({
       <div className="flex flex-col items-center justify-center h-full min-h-[300px] text-center">
         <p className="font-display text-4xl mb-4" style={{ color: "var(--faint)" }}>✦</p>
         <p className="text-lg font-display" style={{ color: "var(--muted)" }}>
-          Tap a planet or house to learn
+          {t("explore.emptyTitle")}
         </p>
         <p className="text-sm mt-2 max-w-xs" style={{ color: "var(--faint)" }}>
-          Each placement tells a story — select anything on the chart to see its reading.
+          {t("explore.emptySub")}
         </p>
         <div className="mt-8 text-left max-w-xs">
           <p className="text-xs uppercase tracking-widest mb-3" style={{ color: "var(--faint)" }}>
-            Planet guide
+            {t("explore.planetGuide")}
           </p>
           <div className="grid grid-cols-3 gap-2">
             {(["sun","moon","mars","mercury","jupiter","venus","saturn","rahu","ketu"] as GrahaId[]).map((g) => {
@@ -74,7 +76,7 @@ export default function ExplorePanel({
                     {GRAHA_GLYPHS[g]}
                   </span>
                   <span className="text-xs" style={{ color: "var(--muted)" }}>
-                    {gr?.sanskrit}
+                    {getName(gr, lang)}
                   </span>
                 </div>
               );
@@ -96,10 +98,10 @@ export default function ExplorePanel({
           </span>
           <div>
             <h2 className="font-display text-2xl font-semibold" style={{ color: "var(--parchment)" }}>
-              {graha?.sanskrit} / {graha?.en}
+              {getName(graha, lang)}
             </h2>
             <p className="text-sm mt-0.5" style={{ color: "var(--muted)" }}>
-              House {placement.house} · {kb.rashis[placement.sign]?.sanskrit} ({kb.rashis[placement.sign]?.en})
+              House {placement.house} · {getName(kb.rashis[placement.sign], lang)}
               {placement.retrograde && (
                 <span className="ml-2" style={{ color: "var(--weak)" }}>℞ Retrograde</span>
               )}
@@ -189,7 +191,7 @@ export default function ExplorePanel({
             {data.headline.replace(`House ${house} — `, "")}
           </h2>
           <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>
-            {data.sign.sanskrit} ({data.sign.en}) · ruled by {data.sign.ruler}
+            {getName(kb.rashis[signFromNumber(((chart.lagnaSign - 1 + house - 1) % 12) + 1)], lang)} · ruled by {data.sign.ruler}
           </p>
           <div className="flex gap-1.5 mt-2 flex-wrap">
             {data.houseClass.map((c) => (
@@ -216,7 +218,7 @@ export default function ExplorePanel({
                     className="flex items-center gap-1 px-3 py-1 rounded text-sm"
                     style={{ background: "var(--panel-2)", color: "var(--brass)", border: "1px solid var(--faint)" }}
                   >
-                    {GRAHA_GLYPHS[gid]} {g?.sanskrit}/{g?.en}
+                    {GRAHA_GLYPHS[gid]} {getName(g, lang)}
                   </span>
                 );
               })}

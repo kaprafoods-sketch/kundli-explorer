@@ -15,6 +15,8 @@ import { useState, useEffect } from "react";
 import GrahaAIChat from "./GrahaAIChat";
 import GrahaAI, { type ChartPlacements } from "@/components/GrahaAI";
 import type { SuggestedQuestion } from "@/lib/suggestQuestions";
+import { useLang } from "@/components/i18n/LanguageProvider";
+import type { MessageKey } from "@/lib/i18n/messages";
 
 type Mode = "astrologer" | "guru";
 
@@ -27,12 +29,13 @@ interface Props {
   suggested?: SuggestedQuestion[];
 }
 
-const MODES: { id: Mode; label: string; sub: string; glyph: string }[] = [
-  { id: "astrologer", label: "AI Astrologer", sub: "Ask about your chart", glyph: "✦" },
-  { id: "guru",       label: "Astro Guru",    sub: "Learn the fundamentals", glyph: "📖" },
+const MODES: { id: Mode; labelKey: MessageKey; subKey: MessageKey; glyph: string }[] = [
+  { id: "astrologer", labelKey: "ai.astrologer", subKey: "ai.astrologerSub", glyph: "✦" },
+  { id: "guru",       labelKey: "ai.guru",       subKey: "ai.guruSub",       glyph: "📖" },
 ];
 
 export default function GrahaAIDock({ chartId, placements, interests, suggested }: Props) {
+  const { t } = useLang();
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<Mode>("astrologer");
 
@@ -99,7 +102,7 @@ export default function GrahaAIDock({ chartId, placements, interests, suggested 
           }}
         >
           <span style={{ fontSize: "1.05rem" }}>✦</span>
-          Ask GRAHA AI
+          {t("ai.ask")}
         </button>
       )}
 
@@ -169,11 +172,11 @@ export default function GrahaAIDock({ chartId, placements, interests, suggested 
                   display: "flex", alignItems: "center", gap: 8,
                 }}
               >
-                <span style={{ color: "var(--brass)" }}>✦</span> GRAHA AI
+                <span style={{ color: "var(--brass)" }}>✦</span> {t("ai.title")}
               </span>
               <button
                 onClick={() => setOpen(false)}
-                aria-label="Close GRAHA AI"
+                aria-label={t("common.close")}
                 className="press"
                 style={{
                   background: "none", border: "none", color: "var(--muted)",
@@ -219,9 +222,9 @@ export default function GrahaAIDock({ chartId, placements, interests, suggested 
                     }}
                   >
                     <span style={{ fontSize: "0.95rem", fontWeight: 700, display: "flex", alignItems: "center", gap: 6 }}>
-                      <span aria-hidden>{m.glyph}</span> {m.label}
+                      <span aria-hidden>{m.glyph}</span> {t(m.labelKey)}
                     </span>
-                    <span style={{ fontSize: "0.8rem", opacity: active ? 0.85 : 0.7 }}>{m.sub}</span>
+                    <span style={{ fontSize: "0.8rem", opacity: active ? 0.85 : 0.7 }}>{t(m.subKey)}</span>
                   </button>
                 );
               })}

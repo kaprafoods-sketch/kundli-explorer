@@ -9,9 +9,10 @@
 import { useMemo } from "react";
 import type { Placement, NatalChart } from "@/lib/astro/computeChart";
 import { composePlanetInterpretation } from "@/lib/interpret";
-import { kb, GRAHA_GLYPHS, type GrahaId } from "@/lib/kb";
+import { kb, GRAHA_GLYPHS, getName, type GrahaId } from "@/lib/kb";
 import { GRAHA_COLORS } from "@/lib/grahaColors";
 import GrahaAIChat from "./GrahaAIChat";
+import { useLang } from "@/components/i18n/LanguageProvider";
 
 interface Props {
   placement: Placement;
@@ -33,6 +34,7 @@ export default function PlanetReadingSheet({
   onBack,
   backLabel = "← Back",
 }: Props) {
+  const { lang } = useLang();
   const gid = placement.body as GrahaId;
   const graha = kb.grahas[gid];
   const bhava = kb.bhavas[String(placement.house)];
@@ -127,16 +129,18 @@ export default function PlanetReadingSheet({
             lineHeight: 1.15,
             margin: 0,
           }}>
-            {graha?.sanskrit}
-            <span style={{
-              fontStyle: "italic", fontWeight: 400,
-              fontSize: "0.72em", color, marginLeft: "0.4em",
-            }}>
-              / {graha?.en}
-            </span>
+            {getName(graha, lang)}
+            {lang !== "en" && (
+              <span style={{
+                fontStyle: "italic", fontWeight: 400,
+                fontSize: "0.72em", color, marginLeft: "0.4em",
+              }}>
+                / {graha?.en}
+              </span>
+            )}
           </h2>
           <p style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 3 }}>
-            House {placement.house} · {bhava?.en} · {rashi?.en}
+            House {placement.house} · {getName(bhava, lang)} · {getName(rashi, lang)}
           </p>
         </div>
       </div>

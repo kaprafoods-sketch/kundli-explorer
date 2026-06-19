@@ -3,7 +3,8 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import type { NatalChart } from "@/lib/astro/computeChart";
 import type { TransitPlanet } from "@/lib/astro/transits";
-import { kb, GRAHA_GLYPHS, type GrahaId } from "@/lib/kb";
+import { kb, GRAHA_GLYPHS, getName, type GrahaId } from "@/lib/kb";
+import { useLang } from "@/components/i18n/LanguageProvider";
 
 interface Props {
   chart: NatalChart;
@@ -202,6 +203,7 @@ const stepBtnStyle: React.CSSProperties = {
 // ── Planet card ───────────────────────────────────────────────────────────────
 
 function TransitCard({ t, flash }: { t: TransitPlanet; flash: boolean }) {
+  const { lang } = useLang();
   const graha = kb.grahas[t.body as GrahaId];
   const natalHouseData = kb.bhavas[String(t.natalHouse)];
   const sign = kb.rashis[t.sign];
@@ -228,21 +230,21 @@ function TransitCard({ t, flash }: { t: TransitPlanet; flash: boolean }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-0.5">
           <span className="font-semibold text-sm" style={{ color: "var(--parchment)" }}>
-            {graha?.sanskrit}/{graha?.en}
+            {getName(graha, lang)}
           </span>
           {t.retrograde && (
             <span className="text-xs" style={{ color: "var(--weak)" }}>℞</span>
           )}
         </div>
         <p className="text-xs leading-relaxed" style={{ color: "var(--muted)" }}>
-          in {sign?.sanskrit} ({sign?.en}) — {t.degInSign.toFixed(1)}°
+          in {getName(sign, lang)} — {t.degInSign.toFixed(1)}°
         </p>
         <p className="text-xs mt-1" style={{ color: "var(--faint)" }}>
           Activating your{" "}
           <span style={{ color: "var(--brass)" }}>
             {t.natalHouse}{ordinal(t.natalHouse)} house
           </span>
-          {natalHouseData ? ` (${natalHouseData.en})` : ""}
+          {natalHouseData ? ` (${getName(natalHouseData, lang)})` : ""}
         </p>
       </div>
     </div>

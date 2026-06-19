@@ -8,8 +8,9 @@ import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import * as THREE from "three";
 import { useRef, useState, useEffect, useMemo, useCallback } from "react"; // useMemo kept for OrreryScene internals
 import type { NatalChart, Placement } from "@/lib/astro/computeChart";
-import { kb, GRAHA_GLYPHS, type GrahaId } from "@/lib/kb";
+import { kb, GRAHA_GLYPHS, getName, type GrahaId, type Lang } from "@/lib/kb";
 import { GRAHA_COLORS } from "@/lib/grahaColors";
+import { useLang } from "@/components/i18n/LanguageProvider";
 import PlanetReadingSheet from "./PlanetReadingSheet";
 
 // ── Visual constants — derived from canonical GRAHA_COLORS ────────────────────
@@ -91,13 +92,14 @@ function OrbitRings({ radii }: { radii: number[] }) {
 
 // ── Physical planet orb ───────────────────────────────────────────────────────
 
-function PlanetOrb({ data, focused, hoveredId, onHover, onClick, reduced }: {
+function PlanetOrb({ data, focused, hoveredId, onHover, onClick, reduced, lang }: {
   data: PlanetData;
   focused: boolean;
   hoveredId: string | null;
   onHover: (id: string | null) => void;
   onClick: (id: string) => void;
   reduced: boolean;
+  lang: Lang;
 }) {
   const groupRef  = useRef<THREE.Group>(null!);
   const meshRef   = useRef<THREE.Mesh>(null!);
@@ -177,10 +179,10 @@ function PlanetOrb({ data, focused, hoveredId, onHover, onClick, reduced }: {
             textAlign: "center",
           }}>
             <div style={{ color: data.palette.core, fontWeight: 600 }}>
-              {GRAHA_GLYPHS[data.grahaId]} {graha?.sanskrit}/{graha?.en}
+              {GRAHA_GLYPHS[data.grahaId]} {getName(graha, lang)}
             </div>
             <div style={{ color: "#8E97B8", fontSize: 11, marginTop: 2 }}>
-              House {data.placement.house} · {bhava?.en}
+              House {data.placement.house} · {getName(bhava, lang)}
             </div>
           </div>
         ) : (
@@ -194,7 +196,7 @@ function PlanetOrb({ data, focused, hoveredId, onHover, onClick, reduced }: {
             letterSpacing: "0.05em",
             textAlign: "center",
           }}>
-            {graha?.sanskrit}
+            {getName(graha, lang)}
           </div>
         )}
       </Html>
@@ -204,10 +206,11 @@ function PlanetOrb({ data, focused, hoveredId, onHover, onClick, reduced }: {
 
 // ── Rahu / Ketu — drifting particle nebula (no body) ─────────────────────────
 
-function ShadowNebula({ data, onHover, onClick }: {
+function ShadowNebula({ data, onHover, onClick, lang }: {
   data: PlanetData;
   onHover: (id: string | null) => void;
   onClick: (id: string) => void;
+  lang: Lang;
 }) {
   const N = 480;
   const groupRef = useRef<THREE.Group>(null!);
@@ -296,10 +299,10 @@ function ShadowNebula({ data, onHover, onClick }: {
             textAlign: "center",
           }}>
             <div style={{ color: data.palette.core, fontWeight: 600 }}>
-              {GRAHA_GLYPHS[data.grahaId]} {graha?.sanskrit}/{graha?.en}
+              {GRAHA_GLYPHS[data.grahaId]} {getName(graha, lang)}
             </div>
             <div style={{ color: "#8E97B8", fontSize: 11, marginTop: 2 }}>
-              House {data.placement.house} · {bhava?.en}
+              House {data.placement.house} · {getName(bhava, lang)}
             </div>
           </div>
         ) : (
@@ -313,7 +316,7 @@ function ShadowNebula({ data, onHover, onClick }: {
             letterSpacing: "0.05em",
             textAlign: "center",
           }}>
-            {graha?.sanskrit}
+            {getName(graha, lang)}
           </div>
         )}
       </Html>
@@ -405,12 +408,13 @@ function ElementParticles({ element, palette }: {
 
 // ── Full orrery scene ─────────────────────────────────────────────────────────
 
-function OrreryScene({ planets, focusedId, onHover, onClick, reduced }: {
+function OrreryScene({ planets, focusedId, onHover, onClick, reduced, lang }: {
   planets: PlanetData[];
   focusedId: string | null;
   onHover: (id: string | null) => void;
   onClick: (id: string) => void;
   reduced: boolean;
+  lang: Lang;
 }) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const handleHover = useCallback((id: string | null) => { setHoveredId(id); onHover(id); }, [onHover]);
@@ -480,10 +484,10 @@ function OrreryScene({ planets, focusedId, onHover, onClick, reduced }: {
                   fontSize: 12, color: "#ECE7D7", fontFamily: "system-ui", textAlign: "center",
                 }}>
                   <div style={{ color: "#ff8a2b", fontWeight: 600 }}>
-                    {GRAHA_GLYPHS.sun} {kb.grahas.sun?.sanskrit}/{kb.grahas.sun?.en}
+                    {GRAHA_GLYPHS.sun} {getName(kb.grahas.sun, lang)}
                   </div>
                   <div style={{ color: "#8E97B8", fontSize: 11, marginTop: 2 }}>
-                    House {sun.placement.house} · {kb.bhavas[String(sun.placement.house)]?.en}
+                    House {sun.placement.house} · {getName(kb.bhavas[String(sun.placement.house)], lang)}
                   </div>
                 </div>
               ) : (
@@ -497,7 +501,7 @@ function OrreryScene({ planets, focusedId, onHover, onClick, reduced }: {
                   letterSpacing: "0.05em",
                   textAlign: "center",
                 }}>
-                  {kb.grahas.sun?.sanskrit}
+                  {getName(kb.grahas.sun, lang)}
                 </div>
               )}
             </Html>
@@ -509,7 +513,7 @@ function OrreryScene({ planets, focusedId, onHover, onClick, reduced }: {
       {others.map(data => (
         <group key={data.grahaId}>
           {data.isShadow
-            ? <ShadowNebula data={data} onHover={handleHover} onClick={onClick} />
+            ? <ShadowNebula data={data} onHover={handleHover} onClick={onClick} lang={lang} />
             : (
               <PlanetOrb
                 data={data}
@@ -518,6 +522,7 @@ function OrreryScene({ planets, focusedId, onHover, onClick, reduced }: {
                 onHover={handleHover}
                 onClick={onClick}
                 reduced={reduced}
+                lang={lang}
               />
             )
           }
@@ -550,6 +555,7 @@ interface Props {
 
 export default function PlanetsTab({ chart, chartId, interests }: Props) {
   const reduced = useReducedMotion();
+  const { lang } = useLang();
   const [focusedId, setFocusedId] = useState<string | null>(null);
   const [, setHoveredId] = useState<string | null>(null);
 
@@ -613,6 +619,7 @@ export default function PlanetsTab({ chart, chartId, interests }: Props) {
             onHover={handleHover}
             onClick={handleClick}
             reduced={reduced}
+            lang={lang}
           />
         </PerformanceMonitor>
       </Canvas>
