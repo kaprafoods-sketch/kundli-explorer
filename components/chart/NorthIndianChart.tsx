@@ -1,8 +1,26 @@
 "use client";
 
-import { useMemo, useState, useRef, useEffect } from "react";
+import { useMemo, useState, useRef, useEffect, useCallback } from "react";
 import type { Placement } from "@/lib/astro/computeChart";
 import { GRAHA_GLYPHS, kb, type GrahaId } from "@/lib/kb";
+import { GRAHA_COLORS } from "@/lib/grahaColors";
+
+// ── Animation config ──────────────────────────────────────────────────────────
+// Change this one constant to switch animation modes globally.
+const CHART_ANIMATION: "in-place" | "orbit-ring-only" | "off" = "in-place";
+
+// ── Planet display names (short Sanskrit, matches the app's aesthetic) ────────
+const GRAHA_SHORT: Record<string, string> = {
+  sun:     "Surya",
+  moon:    "Chandra",
+  mars:    "Mangal",
+  mercury: "Budha",
+  jupiter: "Guru",
+  venus:   "Shukra",
+  saturn:  "Shani",
+  rahu:    "Rahu",
+  ketu:    "Ketu",
+};
 
 // ── Geometry constants ────────────────────────────────────────────────────────
 
@@ -27,20 +45,13 @@ const CENTROID: Record<number, [number, number]> = {
   9: [.917,.75],10:[.75,.5],   11:[.917,.25],  12:[.75,.083],
 };
 
-// House signification labels (for popup on hover/select)
 const HOUSE_SIGNIFIES: Record<number, string> = {
-  1:  "Self & Personality",
-  2:  "Wealth & Speech",
-  3:  "Courage & Siblings",
-  4:  "Home & Mother",
-  5:  "Creativity & Children",
-  6:  "Health & Daily Work",
-  7:  "Partnership & Marriage",
-  8:  "Transformation & Secrets",
-  9:  "Fortune & Dharma",
-  10: "Career & Status",
-  11: "Gains & Desires",
-  12: "Moksha & Foreign Lands",
+  1:  "Self & Personality",   2:  "Wealth & Speech",
+  3:  "Courage & Siblings",   4:  "Home & Mother",
+  5:  "Creativity & Children",6:  "Health & Daily Work",
+  7:  "Partnership & Marriage",8:  "Transformation & Secrets",
+  9:  "Fortune & Dharma",     10: "Career & Status",
+  11: "Gains & Desires",      12: "Moksha & Foreign Lands",
 };
 
 const SIGN_SANSKRIT_SHORT = [
@@ -53,16 +64,15 @@ const SIGN_EN_SHORT = [
   "Lib", "Sco", "Sag", "Cap", "Aqu", "Pis",
 ];
 
-function signForHouse(lagnaSign: number, house: number): number {
-  return ((lagnaSign - 1 + house - 1) % 12) + 1;
-}
-
-// SVG structural lines (all in unit coords, drawn on top as decorative layer)
 const STRUCT_LINES: [[number, number], [number, number]][] = [
   [[0,0],[1,0]], [[1,0],[1,1]], [[1,1],[0,1]], [[0,1],[0,0]],
   [[0,0],[1,1]], [[1,0],[0,1]],
   [[.5,0],[1,.5]], [[1,.5],[.5,1]], [[.5,1],[0,.5]], [[0,.5],[.5,0]],
 ];
+
+function signForHouse(lagnaSign: number, house: number): number {
+  return ((lagnaSign - 1 + house - 1) % 12) + 1;
+}
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -78,7 +88,7 @@ interface Props {
 
 interface TooltipState {
   body: string;
-  x: number; // percent of container
+  x: number;
   y: number;
 }
 
@@ -89,19 +99,58 @@ export default function NorthIndianChart({
   selectedHouse, selectedBody, onHouseClick, onBodyClick,
   size = 440,
 }: Props) {
-  const PAD = size * 0.018; // ~8px at 440
+  const PAD = size * 0.018;
   const S = size - PAD * 2;
   const containerRef = useRef<HTMLDivElement>(null);
   const [tooltip, setTooltip] = useState<TooltipState | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [animPaused, setAnimPaused] = useState(false);
 
+  // Entry animation
   useEffect(() => {
-    // trigger entry animations after first paint
     const t = requestAnimationFrame(() => setMounted(true));
     return () => cancelAnimationFrame(t);
   }, []);
 
-  // Build house → planets map
+  // prefers-reduced-motion + visibilitychange
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setAnimPaused(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+
+    const onVis = () => {
+      if (document.hidden) {
+        setAnimPaused(true);
+      } else {
+        const mq2 = window.matchMedia("(prefers-reduced-motion: reduce)");
+        setAnimPaused(mq2.matches);
+      }
+    };
+    document.addEventListener("visibilitychange", onVis);
+    return () => {
+      mq.removeEventListener("change", update);
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, []);
+
+  // Pause when chart is offscreen (IntersectionObserver)
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) {
+        setAnimPaused(true);
+      } else {
+        const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+        setAnimPaused(mq.matches);
+      }
+    }, { threshold: 0 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  // House → planets map
   const housePlanets = useMemo(() => {
     const map: Record<number, Placement[]> = {};
     for (let h = 1; h <= 12; h++) map[h] = [];
@@ -112,62 +161,54 @@ export default function NorthIndianChart({
     return map;
   }, [placements]);
 
-  // Unit → SVG pixel
+  // Coordinate helpers
   function toSvgPx(ux: number, uy: number): [number, number] {
     return [PAD + ux * S, PAD + uy * S];
   }
-
-  // Unit → CSS percentage string (for clip-path and absolute positioning)
   function toPct(ux: number, uy: number): [string, string] {
-    const x = ((PAD + ux * S) / size) * 100;
-    const y = ((PAD + uy * S) / size) * 100;
-    return [`${x.toFixed(3)}%`, `${y.toFixed(3)}%`];
+    return [
+      `${((PAD + ux * S) / size * 100).toFixed(3)}%`,
+      `${((PAD + uy * S) / size * 100).toFixed(3)}%`,
+    ];
   }
-
   function clipPath(poly: [number, number][]): string {
     return `polygon(${poly.map(([x, y]) => toPct(x, y).join(" ")).join(", ")})`;
   }
-
   function centroidPct(h: number): [number, number] {
     const [cx, cy] = CENTROID[h];
-    const x = ((PAD + cx * S) / size) * 100;
-    const y = ((PAD + cy * S) / size) * 100;
-    return [x, y];
+    return [
+      (PAD + cx * S) / size * 100,
+      (PAD + cy * S) / size * 100,
+    ];
   }
 
-  // SVG line points
-  function svgLine(a: [number, number], b: [number, number]) {
-    const [x1, y1] = toSvgPx(a[0], a[1]);
-    const [x2, y2] = toSvgPx(b[0], b[1]);
-    return { x1, y1, x2, y2 };
-  }
-
-  const totalLineLength = useMemo(() => {
-    return STRUCT_LINES.reduce((acc, [a, b]) => {
-      const [x1, y1] = toSvgPx(a[0], a[1]);
-      const [x2, y2] = toSvgPx(b[0], b[1]);
-      return acc + Math.hypot(x2 - x1, y2 - y1);
-    }, 0);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [size]);
+  const shouldSpin = CHART_ANIMATION === "in-place" && !animPaused;
 
   return (
     <>
-      {/* Inline keyframes */}
       <style>{`
+        /* Line draw-in */
         @keyframes drawLine {
           from { stroke-dashoffset: var(--line-len); }
           to   { stroke-dashoffset: 0; }
         }
+        /* House fade-in */
         @keyframes houseIn {
           from { opacity: 0; }
           to   { opacity: 1; }
         }
+        /* Planet pop-in */
         @keyframes planetPop {
-          0%   { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-          70%  { transform: translate(-50%, -50%) scale(1.25); opacity: 1; }
-          100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+          0%   { transform: translate(-50%,-50%) scale(0);    opacity: 0; }
+          70%  { transform: translate(-50%,-50%) scale(1.18); opacity: 1; }
+          100% { transform: translate(-50%,-50%) scale(1);    opacity: 1; }
         }
+        /* Glyph slow spin (in-place) */
+        @keyframes glyphSpin {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+        /* Ascendant pulse */
         @keyframes ascPulse {
           0%, 100% { box-shadow: 0 0 0 0 rgba(200,162,74,0); }
           50%       { box-shadow: 0 0 0 6px rgba(200,162,74,0.18); }
@@ -176,131 +217,80 @@ export default function NorthIndianChart({
           0%, 100% { opacity: 0.55; }
           50%       { opacity: 1; }
         }
-        .chart-house {
-          position: absolute; inset: 0;
-          cursor: pointer;
-          transition: background 0.18s ease;
-          -webkit-tap-highlight-color: transparent;
-        }
-        .chart-house:focus-visible {
-          outline: 2px solid var(--brass-bright);
-          outline-offset: 2px;
-        }
-        .chart-house:hover .house-bg {
-          background: rgba(200,162,74,0.07);
-        }
-        .chart-house.selected .house-bg {
-          background: rgba(200,162,74,0.14);
-        }
-        .house-bg {
-          position: absolute; inset: 0;
-          transition: background 0.18s ease;
-        }
-        .planet-btn {
+        /* Shared house button behavior */
+        .chart-house { position: absolute; inset: 0; cursor: pointer;
+          -webkit-tap-highlight-color: transparent; }
+        .chart-house:focus-visible { outline: 2px solid var(--brass-bright); outline-offset: 2px; }
+        .chart-house:hover .house-bg,
+        .chart-house.selected .house-bg { background: rgba(200,162,74,0.08); }
+        .chart-house.selected .house-bg { background: rgba(200,162,74,0.14); }
+        .house-bg { position: absolute; inset: 0; transition: background 0.18s ease; }
+        /* Planet token */
+        .planet-token-btn {
           position: absolute;
           transform: translate(-50%, -50%);
           cursor: pointer;
           background: none;
           border: none;
-          padding: 0;
-          line-height: 1;
-          font-family: serif;
-          -webkit-tap-highlight-color: transparent;
-          transition: transform 0.15s ease, filter 0.15s ease;
-          z-index: 10;
-        }
-        .planet-btn:hover {
-          transform: translate(-50%, -50%) scale(1.4);
-          filter: drop-shadow(0 0 6px rgba(200,162,74,0.7));
-          z-index: 20;
-        }
-        .planet-btn.planet-selected {
-          transform: translate(-50%, -50%) scale(1.3);
-          filter: drop-shadow(0 0 8px rgba(240,206,122,0.9));
-        }
-        .planet-btn:focus-visible {
-          outline: 2px solid var(--brass-bright);
-          outline-offset: 3px;
-          border-radius: 4px;
-        }
-        .house-label-pill {
-          pointer-events: none;
+          padding: 4px; /* extends hit area beyond visual token */
+          min-width: 40px;
+          min-height: 40px;
           display: flex;
           align-items: center;
-          gap: 3px;
-          padding: 2px 5px;
-          border-radius: 99px;
-          background: rgba(11,15,35,0.7);
-          border: 1px solid rgba(200,162,74,0.18);
-          font-family: var(--font-ui, system-ui);
-          font-size: 9px;
-          line-height: 1.2;
-          white-space: nowrap;
-          backdrop-filter: blur(2px);
+          justify-content: center;
+          pointer-events: auto;
+          z-index: 10;
+          -webkit-tap-highlight-color: transparent;
         }
-        .house-label-pill .h-num {
-          color: var(--faint);
-          font-weight: 700;
-        }
-        .house-label-pill .h-sign {
-          color: var(--muted);
-        }
+        .planet-token-btn:focus-visible { outline: 2px solid var(--brass-bright); outline-offset: 2px; border-radius: 8px; }
+        .planet-token-btn:hover .planet-token-visual { filter: brightness(1.25) drop-shadow(0 0 6px currentColor); transform: scale(1.12); }
+        .planet-token-btn.planet-selected .planet-token-visual { transform: scale(1.15); filter: brightness(1.35) drop-shadow(0 0 10px currentColor); }
+        .planet-token-visual { transition: transform 0.14s ease, filter 0.14s ease; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 6px; border-radius: 8px; }
+        /* Glyph rotation — respects animPaused via inline animationPlayState */
+        .planet-glyph { display: block; will-change: transform; line-height: 1; }
+        /* House label pill */
+        .house-label-pill { pointer-events: none; display: flex; align-items: center; gap: 3px;
+          padding: 2px 6px; border-radius: 99px; background: rgba(11,15,35,0.72);
+          border: 1px solid rgba(200,162,74,0.18); font-family: var(--font-ui,system-ui);
+          font-size: 9px; line-height: 1.2; white-space: nowrap; backdrop-filter: blur(3px); }
         .chart-house.selected .house-label-pill,
-        .chart-house:hover .house-label-pill {
-          border-color: rgba(200,162,74,0.4);
-          background: rgba(11,15,35,0.9);
-        }
-        .chart-house.selected .house-label-pill .h-num,
-        .chart-house:hover .house-label-pill .h-num {
-          color: var(--brass-bright);
-        }
-        .chart-house.selected .house-label-pill .h-sign,
-        .chart-house:hover .house-label-pill .h-sign {
-          color: var(--parchment);
-        }
+        .chart-house:hover   .house-label-pill { border-color: rgba(200,162,74,0.42); background: rgba(11,15,35,0.92); }
+        .h-num  { color: var(--faint); font-weight: 700; }
+        .h-sign { color: var(--muted); }
+        .chart-house.selected .h-num,
+        .chart-house:hover    .h-num  { color: var(--brass-bright); }
+        .chart-house.selected .h-sign,
+        .chart-house:hover    .h-sign { color: var(--parchment); }
+        /* Hide webkit scrollbar inherited */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
       `}</style>
 
       <div
         ref={containerRef}
-        style={{
-          position: "relative",
-          width: size,
-          height: size,
-          maxWidth: "100%",
-          flexShrink: 0,
-          userSelect: "none",
-        }}
+        style={{ position: "relative", width: size, height: size, maxWidth: "100%", userSelect: "none" }}
         aria-label="North Indian birth chart"
       >
-        {/* ── SVG: structural lines only ─────────────────────────────── */}
+        {/* ── SVG: structural lines only ──────────────────────────────── */}
         <svg
-          width={size}
-          height={size}
+          width={size} height={size}
           viewBox={`0 0 ${size} ${size}`}
           aria-hidden="true"
           style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 1 }}
         >
           <defs>
-            <filter id="lineGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <filter id="nic-glow" x="-20%" y="-20%" width="140%" height="140%">
               <feGaussianBlur stdDeviation="2.5" result="blur" />
-              <feMerge>
-                <feMergeNode in="blur" />
-                <feMergeNode in="SourceGraphic" />
-              </feMerge>
+              <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
             </filter>
           </defs>
 
-          {/* Gold structural lines — animated draw-in */}
           {STRUCT_LINES.map(([a, b], i) => {
-            const { x1, y1, x2, y2 } = svgLine(a, b);
+            const [x1, y1] = toSvgPx(a[0], a[1]);
+            const [x2, y2] = toSvgPx(b[0], b[1]);
             const len = Math.hypot(x2 - x1, y2 - y1);
             return (
-              <line
-                key={i}
-                x1={x1} y1={y1} x2={x2} y2={y2}
-                stroke="var(--brass)"
-                strokeWidth={0.7}
-                opacity={0.5}
+              <line key={i} x1={x1} y1={y1} x2={x2} y2={y2}
+                stroke="var(--brass)" strokeWidth={0.7} opacity={0.5}
                 style={{
                   "--line-len": `${len}`,
                   strokeDasharray: len,
@@ -314,21 +304,14 @@ export default function NorthIndianChart({
           })}
         </svg>
 
-        {/* ── HTML layer: interactive house buttons ─────────────────── */}
-        <div
-          style={{ position: "absolute", inset: 0, zIndex: 2 }}
-          aria-label="Chart houses"
-        >
+        {/* ── HTML layer: house buttons ────────────────────────────────── */}
+        <div style={{ position: "absolute", inset: 0, zIndex: 2 }}>
           {Object.entries(HOUSE_POLYS).map(([hStr, poly]) => {
             const h = Number(hStr);
             const signNum = signForHouse(lagnaSign, h);
-            const planets = housePlanets[h] ?? [];
             const sel = selectedHouse === h;
             const isAsc = h === 1;
             const [cxPct, cyPct] = centroidPct(h);
-
-            // Staggered fade-in for each house
-            const houseDelay = `${0.5 + (h - 1) * 0.04}s`;
 
             return (
               <button
@@ -341,11 +324,9 @@ export default function NorthIndianChart({
                   padding: 0,
                   opacity: mounted ? 1 : 0,
                   transition: mounted
-                    ? `opacity 0.35s ease ${houseDelay}`
+                    ? `opacity 0.35s ease ${0.5 + (h - 1) * 0.04}s`
                     : "none",
-                  ...(isAsc && sel
-                    ? { animation: "ascPulse 2.4s ease-in-out infinite" }
-                    : {}),
+                  ...(isAsc && sel ? { animation: "ascPulse 2.4s ease-in-out infinite" } : {}),
                 }}
                 aria-label={`House ${h} — ${HOUSE_SIGNIFIES[h]}`}
                 aria-pressed={sel}
@@ -353,12 +334,9 @@ export default function NorthIndianChart({
               >
                 <div className="house-bg" />
 
-                {/* Selected house: inner glow border via SVG overlay */}
+                {/* Selected glow border */}
                 {sel && (
-                  <svg
-                    aria-hidden="true"
-                    style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}
-                  >
+                  <svg aria-hidden="true" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
                     <polygon
                       points={poly.map(([x, y]) => {
                         const [px, py] = toSvgPx(x, y);
@@ -367,77 +345,54 @@ export default function NorthIndianChart({
                       fill="none"
                       stroke="var(--brass-bright)"
                       strokeWidth={1.5}
-                      filter="url(#lineGlow)"
+                      filter="url(#nic-glow)"
                       style={{ animation: isAsc ? "glowPulse 2.4s ease-in-out infinite" : undefined }}
                     />
                   </svg>
                 )}
 
-                {/* House label pill (number + sign) */}
-                <div
-                  style={{
-                    position: "absolute",
-                    left: `${cxPct}%`,
-                    top: `${cyPct}%`,
-                    transform: "translate(-50%, -50%)",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: 3,
-                    pointerEvents: "none",
-                  }}
-                >
+                {/* House label pill */}
+                <div style={{
+                  position: "absolute",
+                  left: `${cxPct}%`, top: `${cyPct}%`,
+                  transform: "translate(-50%, -50%)",
+                  display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
+                  pointerEvents: "none",
+                }}>
                   <span className="house-label-pill">
                     <span className="h-num">{h}</span>
                     <span className="h-sign">{SIGN_SANSKRIT_SHORT[signNum]}</span>
                   </span>
-
-                  {/* Hover / selected: show signification below pill */}
                   {sel && (
-                    <span
-                      style={{
-                        fontSize: 8,
-                        color: "var(--brass)",
-                        fontFamily: "var(--font-ui, system-ui)",
-                        textAlign: "center",
-                        maxWidth: 60,
-                        lineHeight: 1.3,
-                        padding: "2px 4px",
-                        background: "rgba(11,15,35,0.85)",
-                        borderRadius: 4,
-                        whiteSpace: "nowrap",
-                      }}
-                    >
+                    <span style={{
+                      fontSize: 8, color: "var(--brass)",
+                      fontFamily: "var(--font-ui,system-ui)",
+                      textAlign: "center", maxWidth: 60, lineHeight: 1.3,
+                      padding: "2px 4px",
+                      background: "rgba(11,15,35,0.88)", borderRadius: 4,
+                      whiteSpace: "nowrap",
+                    }}>
                       {HOUSE_SIGNIFIES[h]}
                     </span>
                   )}
                 </div>
 
-                {/* Ascendant marker */}
                 {isAsc && (
-                  <span
-                    style={{
-                      position: "absolute",
-                      left: `${cxPct + 4}%`,
-                      top: `${cyPct - 6}%`,
-                      transform: "translate(-50%, -50%)",
-                      fontSize: 7,
-                      color: "var(--brass)",
-                      fontFamily: "var(--font-ui, system-ui)",
-                      letterSpacing: "0.05em",
-                      pointerEvents: "none",
-                      opacity: 0.85,
-                    }}
-                  >
-                    Asc
-                  </span>
+                  <span style={{
+                    position: "absolute",
+                    left: `${cxPct + 4}%`, top: `${cyPct - 6}%`,
+                    transform: "translate(-50%, -50%)",
+                    fontSize: 7, color: "var(--brass)",
+                    fontFamily: "var(--font-ui,system-ui)", letterSpacing: "0.05em",
+                    pointerEvents: "none", opacity: 0.85,
+                  }}>Asc</span>
                 )}
               </button>
             );
           })}
         </div>
 
-        {/* ── Planet buttons — outside clip-path so tooltips aren't cut ─── */}
+        {/* ── Planet tokens — outside clip-path to prevent clipping ────── */}
         <div
           style={{ position: "absolute", inset: 0, zIndex: 3, pointerEvents: "none" }}
           aria-label="Chart planets"
@@ -450,37 +405,36 @@ export default function NorthIndianChart({
             return planets.map((p, i) => {
               const gid = p.body as GrahaId;
               const glyph = GRAHA_GLYPHS[gid] ?? "?";
+              const shortName = GRAHA_SHORT[gid] ?? gid;
               const graha = kb.grahas[gid];
               const isSel = selectedBody === p.body;
 
-              // Offset planets from centroid: up to 2 per row
-              const row = Math.floor(i / 2);
-              const col = i % 2 === 0 ? -1 : 1;
-              // shift down from the pill label by ~8%
-              const px = cxPct + col * 4.5;
-              const py = cyPct + 8 + row * 5.5;
+              // Color from GRAHA_COLORS (single source of truth)
+              const colors = GRAHA_COLORS[gid as keyof typeof GRAHA_COLORS];
+              const color = colors?.core ?? "#C8A24A";
 
-              const planetColor = isSel
-                ? "var(--brass-bright)"
-                : p.dignity === "debilitated"
-                ? "var(--weak)"
-                : p.dignity === "exalted" || p.dignity === "own" || p.dignity === "moolatrikona"
-                ? "var(--brass)"
-                : "var(--parchment)";
+              // Position tokens below the pill label
+              // Single planet: centered; multiple: 2-column grid
+              const isSingle = planets.length === 1;
+              const row = Math.floor(i / 2);
+              const colDir = isSingle ? 0 : (i % 2 === 0 ? -1 : 1);
+              const px = cxPct + colDir * 4.5;
+              const py = cyPct + 7.5 + row * 7;
 
               // Staggered pop-in
-              const popDelay = `${1.1 + h * 0.03 + i * 0.06}s`;
+              const popDelay = `${1.1 + h * 0.025 + i * 0.06}s`;
+
+              // Text shadow for legibility on any house background (critical for Moon/Venus)
+              const textShadow = `0 0 8px rgba(0,0,0,0.95), 0 1px 4px rgba(0,0,0,0.9), 0 0 20px ${color}55`;
 
               return (
                 <button
                   key={p.body}
-                  className={`planet-btn${isSel ? " planet-selected" : ""}`}
-                  aria-label={`${graha?.en ?? p.body}${p.retrograde ? " (retrograde)" : ""} in house ${p.house}`}
+                  className={`planet-token-btn${isSel ? " planet-selected" : ""}`}
+                  aria-label={`${graha?.en ?? shortName} — view details`}
                   style={{
                     left: `${px}%`,
                     top: `${py}%`,
-                    fontSize: size < 300 ? 11 : 14,
-                    color: planetColor,
                     pointerEvents: "auto",
                     opacity: mounted ? 1 : 0,
                     animation: mounted
@@ -491,28 +445,66 @@ export default function NorthIndianChart({
                     e.stopPropagation();
                     onBodyClick(p.body);
                   }}
-                  onMouseEnter={() => {
-                    setTooltip({ body: p.body, x: px, y: Math.max(py - 8, 5) });
-                  }}
+                  onMouseEnter={() => setTooltip({ body: p.body, x: px, y: Math.max(py - 9, 5) })}
                   onMouseLeave={() => setTooltip(null)}
-                  onFocus={() => {
-                    setTooltip({ body: p.body, x: px, y: Math.max(py - 8, 5) });
-                  }}
+                  onFocus={() => setTooltip({ body: p.body, x: px, y: Math.max(py - 9, 5) })}
                   onBlur={() => setTooltip(null)}
                 >
-                  {glyph}{p.retrograde ? "℞" : ""}
+                  <div
+                    className="planet-token-visual"
+                    style={{
+                      background: `${color}14`,
+                      border: isSel ? `1.5px solid ${color}70` : `1px solid ${color}35`,
+                      boxShadow: isSel ? `0 0 12px ${color}40, inset 0 0 8px ${color}10` : "none",
+                    }}
+                  >
+                    {/* Glyph — spins in-place when CHART_ANIMATION=in-place */}
+                    <span
+                      className="planet-glyph"
+                      style={{
+                        fontSize: size < 320 ? 11 : 14,
+                        color,
+                        textShadow,
+                        fontFamily: "serif",
+                        animation: shouldSpin
+                          ? `glyphSpin ${45 + (Object.keys(GRAHA_COLORS).indexOf(gid) * 5)}s linear infinite`
+                          : "none",
+                        animationPlayState: animPaused ? "paused" : "running",
+                      }}
+                    >
+                      {glyph}
+                    </span>
+                    {/* Short name label */}
+                    <span style={{
+                      fontSize: size < 320 ? 6 : 7.5,
+                      color,
+                      fontFamily: "var(--font-ui,system-ui)",
+                      fontWeight: 700,
+                      letterSpacing: "0.03em",
+                      lineHeight: 1,
+                      textShadow: `0 1px 4px rgba(0,0,0,0.95)`,
+                      whiteSpace: "nowrap",
+                    }}>
+                      {shortName}
+                    </span>
+                    {/* Retrograde indicator hook */}
+                    {p.retrograde && (
+                      <span style={{ fontSize: 6, color: "var(--weak)", lineHeight: 1 }}>℞</span>
+                    )}
+                  </div>
                 </button>
               );
             });
           })}
         </div>
 
-        {/* ── Planet tooltip (outside clip-path) ─────────────────────── */}
+        {/* ── Planet tooltip (outside clip-path, no clipping) ──────────── */}
         {tooltip && (() => {
           const gid = tooltip.body as GrahaId;
           const graha = kb.grahas[gid];
           const pl = placements.find((p) => p.body === tooltip.body);
           const signNum = pl?.sign ? Number(pl.sign) : 0;
+          const color = GRAHA_COLORS[gid as keyof typeof GRAHA_COLORS]?.core ?? "#C8A24A";
           return (
             <div
               aria-hidden="true"
@@ -522,24 +514,25 @@ export default function NorthIndianChart({
                 top: `${tooltip.y}%`,
                 transform: "translate(-50%, -100%)",
                 zIndex: 30,
-                background: "rgba(11,15,35,0.96)",
-                border: "1px solid rgba(200,162,74,0.4)",
-                borderRadius: 7,
-                padding: "5px 9px",
+                background: "rgba(11,15,35,0.97)",
+                border: `1px solid ${color}50`,
+                borderRadius: 8,
+                padding: "6px 10px",
                 pointerEvents: "none",
                 whiteSpace: "nowrap",
-                boxShadow: "0 4px 18px rgba(0,0,0,0.55)",
+                boxShadow: `0 4px 18px rgba(0,0,0,0.6), 0 0 12px ${color}18`,
               }}
             >
-              <p style={{ fontSize: 11, color: "var(--parchment)", fontFamily: "var(--font-ui, system-ui)", margin: 0, fontWeight: 600 }}>
+              <p style={{ fontSize: 12, color: "var(--parchment)", fontFamily: "var(--font-ui,system-ui)", margin: 0, fontWeight: 700 }}>
+                <span style={{ color, marginRight: 5 }}>{GRAHA_GLYPHS[gid]}</span>
                 {graha?.sanskrit} / {graha?.en}
               </p>
               {pl && (
-                <p style={{ fontSize: 9.5, color: "var(--muted)", fontFamily: "var(--font-ui, system-ui)", margin: "2px 0 0", lineHeight: 1.4 }}>
+                <p style={{ fontSize: 10, color: "var(--muted)", fontFamily: "var(--font-ui,system-ui)", margin: "3px 0 0", lineHeight: 1.4 }}>
                   House {pl.house} · {SIGN_EN_SHORT[signNum]}
                   {pl.retrograde && <span style={{ color: "var(--weak)", marginLeft: 4 }}>℞</span>}
                   {pl.dignity && (
-                    <span style={{ color: "var(--brass)", marginLeft: 4, textTransform: "capitalize" }}>
+                    <span style={{ color, marginLeft: 5, textTransform: "capitalize", opacity: 0.8 }}>
                       {pl.dignity === "own" ? "own sign" : pl.dignity}
                     </span>
                   )}
@@ -548,9 +541,6 @@ export default function NorthIndianChart({
             </div>
           );
         })()}
-
-        {/* ── House hover tooltip (shows signification name on hover) ── */}
-        {/* House-level hover tooltip is handled via CSS :hover on .house-label-pill above */}
       </div>
     </>
   );

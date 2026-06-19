@@ -6,11 +6,11 @@ import {
 } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import * as THREE from "three";
-import { useRef, useState, useEffect, useMemo, useCallback } from "react";
+import { useRef, useState, useEffect, useMemo, useCallback } from "react"; // useMemo kept for OrreryScene internals
 import type { NatalChart, Placement } from "@/lib/astro/computeChart";
 import { kb, GRAHA_GLYPHS, type GrahaId } from "@/lib/kb";
-import { composePlanetInterpretation } from "@/lib/interpret";
 import { GRAHA_COLORS } from "@/lib/grahaColors";
+import PlanetReadingSheet from "./PlanetReadingSheet";
 
 // ── Visual constants — derived from canonical GRAHA_COLORS ────────────────────
 
@@ -540,164 +540,6 @@ function OrreryScene({ planets, focusedId, onHover, onClick, reduced }: {
   );
 }
 
-// ── Bhava-chamber reading panel (DOM overlay) ─────────────────────────────────
-
-function ReadingPanel({ data, chart, onBack }: {
-  data: PlanetData;
-  chart: NatalChart;
-  onBack: () => void;
-}) {
-  const interp = useMemo(
-    () => composePlanetInterpretation(data.placement, chart.placements),
-    [data.placement, chart.placements]
-  );
-  const graha = kb.grahas[data.grahaId];
-  const bhava = kb.bhavas[String(data.placement.house)];
-  const rashi = kb.rashis[data.placement.sign];
-
-  const pillars = [
-    { label: "The Planet",  text: interp.pillars.planet },
-    { label: "The House",   text: interp.pillars.house },
-    { label: "The Sign",    text: interp.pillars.sign },
-    { label: "Dignity",     text: interp.pillars.dignity },
-    ...(interp.pillars.aspects ? [{ label: "Aspects", text: interp.pillars.aspects }] : []),
-  ];
-
-  return (
-    <div
-      style={{
-        position: "absolute",
-        top: 0, right: 0,
-        width: "clamp(300px, 40%, 420px)",
-        height: "100%",
-        background: "rgba(7,6,13,0.96)",
-        backdropFilter: "blur(24px)",
-        WebkitBackdropFilter: "blur(24px)",
-        borderLeft: `1px solid ${data.palette.core}38`,
-        overflowY: "auto",
-        zIndex: 20,
-        padding: "22px 20px",
-        display: "flex",
-        flexDirection: "column",
-        gap: 15,
-        animation: "chamberIn 0.28s cubic-bezier(0.34,1.36,0.64,1)",
-      }}
-    >
-      <style>{`
-        @keyframes chamberIn {
-          from { transform: translateX(32px); opacity: 0; }
-          to   { transform: translateX(0);    opacity: 1; }
-        }
-      `}</style>
-
-      {/* Back control */}
-      <button
-        onClick={onBack}
-        style={{
-          alignSelf: "flex-start",
-          background: "none",
-          border: "1px solid var(--faint)",
-          borderRadius: 6,
-          padding: "4px 12px",
-          cursor: "pointer",
-          color: "var(--muted)",
-          fontSize: "0.78rem",
-          fontFamily: "var(--font-ui), system-ui",
-        }}
-      >
-        ← Orrery
-      </button>
-
-      {/* Glyph + name */}
-      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-        <div style={{
-          width: 54, height: 54,
-          borderRadius: "50%",
-          border: `1px solid ${data.palette.core}50`,
-          background: `${data.palette.core}10`,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: "2rem", color: data.palette.core, flexShrink: 0,
-        }}>
-          {GRAHA_GLYPHS[data.grahaId]}
-        </div>
-        <div>
-          <h2 style={{
-            fontSize: "1.35rem",
-            color: "var(--parchment)",
-            fontFamily: "var(--font-display), Georgia, serif",
-            fontWeight: 600,
-            lineHeight: 1.1,
-          }}>
-            {graha?.sanskrit}
-            <span style={{
-              fontStyle: "italic", fontWeight: 400,
-              fontSize: "0.72em", color: data.palette.core, marginLeft: "0.4em",
-            }}>
-              {graha?.en}
-            </span>
-          </h2>
-          <p style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: 3 }}>
-            House {data.placement.house} · {bhava?.en} · {rashi?.en}
-          </p>
-        </div>
-      </div>
-
-      {/* Dignity badges */}
-      <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-        <span className={`badge ${interp.dignityClass}`}>{interp.dignityLabel}</span>
-        {interp.houseClass.map(c => (
-          <span key={c} className="badge badge-neutral" style={{ textTransform: "capitalize" }}>{c}</span>
-        ))}
-        {data.placement.retrograde && (
-          <span className="badge" style={{ color: "var(--weak)", borderColor: "var(--weak)" }}>℞ Retrograde</span>
-        )}
-      </div>
-
-      <div style={{ height: 1, background: `${data.palette.core}22` }} />
-
-      {/* Pillar readings */}
-      {pillars.map(({ label, text }) => (
-        <div key={label}>
-          <p style={{
-            fontSize: "0.68rem", textTransform: "uppercase",
-            letterSpacing: "0.14em", color: "var(--faint)", marginBottom: 4,
-          }}>
-            {label}
-          </p>
-          <p style={{ fontSize: "0.83rem", lineHeight: 1.65, color: "var(--parchment)" }}>
-            {text}
-          </p>
-        </div>
-      ))}
-
-      {/* Karaka chips */}
-      <div>
-        <p style={{
-          fontSize: "0.68rem", textTransform: "uppercase",
-          letterSpacing: "0.14em", color: "var(--faint)", marginBottom: 6,
-        }}>
-          Signifies
-        </p>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-          {graha?.karaka_of?.slice(0, 6).map(k => (
-            <span key={k} style={{
-              fontSize: "0.73rem",
-              padding: "3px 10px",
-              borderRadius: 100,
-              background: `${data.palette.core}12`,
-              border: `1px solid ${data.palette.core}38`,
-              color: data.palette.core,
-              textTransform: "capitalize",
-            }}>
-              {k}
-            </span>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ── Root export ───────────────────────────────────────────────────────────────
 
 interface Props {
@@ -774,12 +616,14 @@ export default function PlanetsTab({ chart }: Props) {
         </PerformanceMonitor>
       </Canvas>
 
-      {/* Bhava-chamber reading panel */}
+      {/* Bhava-chamber reading panel — shared PlanetReadingSheet */}
       {focusedPlanet && (
-        <ReadingPanel
-          data={focusedPlanet}
+        <PlanetReadingSheet
+          placement={focusedPlanet.placement}
           chart={chart}
+          variant="orrery"
           onBack={() => setFocusedId(null)}
+          backLabel="← Orrery"
         />
       )}
 
