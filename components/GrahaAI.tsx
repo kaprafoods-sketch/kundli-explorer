@@ -44,6 +44,9 @@ type BottomTab = "topics" | "planets" | "houses" | "signs";
 
 interface Props {
   chart?: ChartPlacements;
+  /** When true, render only the browser body (search + content + tabs) with no
+   *  FAB and no fixed chrome — for hosting inside the unified GRAHA AI dock. */
+  embedded?: boolean;
 }
 
 // ── Atom card ────────────────────────────────────────────────────────────────
@@ -1109,7 +1112,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function GrahaAI({ chart }: Props) {
+export default function GrahaAI({ chart, embedded = false }: Props) {
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<View>({ kind: "home" });
   const [prevView, setPrevView] = useState<View>({ kind: "home" });
@@ -1275,6 +1278,122 @@ export default function GrahaAI({ chart }: Props) {
     { id: "signs",   label: "Signs"   },
   ];
 
+  // Shared Sanskrit toggle (used in both embedded and standalone chrome)
+  const sanskritToggle = (
+    <button
+      onClick={() => setSanskrit((s) => !s)}
+      title={sanskrit ? "Sanskrit on" : "Sanskrit off"}
+      className="press"
+      style={{
+        background: sanskrit ? "var(--brass)" : "var(--panel-2)",
+        border: "1px solid var(--faint)",
+        borderRadius: 6,
+        minHeight: 36,
+        padding: "4px 10px",
+        fontSize: "0.8rem",
+        color: sanskrit ? "var(--bg)" : "var(--muted)",
+        cursor: "pointer",
+        fontFamily: "var(--font-ui, system-ui)",
+        letterSpacing: "0.03em",
+      }}
+    >
+      San {sanskrit ? "◉" : "○"}
+    </button>
+  );
+
+  // Search + body + bottom tabs — the reusable browser core.
+  const browserCore = (
+    <>
+      {/* Search bar */}
+      <div
+        style={{ padding: "8px 14px", borderBottom: "1px solid var(--faint)", flexShrink: 0 }}
+      >
+        <input
+          ref={searchRef}
+          type="text"
+          inputMode="search"
+          placeholder="Search planets, houses, life areas…"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          style={{
+            width: "100%",
+            background: "var(--panel-2)",
+            border: "1px solid var(--faint)",
+            borderRadius: 8,
+            padding: "10px 12px",
+            fontSize: 16, /* prevent iOS zoom-on-focus */
+            color: "var(--parchment)",
+            outline: "none",
+            fontFamily: "var(--font-ui, system-ui)",
+            boxSizing: "border-box",
+          }}
+        />
+      </div>
+
+      {/* Body */}
+      <div className="scroll-area" style={{ flex: 1 }}>
+        {renderBody()}
+      </div>
+
+      {/* Bottom tab bar */}
+      <div
+        style={{
+          display: "flex",
+          borderTop: "1px solid var(--faint)",
+          flexShrink: 0,
+          background: "var(--panel)",
+          paddingBottom: embedded ? "var(--safe-bottom)" : 0,
+        }}
+      >
+        {TABS.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => handleTab(tab.id)}
+              className="press"
+              style={{
+                flex: 1,
+                minHeight: 48,
+                padding: "10px 4px",
+                background: "none",
+                border: "none",
+                borderTop: isActive ? "2px solid var(--brass)" : "2px solid transparent",
+                color: isActive ? "var(--brass-bright)" : "var(--muted)",
+                fontSize: "0.8rem",
+                cursor: "pointer",
+                fontFamily: "var(--font-ui, system-ui)",
+                transition: "color 0.15s",
+              }}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+    </>
+  );
+
+  // Embedded: just the core + a slim toolbar (the dock owns the title/close).
+  if (embedded) {
+    return (
+      <div style={{ display: "flex", flexDirection: "column", height: "100%", minHeight: 0 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            padding: "8px 14px",
+            borderBottom: "1px solid var(--faint)",
+            flexShrink: 0,
+          }}
+        >
+          {sanskritToggle}
+        </div>
+        {browserCore}
+      </div>
+    );
+  }
+
   return (
     <>
       {/* Inject pulse animation */}
@@ -1364,28 +1483,12 @@ export default function GrahaAI({ chart }: Props) {
               <span style={{ fontSize: "0.72rem", color: "var(--muted)" }}>· plain words</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              {/* Sanskrit toggle */}
-              <button
-                onClick={() => setSanskrit((s) => !s)}
-                title={sanskrit ? "Sanskrit on" : "Sanskrit off"}
-                style={{
-                  background: sanskrit ? "var(--brass)" : "var(--panel-2)",
-                  border: "1px solid var(--faint)",
-                  borderRadius: 4,
-                  padding: "3px 7px",
-                  fontSize: "0.7rem",
-                  color: sanskrit ? "var(--bg)" : "var(--muted)",
-                  cursor: "pointer",
-                  fontFamily: "var(--font-ui, system-ui)",
-                  letterSpacing: "0.03em",
-                }}
-              >
-                San {sanskrit ? "◉" : "○"}
-              </button>
+              {sanskritToggle}
               {/* Close */}
               <button
                 aria-label="Close GRAHA AI"
                 onClick={() => setOpen(false)}
+                className="press"
                 style={{
                   background: "none",
                   border: "none",
@@ -1393,8 +1496,9 @@ export default function GrahaAI({ chart }: Props) {
                   cursor: "pointer",
                   fontSize: "1.2rem",
                   lineHeight: 1,
-                  padding: "2px 6px",
-                  borderRadius: 4,
+                  minWidth: 36,
+                  minHeight: 36,
+                  borderRadius: 6,
                 }}
               >
                 ✕
@@ -1402,76 +1506,7 @@ export default function GrahaAI({ chart }: Props) {
             </div>
           </div>
 
-          {/* Search bar */}
-          <div
-            style={{
-              padding: "8px 14px",
-              borderBottom: "1px solid var(--faint)",
-              flexShrink: 0,
-            }}
-          >
-            <input
-              ref={searchRef}
-              type="text"
-              placeholder="Search planets, houses, life areas…"
-              value={searchQuery}
-              onChange={handleSearchChange}
-              style={{
-                width: "100%",
-                background: "var(--panel-2)",
-                border: "1px solid var(--faint)",
-                borderRadius: 6,
-                padding: "7px 10px",
-                fontSize: "0.82rem",
-                color: "var(--parchment)",
-                outline: "none",
-                fontFamily: "var(--font-ui, system-ui)",
-                boxSizing: "border-box",
-              }}
-            />
-          </div>
-
-          {/* Body */}
-          <div
-            style={{ flex: 1, overflowY: "auto" }}
-            className="overflow-y-auto"
-          >
-            {renderBody()}
-          </div>
-
-          {/* Bottom tab bar */}
-          <div
-            style={{
-              display: "flex",
-              borderTop: "1px solid var(--faint)",
-              flexShrink: 0,
-              background: "var(--panel)",
-            }}
-          >
-            {TABS.map((tab) => {
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => handleTab(tab.id)}
-                  style={{
-                    flex: 1,
-                    padding: "10px 4px",
-                    background: "none",
-                    border: "none",
-                    borderTop: isActive ? "2px solid var(--brass)" : "2px solid transparent",
-                    color: isActive ? "var(--brass-bright)" : "var(--muted)",
-                    fontSize: "0.74rem",
-                    cursor: "pointer",
-                    fontFamily: "var(--font-ui, system-ui)",
-                    transition: "color 0.15s",
-                  }}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
+          {browserCore}
         </div>
       )}
     </>
