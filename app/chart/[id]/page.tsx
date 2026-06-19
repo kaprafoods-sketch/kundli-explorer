@@ -32,11 +32,23 @@ export default async function ChartPage({ params }: Props) {
   return (
     <main className="min-h-screen" style={{ background: "var(--bg)" }}>
       <header
-        className="sticky top-0 z-30 flex items-center justify-between px-4 py-3 border-b gap-4"
-        style={{ background: "var(--panel)", borderColor: "var(--faint)" }}
+        className="sticky top-0 z-30 flex items-center justify-between border-b gap-4"
+        style={{
+          background: "var(--panel)",
+          borderColor: "var(--faint)",
+          paddingTop: "calc(10px + var(--safe-top))",
+          paddingBottom: 10,
+          paddingLeft: "max(16px, var(--safe-left))",
+          paddingRight: "max(16px, var(--safe-right))",
+        }}
       >
         {/* Logo */}
-        <Link href="/" className="transition-opacity hover:opacity-70 shrink-0" aria-label="GRAHA home">
+        <Link
+          href="/"
+          className="press transition-opacity hover:opacity-70 shrink-0 inline-grid place-items-center"
+          aria-label="GRAHA home"
+          style={{ minWidth: 44, minHeight: 44 }}
+        >
           <Logo size={22} style={{ color: "var(--parchment)" }} />
         </Link>
 

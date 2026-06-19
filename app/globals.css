@@ -63,14 +63,23 @@
   --font-sanskrit: var(--font-tiro), serif;
 
   /* ── Type scale ──────────────────────────────────────────────── */
+  /* Mobile-first floor: body text ≥16px (1rem) to avoid iOS zoom-on-focus
+     and stay readable at arm's length. Smaller steps reserved for
+     non-body chrome (labels, meta) only. */
   --text-2xl: clamp(2rem, 4.5vw, 3.5rem);
   --text-xl:  clamp(1.5rem, 3vw, 2.25rem);
   --text-lg:  1.25rem;
   --text-md:  1rem;
-  --text-base: 0.9375rem;
-  --text-sm:  0.8125rem;
-  --text-xs:  0.75rem;
-  --text-2xs: 0.6875rem;
+  --text-base: 1rem;
+  --text-sm:  0.875rem;
+  --text-xs:  0.8125rem;
+  --text-2xs: 0.75rem;
+
+  /* ── Safe-area insets (notch / Dynamic Island / home indicator) ── */
+  --safe-top:    env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left:   env(safe-area-inset-left, 0px);
+  --safe-right:  env(safe-area-inset-right, 0px);
 
   /* ── Spacing ─────────────────────────────────────────────────── */
   --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
@@ -127,6 +136,31 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Stop scroll chaining leaking to the page behind sheets/modals */
+html, body { overscroll-behavior-y: none; }
+
+/* Momentum scroll + contained overscroll for inner scroll regions */
+.scroll-area {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* iOS will zoom the viewport when focusing an input under 16px. Floor every
+   form control at 16px on touch; brand sizing can scale up at md+. */
+input, textarea, select { font-size: 16px; }
+
+/* Reusable touch-feedback: immediate pressed state before any async work.
+   transform-only so it never triggers layout. */
+.press { transition: transform 120ms var(--ease-out, ease-out); touch-action: manipulation; }
+.press:active { transform: scale(0.97); }
+
+/* Edge-safe screen padding so content never kisses the notch / screen edge */
+.screen-x {
+  padding-left: max(16px, var(--safe-left));
+  padding-right: max(16px, var(--safe-right));
+}
+
 /* Selection */
 ::selection {
   background: var(--accent);
@@ -161,8 +195,8 @@ body {
   border: 1px solid var(--faint);
   border-radius: 6px;
   color: var(--parchment);
-  padding: 10px 14px;
-  font-size: 0.9rem;
+  padding: 12px 14px;
+  font-size: 16px; /* prevent iOS zoom-on-focus */
   font-family: var(--font-ui);
   transition: border-color 0.15s;
 }

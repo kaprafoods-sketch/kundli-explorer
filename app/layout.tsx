@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fraunces, Hanken_Grotesk, IBM_Plex_Mono, Tiro_Devanagari_Sanskrit } from "next/font/google";
 import "./globals.css";
 
@@ -37,6 +37,13 @@ export const metadata: Metadata = {
   description:
     "An immersive Vedic astrology learning platform. Compute your natal chart, explore planetary placements in 3D, and learn through your own kundli.",
   keywords: ["vedic astrology", "kundli", "birth chart", "jyotish", "graha", "planets", "learn astrology"],
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#0A1020",
 };
 
 export default function RootLayout({
