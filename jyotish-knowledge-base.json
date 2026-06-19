@@ -13,252 +13,1607 @@
       "Degrees for exaltation/debilitation are the deep-exaltation/deep-debilitation points. The whole sign carries the dignity; the degree is peak strength."
     ]
   },
-
   "grahas": {
     "sun": {
-      "id": "sun", "en": "Sun", "sanskrit": "Surya", "alt_sanskrit": "Ravi", "glyph": "\u2609",
-      "gender": "male", "nature": "malefic", "element": "fire", "guna": "sattva",
-      "caste": "kshatriya", "deity": "Agni/Surya",
-      "karaka_of": ["soul (atma)", "father", "authority", "ego", "vitality", "self-confidence", "government", "status", "leadership"],
-      "signifies_body": ["bones", "heart", "right eye (male) / left eye (female)", "general vitality"],
-      "exaltation": { "sign": "aries", "degree": 10 },
-      "debilitation": { "sign": "libra", "degree": 10 },
-      "own_signs": ["leo"],
-      "mooltrikona": { "sign": "leo", "range": [0, 20] },
-      "relationships": { "friends": ["moon", "mars", "jupiter"], "enemies": ["venus", "saturn"], "neutral": ["mercury"] },
-      "aspects_special": [7],
-      "nakshatras_ruled": ["krittika", "uttara_phalguni", "uttara_ashadha"],
+      "id": "sun",
+      "en": "Sun",
+      "sanskrit": "Surya",
+      "alt_sanskrit": "Ravi",
+      "glyph": "☉",
+      "gender": "male",
+      "nature": "malefic",
+      "element": "fire",
+      "guna": "sattva",
+      "caste": "kshatriya",
+      "deity": "Agni/Surya",
+      "karaka_of": [
+        "soul (atma)",
+        "father",
+        "authority",
+        "ego",
+        "vitality",
+        "self-confidence",
+        "government",
+        "status",
+        "leadership"
+      ],
+      "signifies_body": [
+        "bones",
+        "heart",
+        "right eye (male) / left eye (female)",
+        "general vitality"
+      ],
+      "exaltation": {
+        "sign": "aries",
+        "degree": 10
+      },
+      "debilitation": {
+        "sign": "libra",
+        "degree": 10
+      },
+      "own_signs": [
+        "leo"
+      ],
+      "mooltrikona": {
+        "sign": "leo",
+        "range": [
+          0,
+          20
+        ]
+      },
+      "relationships": {
+        "friends": [
+          "moon",
+          "mars",
+          "jupiter"
+        ],
+        "enemies": [
+          "venus",
+          "saturn"
+        ],
+        "neutral": [
+          "mercury"
+        ]
+      },
+      "aspects_special": [
+        7
+      ],
+      "nakshatras_ruled": [
+        "krittika",
+        "uttara_phalguni",
+        "uttara_ashadha"
+      ],
       "vimshottari_years": 6,
-      "day": "Sunday", "direction": "east", "gemstone": "Ruby", "metal": "gold/copper", "color": "copper/orange-red",
-      "keywords": ["authority", "father", "soul", "ego", "power", "vitality"]
+      "day": "Sunday",
+      "direction": "east",
+      "gemstone": "Ruby",
+      "metal": "gold/copper",
+      "color": "copper/orange-red",
+      "keywords": [
+        "authority",
+        "father",
+        "soul",
+        "ego",
+        "power",
+        "vitality"
+      ],
+      "hi": "सूर्य",
+      "alt_hi": "रवि"
     },
     "moon": {
-      "id": "moon", "en": "Moon", "sanskrit": "Chandra", "alt_sanskrit": "Soma", "glyph": "\u263D",
-      "gender": "female", "nature": "conditional", "_note_nature": "Benefic when waxing/bright (paksha bala) or full; functions as malefic when waning/dark or weak.",
-      "element": "water", "guna": "sattva", "caste": "vaishya", "deity": "Varuna/Parvati",
-      "karaka_of": ["mind (manas)", "mother", "emotions", "comfort", "the public/masses", "nurturing", "habits", "memory"],
-      "signifies_body": ["blood/fluids", "chest/breasts", "left eye (male) / right eye (female)", "lymphatic system", "mind"],
-      "exaltation": { "sign": "taurus", "degree": 3 },
-      "debilitation": { "sign": "scorpio", "degree": 3 },
-      "own_signs": ["cancer"],
-      "mooltrikona": { "sign": "taurus", "range": [4, 30], "_note": "Some texts give 3\u201330. Cancer is the own sign; Taurus 4\u201330 is mooltrikona." },
-      "relationships": { "friends": ["sun", "mercury"], "enemies": [], "neutral": ["mars", "jupiter", "venus", "saturn"] },
-      "aspects_special": [7],
-      "nakshatras_ruled": ["rohini", "hasta", "shravana"],
+      "id": "moon",
+      "en": "Moon",
+      "sanskrit": "Chandra",
+      "alt_sanskrit": "Soma",
+      "glyph": "☽",
+      "gender": "female",
+      "nature": "conditional",
+      "_note_nature": "Benefic when waxing/bright (paksha bala) or full; functions as malefic when waning/dark or weak.",
+      "element": "water",
+      "guna": "sattva",
+      "caste": "vaishya",
+      "deity": "Varuna/Parvati",
+      "karaka_of": [
+        "mind (manas)",
+        "mother",
+        "emotions",
+        "comfort",
+        "the public/masses",
+        "nurturing",
+        "habits",
+        "memory"
+      ],
+      "signifies_body": [
+        "blood/fluids",
+        "chest/breasts",
+        "left eye (male) / right eye (female)",
+        "lymphatic system",
+        "mind"
+      ],
+      "exaltation": {
+        "sign": "taurus",
+        "degree": 3
+      },
+      "debilitation": {
+        "sign": "scorpio",
+        "degree": 3
+      },
+      "own_signs": [
+        "cancer"
+      ],
+      "mooltrikona": {
+        "sign": "taurus",
+        "range": [
+          4,
+          30
+        ],
+        "_note": "Some texts give 3–30. Cancer is the own sign; Taurus 4–30 is mooltrikona."
+      },
+      "relationships": {
+        "friends": [
+          "sun",
+          "mercury"
+        ],
+        "enemies": [],
+        "neutral": [
+          "mars",
+          "jupiter",
+          "venus",
+          "saturn"
+        ]
+      },
+      "aspects_special": [
+        7
+      ],
+      "nakshatras_ruled": [
+        "rohini",
+        "hasta",
+        "shravana"
+      ],
       "vimshottari_years": 10,
-      "day": "Monday", "direction": "northwest", "gemstone": "Pearl", "metal": "silver", "color": "white",
-      "keywords": ["mind", "mother", "emotion", "comfort", "public", "moods"]
+      "day": "Monday",
+      "direction": "northwest",
+      "gemstone": "Pearl",
+      "metal": "silver",
+      "color": "white",
+      "keywords": [
+        "mind",
+        "mother",
+        "emotion",
+        "comfort",
+        "public",
+        "moods"
+      ],
+      "hi": "चंद्र",
+      "alt_hi": "सोम"
     },
     "mars": {
-      "id": "mars", "en": "Mars", "sanskrit": "Mangala", "alt_sanskrit": "Kuja/Angaraka", "glyph": "\u2642",
-      "gender": "male", "nature": "malefic", "element": "fire", "guna": "tamas",
-      "caste": "kshatriya", "deity": "Subrahmanya/Kartikeya",
-      "karaka_of": ["energy", "courage", "younger siblings", "land & property", "drive", "aggression", "war", "competition", "engineering/surgery"],
-      "signifies_body": ["muscles", "blood (hemoglobin)", "bone marrow", "genitals", "forehead"],
-      "exaltation": { "sign": "capricorn", "degree": 28 },
-      "debilitation": { "sign": "cancer", "degree": 28 },
-      "own_signs": ["aries", "scorpio"],
-      "mooltrikona": { "sign": "aries", "range": [0, 12] },
-      "relationships": { "friends": ["sun", "moon", "jupiter"], "enemies": ["mercury"], "neutral": ["venus", "saturn"] },
-      "aspects_special": [4, 7, 8],
-      "nakshatras_ruled": ["mrigashira", "chitra", "dhanishta"],
+      "id": "mars",
+      "en": "Mars",
+      "sanskrit": "Mangala",
+      "alt_sanskrit": "Kuja/Angaraka",
+      "glyph": "♂",
+      "gender": "male",
+      "nature": "malefic",
+      "element": "fire",
+      "guna": "tamas",
+      "caste": "kshatriya",
+      "deity": "Subrahmanya/Kartikeya",
+      "karaka_of": [
+        "energy",
+        "courage",
+        "younger siblings",
+        "land & property",
+        "drive",
+        "aggression",
+        "war",
+        "competition",
+        "engineering/surgery"
+      ],
+      "signifies_body": [
+        "muscles",
+        "blood (hemoglobin)",
+        "bone marrow",
+        "genitals",
+        "forehead"
+      ],
+      "exaltation": {
+        "sign": "capricorn",
+        "degree": 28
+      },
+      "debilitation": {
+        "sign": "cancer",
+        "degree": 28
+      },
+      "own_signs": [
+        "aries",
+        "scorpio"
+      ],
+      "mooltrikona": {
+        "sign": "aries",
+        "range": [
+          0,
+          12
+        ]
+      },
+      "relationships": {
+        "friends": [
+          "sun",
+          "moon",
+          "jupiter"
+        ],
+        "enemies": [
+          "mercury"
+        ],
+        "neutral": [
+          "venus",
+          "saturn"
+        ]
+      },
+      "aspects_special": [
+        4,
+        7,
+        8
+      ],
+      "nakshatras_ruled": [
+        "mrigashira",
+        "chitra",
+        "dhanishta"
+      ],
       "vimshottari_years": 7,
-      "day": "Tuesday", "direction": "south", "gemstone": "Red Coral", "metal": "copper", "color": "red",
-      "keywords": ["energy", "courage", "siblings", "property", "drive", "conflict"]
+      "day": "Tuesday",
+      "direction": "south",
+      "gemstone": "Red Coral",
+      "metal": "copper",
+      "color": "red",
+      "keywords": [
+        "energy",
+        "courage",
+        "siblings",
+        "property",
+        "drive",
+        "conflict"
+      ],
+      "hi": "मंगल"
     },
     "mercury": {
-      "id": "mercury", "en": "Mercury", "sanskrit": "Budha", "glyph": "\u263F",
-      "gender": "neutral", "nature": "conditional", "_note_nature": "Naturally benefic, but mutable \u2014 takes on the nature of the planets it conjoins/aspects. Benefic only when alone or with benefics.",
-      "element": "earth", "guna": "rajas", "caste": "vaishya", "_note_caste": "Some texts assign Shudra.", "deity": "Vishnu/Narayana",
-      "karaka_of": ["intellect", "communication", "speech", "commerce/trade", "logic & analysis", "writing", "mathematics", "skill", "nervous wit"],
-      "signifies_body": ["skin", "nervous system", "speech organs", "hands", "intellect"],
-      "exaltation": { "sign": "virgo", "degree": 15, "_note": "Mercury is the only planet exalted in its own sign." },
-      "debilitation": { "sign": "pisces", "degree": 15 },
-      "own_signs": ["gemini", "virgo"],
-      "mooltrikona": { "sign": "virgo", "range": [15, 20], "_note": "Some give 16\u201320." },
-      "relationships": { "friends": ["sun", "venus"], "enemies": ["moon"], "neutral": ["mars", "jupiter", "saturn"] },
-      "aspects_special": [7],
-      "nakshatras_ruled": ["ashlesha", "jyeshtha", "revati"],
+      "id": "mercury",
+      "en": "Mercury",
+      "sanskrit": "Budha",
+      "glyph": "☿",
+      "gender": "neutral",
+      "nature": "conditional",
+      "_note_nature": "Naturally benefic, but mutable — takes on the nature of the planets it conjoins/aspects. Benefic only when alone or with benefics.",
+      "element": "earth",
+      "guna": "rajas",
+      "caste": "vaishya",
+      "_note_caste": "Some texts assign Shudra.",
+      "deity": "Vishnu/Narayana",
+      "karaka_of": [
+        "intellect",
+        "communication",
+        "speech",
+        "commerce/trade",
+        "logic & analysis",
+        "writing",
+        "mathematics",
+        "skill",
+        "nervous wit"
+      ],
+      "signifies_body": [
+        "skin",
+        "nervous system",
+        "speech organs",
+        "hands",
+        "intellect"
+      ],
+      "exaltation": {
+        "sign": "virgo",
+        "degree": 15,
+        "_note": "Mercury is the only planet exalted in its own sign."
+      },
+      "debilitation": {
+        "sign": "pisces",
+        "degree": 15
+      },
+      "own_signs": [
+        "gemini",
+        "virgo"
+      ],
+      "mooltrikona": {
+        "sign": "virgo",
+        "range": [
+          15,
+          20
+        ],
+        "_note": "Some give 16–20."
+      },
+      "relationships": {
+        "friends": [
+          "sun",
+          "venus"
+        ],
+        "enemies": [
+          "moon"
+        ],
+        "neutral": [
+          "mars",
+          "jupiter",
+          "saturn"
+        ]
+      },
+      "aspects_special": [
+        7
+      ],
+      "nakshatras_ruled": [
+        "ashlesha",
+        "jyeshtha",
+        "revati"
+      ],
       "vimshottari_years": 17,
-      "day": "Wednesday", "direction": "north", "gemstone": "Emerald", "metal": "brass/bronze", "color": "green",
-      "keywords": ["intellect", "speech", "commerce", "logic", "skill", "adaptability"]
+      "day": "Wednesday",
+      "direction": "north",
+      "gemstone": "Emerald",
+      "metal": "brass/bronze",
+      "color": "green",
+      "keywords": [
+        "intellect",
+        "speech",
+        "commerce",
+        "logic",
+        "skill",
+        "adaptability"
+      ],
+      "hi": "बुध"
     },
     "jupiter": {
-      "id": "jupiter", "en": "Jupiter", "sanskrit": "Guru", "alt_sanskrit": "Brihaspati", "glyph": "\u2643",
-      "gender": "male", "nature": "benefic", "_note_nature": "Greatest natural benefic.",
-      "element": "ether", "guna": "sattva", "caste": "brahmin", "deity": "Brahma/Indra (Brihaspati)",
-      "karaka_of": ["wisdom", "knowledge", "guru/teacher", "children", "dharma", "wealth & fortune", "expansion", "optimism", "husband (in a woman's chart)"],
-      "signifies_body": ["fat", "liver", "thighs", "growth/tissue", "arterial system"],
-      "exaltation": { "sign": "cancer", "degree": 5 },
-      "debilitation": { "sign": "capricorn", "degree": 5 },
-      "own_signs": ["sagittarius", "pisces"],
-      "mooltrikona": { "sign": "sagittarius", "range": [0, 10] },
-      "relationships": { "friends": ["sun", "moon", "mars"], "enemies": ["mercury", "venus"], "neutral": ["saturn"] },
-      "aspects_special": [5, 7, 9],
-      "nakshatras_ruled": ["punarvasu", "vishakha", "purva_bhadrapada"],
+      "id": "jupiter",
+      "en": "Jupiter",
+      "sanskrit": "Guru",
+      "alt_sanskrit": "Brihaspati",
+      "glyph": "♃",
+      "gender": "male",
+      "nature": "benefic",
+      "_note_nature": "Greatest natural benefic.",
+      "element": "ether",
+      "guna": "sattva",
+      "caste": "brahmin",
+      "deity": "Brahma/Indra (Brihaspati)",
+      "karaka_of": [
+        "wisdom",
+        "knowledge",
+        "guru/teacher",
+        "children",
+        "dharma",
+        "wealth & fortune",
+        "expansion",
+        "optimism",
+        "husband (in a woman's chart)"
+      ],
+      "signifies_body": [
+        "fat",
+        "liver",
+        "thighs",
+        "growth/tissue",
+        "arterial system"
+      ],
+      "exaltation": {
+        "sign": "cancer",
+        "degree": 5
+      },
+      "debilitation": {
+        "sign": "capricorn",
+        "degree": 5
+      },
+      "own_signs": [
+        "sagittarius",
+        "pisces"
+      ],
+      "mooltrikona": {
+        "sign": "sagittarius",
+        "range": [
+          0,
+          10
+        ]
+      },
+      "relationships": {
+        "friends": [
+          "sun",
+          "moon",
+          "mars"
+        ],
+        "enemies": [
+          "mercury",
+          "venus"
+        ],
+        "neutral": [
+          "saturn"
+        ]
+      },
+      "aspects_special": [
+        5,
+        7,
+        9
+      ],
+      "nakshatras_ruled": [
+        "punarvasu",
+        "vishakha",
+        "purva_bhadrapada"
+      ],
       "vimshottari_years": 16,
-      "day": "Thursday", "direction": "northeast", "gemstone": "Yellow Sapphire", "metal": "gold", "color": "yellow",
-      "keywords": ["wisdom", "expansion", "fortune", "children", "dharma", "guidance"]
+      "day": "Thursday",
+      "direction": "northeast",
+      "gemstone": "Yellow Sapphire",
+      "metal": "gold",
+      "color": "yellow",
+      "keywords": [
+        "wisdom",
+        "expansion",
+        "fortune",
+        "children",
+        "dharma",
+        "guidance"
+      ],
+      "hi": "गुरु",
+      "alt_hi": "बृहस्पति"
     },
     "venus": {
-      "id": "venus", "en": "Venus", "sanskrit": "Shukra", "glyph": "\u2640",
-      "gender": "female", "nature": "benefic", "element": "water", "guna": "rajas",
-      "caste": "brahmin", "deity": "Lakshmi/Shukracharya",
-      "karaka_of": ["love", "marriage", "wife (in a man's chart)", "pleasure", "luxury", "beauty", "arts & aesthetics", "vehicles", "relationships", "comfort"],
-      "signifies_body": ["reproductive fluids/semen", "kidneys", "face/cheeks", "skin glow", "eyes"],
-      "exaltation": { "sign": "pisces", "degree": 27 },
-      "debilitation": { "sign": "virgo", "degree": 27 },
-      "own_signs": ["taurus", "libra"],
-      "mooltrikona": { "sign": "libra", "range": [0, 15] },
-      "relationships": { "friends": ["mercury", "saturn"], "enemies": ["sun", "moon"], "neutral": ["mars", "jupiter"] },
-      "aspects_special": [7],
-      "nakshatras_ruled": ["bharani", "purva_phalguni", "purva_ashadha"],
+      "id": "venus",
+      "en": "Venus",
+      "sanskrit": "Shukra",
+      "glyph": "♀",
+      "gender": "female",
+      "nature": "benefic",
+      "element": "water",
+      "guna": "rajas",
+      "caste": "brahmin",
+      "deity": "Lakshmi/Shukracharya",
+      "karaka_of": [
+        "love",
+        "marriage",
+        "wife (in a man's chart)",
+        "pleasure",
+        "luxury",
+        "beauty",
+        "arts & aesthetics",
+        "vehicles",
+        "relationships",
+        "comfort"
+      ],
+      "signifies_body": [
+        "reproductive fluids/semen",
+        "kidneys",
+        "face/cheeks",
+        "skin glow",
+        "eyes"
+      ],
+      "exaltation": {
+        "sign": "pisces",
+        "degree": 27
+      },
+      "debilitation": {
+        "sign": "virgo",
+        "degree": 27
+      },
+      "own_signs": [
+        "taurus",
+        "libra"
+      ],
+      "mooltrikona": {
+        "sign": "libra",
+        "range": [
+          0,
+          15
+        ]
+      },
+      "relationships": {
+        "friends": [
+          "mercury",
+          "saturn"
+        ],
+        "enemies": [
+          "sun",
+          "moon"
+        ],
+        "neutral": [
+          "mars",
+          "jupiter"
+        ]
+      },
+      "aspects_special": [
+        7
+      ],
+      "nakshatras_ruled": [
+        "bharani",
+        "purva_phalguni",
+        "purva_ashadha"
+      ],
       "vimshottari_years": 20,
-      "day": "Friday", "direction": "southeast", "gemstone": "Diamond", "metal": "silver/platinum", "color": "white/variegated",
-      "keywords": ["love", "beauty", "luxury", "marriage", "arts", "pleasure"]
+      "day": "Friday",
+      "direction": "southeast",
+      "gemstone": "Diamond",
+      "metal": "silver/platinum",
+      "color": "white/variegated",
+      "keywords": [
+        "love",
+        "beauty",
+        "luxury",
+        "marriage",
+        "arts",
+        "pleasure"
+      ],
+      "hi": "शुक्र"
     },
     "saturn": {
-      "id": "saturn", "en": "Saturn", "sanskrit": "Shani", "glyph": "\u2644",
-      "gender": "neutral", "nature": "malefic", "_note_nature": "Greatest natural malefic. Karaka of karma and discipline \u2014 difficult but not 'evil'; rewards effort.",
-      "element": "air", "guna": "tamas", "caste": "shudra", "deity": "Yama/Shani",
-      "karaka_of": ["longevity", "discipline", "hard work", "delay & restriction", "sorrow", "detachment", "the masses/labor", "old age", "justice", "chronic patterns", "karma"],
-      "signifies_body": ["nerves", "teeth", "knees & joints", "skin (aging)", "chronic ailments"],
-      "exaltation": { "sign": "libra", "degree": 20 },
-      "debilitation": { "sign": "aries", "degree": 20 },
-      "own_signs": ["capricorn", "aquarius"],
-      "mooltrikona": { "sign": "aquarius", "range": [0, 20] },
-      "relationships": { "friends": ["mercury", "venus"], "enemies": ["sun", "moon", "mars"], "neutral": ["jupiter"] },
-      "aspects_special": [3, 7, 10],
-      "nakshatras_ruled": ["pushya", "anuradha", "uttara_bhadrapada"],
+      "id": "saturn",
+      "en": "Saturn",
+      "sanskrit": "Shani",
+      "glyph": "♄",
+      "gender": "neutral",
+      "nature": "malefic",
+      "_note_nature": "Greatest natural malefic. Karaka of karma and discipline — difficult but not 'evil'; rewards effort.",
+      "element": "air",
+      "guna": "tamas",
+      "caste": "shudra",
+      "deity": "Yama/Shani",
+      "karaka_of": [
+        "longevity",
+        "discipline",
+        "hard work",
+        "delay & restriction",
+        "sorrow",
+        "detachment",
+        "the masses/labor",
+        "old age",
+        "justice",
+        "chronic patterns",
+        "karma"
+      ],
+      "signifies_body": [
+        "nerves",
+        "teeth",
+        "knees & joints",
+        "skin (aging)",
+        "chronic ailments"
+      ],
+      "exaltation": {
+        "sign": "libra",
+        "degree": 20
+      },
+      "debilitation": {
+        "sign": "aries",
+        "degree": 20
+      },
+      "own_signs": [
+        "capricorn",
+        "aquarius"
+      ],
+      "mooltrikona": {
+        "sign": "aquarius",
+        "range": [
+          0,
+          20
+        ]
+      },
+      "relationships": {
+        "friends": [
+          "mercury",
+          "venus"
+        ],
+        "enemies": [
+          "sun",
+          "moon",
+          "mars"
+        ],
+        "neutral": [
+          "jupiter"
+        ]
+      },
+      "aspects_special": [
+        3,
+        7,
+        10
+      ],
+      "nakshatras_ruled": [
+        "pushya",
+        "anuradha",
+        "uttara_bhadrapada"
+      ],
       "vimshottari_years": 19,
-      "day": "Saturday", "direction": "west", "gemstone": "Blue Sapphire", "metal": "iron", "color": "black/dark blue",
-      "keywords": ["discipline", "delay", "karma", "endurance", "restriction", "detachment"]
+      "day": "Saturday",
+      "direction": "west",
+      "gemstone": "Blue Sapphire",
+      "metal": "iron",
+      "color": "black/dark blue",
+      "keywords": [
+        "discipline",
+        "delay",
+        "karma",
+        "endurance",
+        "restriction",
+        "detachment"
+      ],
+      "hi": "शनि"
     },
     "rahu": {
-      "id": "rahu", "en": "Rahu (North Node)", "sanskrit": "Rahu", "glyph": "\u260A",
-      "gender": "neutral", "nature": "malefic", "type": "shadow_graha (chhaya)",
-      "_note_body": "No physical body. Functions like Saturn. Always retrograde; always exactly 180\u00b0 from Ketu.",
-      "element": "air", "caste": "outcaste/mleccha",
-      "karaka_of": ["obsession & desire", "foreign lands/things", "illusion (maya)", "ambition", "sudden & unconventional events", "technology", "taboo-breaking", "materialism", "the unconventional"],
-      "exaltation": { "sign": "taurus", "degree": null, "_note": "Disputed. Common schools: exalts in Taurus (some say Gemini). BPHS does not fix nodal exaltation \u2014 treat as school-dependent." },
-      "debilitation": { "sign": "scorpio", "degree": null, "_note": "Disputed (some say Sagittarius)." },
-      "own_signs": [], "_note_own": "No undisputed ownership. Some assign Aquarius co-rulership with Saturn.",
-      "relationships": { "_note": "Treated like Saturn for friendship; commonly friendly to Venus, Saturn, Mercury and inimical to Sun, Moon." },
-      "aspects_special": [5, 7, 9], "_note_aspects": "Per several schools the nodes aspect 5/7/9 like Jupiter. Disputed \u2014 some use only the 7th.",
-      "nakshatras_ruled": ["ardra", "swati", "shatabhisha"],
+      "id": "rahu",
+      "en": "Rahu (North Node)",
+      "sanskrit": "Rahu",
+      "glyph": "☊",
+      "gender": "neutral",
+      "nature": "malefic",
+      "type": "shadow_graha (chhaya)",
+      "_note_body": "No physical body. Functions like Saturn. Always retrograde; always exactly 180° from Ketu.",
+      "element": "air",
+      "caste": "outcaste/mleccha",
+      "karaka_of": [
+        "obsession & desire",
+        "foreign lands/things",
+        "illusion (maya)",
+        "ambition",
+        "sudden & unconventional events",
+        "technology",
+        "taboo-breaking",
+        "materialism",
+        "the unconventional"
+      ],
+      "exaltation": {
+        "sign": "taurus",
+        "degree": null,
+        "_note": "Disputed. Common schools: exalts in Taurus (some say Gemini). BPHS does not fix nodal exaltation — treat as school-dependent."
+      },
+      "debilitation": {
+        "sign": "scorpio",
+        "degree": null,
+        "_note": "Disputed (some say Sagittarius)."
+      },
+      "own_signs": [],
+      "_note_own": "No undisputed ownership. Some assign Aquarius co-rulership with Saturn.",
+      "relationships": {
+        "_note": "Treated like Saturn for friendship; commonly friendly to Venus, Saturn, Mercury and inimical to Sun, Moon."
+      },
+      "aspects_special": [
+        5,
+        7,
+        9
+      ],
+      "_note_aspects": "Per several schools the nodes aspect 5/7/9 like Jupiter. Disputed — some use only the 7th.",
+      "nakshatras_ruled": [
+        "ardra",
+        "swati",
+        "shatabhisha"
+      ],
       "vimshottari_years": 18,
-      "gemstone": "Hessonite (Gomed)", "metal": "lead/mixed", "color": "smoky/brown",
-      "keywords": ["obsession", "foreign", "illusion", "ambition", "amplification", "disruption"]
+      "gemstone": "Hessonite (Gomed)",
+      "metal": "lead/mixed",
+      "color": "smoky/brown",
+      "keywords": [
+        "obsession",
+        "foreign",
+        "illusion",
+        "ambition",
+        "amplification",
+        "disruption"
+      ],
+      "hi": "राहु"
     },
     "ketu": {
-      "id": "ketu", "en": "Ketu (South Node)", "sanskrit": "Ketu", "glyph": "\u260B",
-      "gender": "neutral", "nature": "malefic", "type": "shadow_graha (chhaya)",
-      "_note_body": "No physical body. Functions like Mars. Always retrograde; always exactly 180\u00b0 from Rahu.",
-      "element": "fire", "caste": "outcaste/mleccha",
-      "karaka_of": ["liberation (moksha)", "spirituality", "detachment", "past-life karma", "sudden loss", "the occult", "intuition", "isolation", "research/depth"],
-      "exaltation": { "sign": "scorpio", "degree": null, "_note": "Disputed (mirror of Rahu). Some say Sagittarius." },
-      "debilitation": { "sign": "taurus", "degree": null, "_note": "Disputed (some say Gemini)." },
-      "own_signs": [], "_note_own": "No undisputed ownership. Some assign Scorpio co-rulership with Mars.",
-      "relationships": { "_note": "Treated like Mars for friendship." },
-      "aspects_special": [5, 7, 9], "_note_aspects": "Same dispute as Rahu.",
-      "nakshatras_ruled": ["ashwini", "magha", "mula"],
+      "id": "ketu",
+      "en": "Ketu (South Node)",
+      "sanskrit": "Ketu",
+      "glyph": "☋",
+      "gender": "neutral",
+      "nature": "malefic",
+      "type": "shadow_graha (chhaya)",
+      "_note_body": "No physical body. Functions like Mars. Always retrograde; always exactly 180° from Rahu.",
+      "element": "fire",
+      "caste": "outcaste/mleccha",
+      "karaka_of": [
+        "liberation (moksha)",
+        "spirituality",
+        "detachment",
+        "past-life karma",
+        "sudden loss",
+        "the occult",
+        "intuition",
+        "isolation",
+        "research/depth"
+      ],
+      "exaltation": {
+        "sign": "scorpio",
+        "degree": null,
+        "_note": "Disputed (mirror of Rahu). Some say Sagittarius."
+      },
+      "debilitation": {
+        "sign": "taurus",
+        "degree": null,
+        "_note": "Disputed (some say Gemini)."
+      },
+      "own_signs": [],
+      "_note_own": "No undisputed ownership. Some assign Scorpio co-rulership with Mars.",
+      "relationships": {
+        "_note": "Treated like Mars for friendship."
+      },
+      "aspects_special": [
+        5,
+        7,
+        9
+      ],
+      "_note_aspects": "Same dispute as Rahu.",
+      "nakshatras_ruled": [
+        "ashwini",
+        "magha",
+        "mula"
+      ],
       "vimshottari_years": 7,
-      "gemstone": "Cat's Eye (Lehsunia)", "metal": "mixed", "color": "grey/smoky",
-      "keywords": ["moksha", "detachment", "past-life", "occult", "loss", "spirituality"]
+      "gemstone": "Cat's Eye (Lehsunia)",
+      "metal": "mixed",
+      "color": "grey/smoky",
+      "keywords": [
+        "moksha",
+        "detachment",
+        "past-life",
+        "occult",
+        "loss",
+        "spirituality"
+      ],
+      "hi": "केतु"
     }
   },
-
   "rashis": {
-    "aries":       { "number": 1,  "en": "Aries",       "sanskrit": "Mesha",      "symbol": "Ram",            "ruler": "mars",    "element": "fire",  "modality": "movable", "gender": "male",   "caste": "kshatriya", "direction": "east",  "body_part": "head",                "keywords": ["initiative", "drive", "pioneering", "impulsive"] },
-    "taurus":      { "number": 2,  "en": "Taurus",      "sanskrit": "Vrishabha",  "symbol": "Bull",           "ruler": "venus",   "element": "earth", "modality": "fixed",   "gender": "female", "caste": "vaishya",   "direction": "south", "body_part": "face/neck",            "keywords": ["stability", "sensuality", "patience", "stubborn"] },
-    "gemini":      { "number": 3,  "en": "Gemini",      "sanskrit": "Mithuna",    "symbol": "Couple",         "ruler": "mercury", "element": "air",   "modality": "dual",    "gender": "male",   "caste": "shudra",    "direction": "west",  "body_part": "arms/shoulders",       "keywords": ["communication", "curiosity", "versatility", "restless"] },
-    "cancer":      { "number": 4,  "en": "Cancer",      "sanskrit": "Karka",      "symbol": "Crab",           "ruler": "moon",    "element": "water", "modality": "movable", "gender": "female", "caste": "brahmin",   "direction": "north", "body_part": "chest/heart",          "keywords": ["nurturing", "emotional", "protective", "moody"] },
-    "leo":         { "number": 5,  "en": "Leo",         "sanskrit": "Simha",      "symbol": "Lion",           "ruler": "sun",     "element": "fire",  "modality": "fixed",   "gender": "male",   "caste": "kshatriya", "direction": "east",  "body_part": "stomach/upper abdomen","keywords": ["authority", "pride", "leadership", "dramatic"] },
-    "virgo":       { "number": 6,  "en": "Virgo",       "sanskrit": "Kanya",      "symbol": "Maiden",         "ruler": "mercury", "element": "earth", "modality": "dual",    "gender": "female", "caste": "vaishya",   "direction": "south", "body_part": "waist/intestines",     "keywords": ["analysis", "service", "precision", "critical"] },
-    "libra":       { "number": 7,  "en": "Libra",       "sanskrit": "Tula",       "symbol": "Scales",         "ruler": "venus",   "element": "air",   "modality": "movable", "gender": "male",   "caste": "shudra",    "direction": "west",  "body_part": "lower abdomen/kidneys","keywords": ["balance", "relationship", "diplomacy", "indecisive"] },
-    "scorpio":     { "number": 8,  "en": "Scorpio",     "sanskrit": "Vrishchika", "symbol": "Scorpion",       "ruler": "mars",    "co_ruler": "ketu", "element": "water", "modality": "fixed",   "gender": "female", "caste": "brahmin",   "direction": "north", "body_part": "genitals/pelvis",      "keywords": ["intensity", "transformation", "depth", "secretive"] },
-    "sagittarius": { "number": 9,  "en": "Sagittarius", "sanskrit": "Dhanu",      "symbol": "Archer",         "ruler": "jupiter", "element": "fire",  "modality": "dual",    "gender": "male",   "caste": "kshatriya", "direction": "east",  "body_part": "hips/thighs",          "keywords": ["philosophy", "freedom", "optimism", "blunt"] },
-    "capricorn":   { "number": 10, "en": "Capricorn",   "sanskrit": "Makara",     "symbol": "Sea-goat",       "ruler": "saturn",  "element": "earth", "modality": "movable", "gender": "female", "caste": "vaishya",   "direction": "south", "body_part": "knees",                "keywords": ["ambition", "discipline", "structure", "cold"] },
-    "aquarius":    { "number": 11, "en": "Aquarius",    "sanskrit": "Kumbha",     "symbol": "Water-bearer",   "ruler": "saturn",  "co_ruler": "rahu", "element": "air",   "modality": "fixed",   "gender": "male",   "caste": "shudra",    "direction": "west",  "body_part": "calves/ankles",        "keywords": ["innovation", "collective", "detachment", "rebellious"] },
-    "pisces":      { "number": 12, "en": "Pisces",      "sanskrit": "Meena",      "symbol": "Two Fishes",     "ruler": "jupiter", "element": "water", "modality": "dual",    "gender": "female", "caste": "brahmin",   "direction": "north", "body_part": "feet",                 "keywords": ["compassion", "spirituality", "imagination", "escapist"] }
+    "aries": {
+      "number": 1,
+      "en": "Aries",
+      "sanskrit": "Mesha",
+      "symbol": "Ram",
+      "ruler": "mars",
+      "element": "fire",
+      "modality": "movable",
+      "gender": "male",
+      "caste": "kshatriya",
+      "direction": "east",
+      "body_part": "head",
+      "keywords": [
+        "initiative",
+        "drive",
+        "pioneering",
+        "impulsive"
+      ],
+      "hi": "मेष"
+    },
+    "taurus": {
+      "number": 2,
+      "en": "Taurus",
+      "sanskrit": "Vrishabha",
+      "symbol": "Bull",
+      "ruler": "venus",
+      "element": "earth",
+      "modality": "fixed",
+      "gender": "female",
+      "caste": "vaishya",
+      "direction": "south",
+      "body_part": "face/neck",
+      "keywords": [
+        "stability",
+        "sensuality",
+        "patience",
+        "stubborn"
+      ],
+      "hi": "वृषभ"
+    },
+    "gemini": {
+      "number": 3,
+      "en": "Gemini",
+      "sanskrit": "Mithuna",
+      "symbol": "Couple",
+      "ruler": "mercury",
+      "element": "air",
+      "modality": "dual",
+      "gender": "male",
+      "caste": "shudra",
+      "direction": "west",
+      "body_part": "arms/shoulders",
+      "keywords": [
+        "communication",
+        "curiosity",
+        "versatility",
+        "restless"
+      ],
+      "hi": "मिथुन"
+    },
+    "cancer": {
+      "number": 4,
+      "en": "Cancer",
+      "sanskrit": "Karka",
+      "symbol": "Crab",
+      "ruler": "moon",
+      "element": "water",
+      "modality": "movable",
+      "gender": "female",
+      "caste": "brahmin",
+      "direction": "north",
+      "body_part": "chest/heart",
+      "keywords": [
+        "nurturing",
+        "emotional",
+        "protective",
+        "moody"
+      ],
+      "hi": "कर्क"
+    },
+    "leo": {
+      "number": 5,
+      "en": "Leo",
+      "sanskrit": "Simha",
+      "symbol": "Lion",
+      "ruler": "sun",
+      "element": "fire",
+      "modality": "fixed",
+      "gender": "male",
+      "caste": "kshatriya",
+      "direction": "east",
+      "body_part": "stomach/upper abdomen",
+      "keywords": [
+        "authority",
+        "pride",
+        "leadership",
+        "dramatic"
+      ],
+      "hi": "सिंह"
+    },
+    "virgo": {
+      "number": 6,
+      "en": "Virgo",
+      "sanskrit": "Kanya",
+      "symbol": "Maiden",
+      "ruler": "mercury",
+      "element": "earth",
+      "modality": "dual",
+      "gender": "female",
+      "caste": "vaishya",
+      "direction": "south",
+      "body_part": "waist/intestines",
+      "keywords": [
+        "analysis",
+        "service",
+        "precision",
+        "critical"
+      ],
+      "hi": "कन्या"
+    },
+    "libra": {
+      "number": 7,
+      "en": "Libra",
+      "sanskrit": "Tula",
+      "symbol": "Scales",
+      "ruler": "venus",
+      "element": "air",
+      "modality": "movable",
+      "gender": "male",
+      "caste": "shudra",
+      "direction": "west",
+      "body_part": "lower abdomen/kidneys",
+      "keywords": [
+        "balance",
+        "relationship",
+        "diplomacy",
+        "indecisive"
+      ],
+      "hi": "तुला"
+    },
+    "scorpio": {
+      "number": 8,
+      "en": "Scorpio",
+      "sanskrit": "Vrishchika",
+      "symbol": "Scorpion",
+      "ruler": "mars",
+      "co_ruler": "ketu",
+      "element": "water",
+      "modality": "fixed",
+      "gender": "female",
+      "caste": "brahmin",
+      "direction": "north",
+      "body_part": "genitals/pelvis",
+      "keywords": [
+        "intensity",
+        "transformation",
+        "depth",
+        "secretive"
+      ],
+      "hi": "वृश्चिक"
+    },
+    "sagittarius": {
+      "number": 9,
+      "en": "Sagittarius",
+      "sanskrit": "Dhanu",
+      "symbol": "Archer",
+      "ruler": "jupiter",
+      "element": "fire",
+      "modality": "dual",
+      "gender": "male",
+      "caste": "kshatriya",
+      "direction": "east",
+      "body_part": "hips/thighs",
+      "keywords": [
+        "philosophy",
+        "freedom",
+        "optimism",
+        "blunt"
+      ],
+      "hi": "धनु"
+    },
+    "capricorn": {
+      "number": 10,
+      "en": "Capricorn",
+      "sanskrit": "Makara",
+      "symbol": "Sea-goat",
+      "ruler": "saturn",
+      "element": "earth",
+      "modality": "movable",
+      "gender": "female",
+      "caste": "vaishya",
+      "direction": "south",
+      "body_part": "knees",
+      "keywords": [
+        "ambition",
+        "discipline",
+        "structure",
+        "cold"
+      ],
+      "hi": "मकर"
+    },
+    "aquarius": {
+      "number": 11,
+      "en": "Aquarius",
+      "sanskrit": "Kumbha",
+      "symbol": "Water-bearer",
+      "ruler": "saturn",
+      "co_ruler": "rahu",
+      "element": "air",
+      "modality": "fixed",
+      "gender": "male",
+      "caste": "shudra",
+      "direction": "west",
+      "body_part": "calves/ankles",
+      "keywords": [
+        "innovation",
+        "collective",
+        "detachment",
+        "rebellious"
+      ],
+      "hi": "कुंभ"
+    },
+    "pisces": {
+      "number": 12,
+      "en": "Pisces",
+      "sanskrit": "Meena",
+      "symbol": "Two Fishes",
+      "ruler": "jupiter",
+      "element": "water",
+      "modality": "dual",
+      "gender": "female",
+      "caste": "brahmin",
+      "direction": "north",
+      "body_part": "feet",
+      "keywords": [
+        "compassion",
+        "spirituality",
+        "imagination",
+        "escapist"
+      ],
+      "hi": "मीन"
+    }
   },
-
   "bhavas": {
-    "1":  { "number": 1,  "sanskrit": ["Tanu", "Lagna"],        "en": "Self",            "natural_karaka": "sun",                  "body_part": "head",                "purushartha": "dharma", "class": ["kendra", "trikona"],    "signifies": ["self", "body", "appearance", "personality", "vitality", "overall life direction", "temperament"], "keywords": ["self", "identity", "body", "vitality"] },
-    "2":  { "number": 2,  "sanskrit": ["Dhana"],               "en": "Wealth & Speech", "natural_karaka": "jupiter",              "body_part": "face/mouth/eyes",     "purushartha": "artha",  "class": ["maraka", "panapara"],   "signifies": ["accumulated wealth", "family", "speech", "food", "early childhood", "values", "savings"], "keywords": ["wealth", "family", "speech", "values"] },
-    "3":  { "number": 3,  "sanskrit": ["Sahaja", "Bhratru"],   "en": "Courage & Siblings","natural_karaka": "mars",               "body_part": "arms/hands/shoulders","purushartha": "kama",   "class": ["upachaya", "apoklima"], "signifies": ["courage", "younger siblings", "communication", "short journeys", "skills/hobbies", "effort", "self-promotion"], "keywords": ["courage", "siblings", "effort", "communication"] },
-    "4":  { "number": 4,  "sanskrit": ["Sukha", "Bandhu"],     "en": "Home & Mother",   "natural_karaka": "moon",                 "body_part": "chest/heart",         "purushartha": "moksha", "class": ["kendra"],               "signifies": ["mother", "home", "happiness", "land & property", "vehicles", "comfort", "inner peace", "basic education"], "keywords": ["mother", "home", "comfort", "property"] },
-    "5":  { "number": 5,  "sanskrit": ["Putra", "Suta"],       "en": "Creativity & Children","natural_karaka": "jupiter",         "body_part": "stomach/upper abdomen","purushartha": "dharma","class": ["trikona", "panapara"],   "signifies": ["children", "intelligence", "creativity", "romance", "speculation", "past-life merit (purva punya)", "mantra/devotion"], "keywords": ["children", "intelligence", "creativity", "romance"] },
-    "6":  { "number": 6,  "sanskrit": ["Ari", "Roga", "Ripu"], "en": "Enemies & Health","natural_karaka": ["mars", "saturn"],     "body_part": "intestines/lower belly","purushartha": "artha","class": ["upachaya", "dusthana", "apoklima"], "signifies": ["enemies", "disease", "debt", "obstacles", "daily work/service", "competition", "litigation", "maternal uncle"], "keywords": ["enemies", "health", "debt", "service"] },
-    "7":  { "number": 7,  "sanskrit": ["Yuvati", "Kalatra"],   "en": "Partnership & Marriage","natural_karaka": "venus",          "body_part": "lower abdomen/pelvis","purushartha": "kama",  "class": ["kendra", "maraka"],     "signifies": ["spouse", "marriage", "business partnership", "public dealings", "trade", "passion", "open relationships"], "keywords": ["spouse", "partnership", "marriage", "business"] },
-    "8":  { "number": 8,  "sanskrit": ["Randhra", "Ayur"],     "en": "Transformation",  "natural_karaka": "saturn",               "body_part": "genitals/excretory",  "purushartha": "moksha", "class": ["dusthana", "panapara"], "signifies": ["longevity", "death & rebirth", "transformation", "occult", "inheritance", "sudden events", "chronic illness", "research", "hidden things"], "keywords": ["transformation", "longevity", "occult", "sudden change"] },
-    "9":  { "number": 9,  "sanskrit": ["Dharma", "Bhagya"],    "en": "Fortune & Dharma","natural_karaka": ["jupiter", "sun"],     "body_part": "hips/thighs",         "purushartha": "dharma", "class": ["trikona", "apoklima"],  "signifies": ["fortune/luck", "father", "guru", "dharma", "higher education", "religion/philosophy", "long journeys", "pilgrimage", "ethics"], "keywords": ["fortune", "father", "dharma", "higher learning"] },
-    "10": { "number": 10, "sanskrit": ["Karma"],               "en": "Career & Status", "natural_karaka": ["sun", "mercury", "jupiter", "saturn"], "body_part": "knees","purushartha": "artha","class": ["kendra", "upachaya"], "signifies": ["career", "profession", "status", "authority", "reputation", "government", "public life", "action/karma"], "keywords": ["career", "status", "authority", "reputation"] },
-    "11": { "number": 11, "sanskrit": ["Labha", "Aya"],        "en": "Gains & Networks","natural_karaka": "jupiter",              "body_part": "calves/ankles",       "purushartha": "kama",   "class": ["upachaya", "panapara"], "signifies": ["gains/income", "fulfillment of desires", "elder siblings", "friends", "networks", "aspirations", "large groups"], "keywords": ["gains", "income", "friends", "aspirations"] },
-    "12": { "number": 12, "sanskrit": ["Vyaya", "Moksha"],     "en": "Loss & Liberation","natural_karaka": ["saturn", "ketu"],    "body_part": "feet",                "purushartha": "moksha", "class": ["dusthana", "apoklima"], "signifies": ["loss", "expenses", "liberation (moksha)", "foreign lands", "isolation/retreat", "bed pleasures", "hidden enemies", "spirituality", "sleep"], "keywords": ["loss", "expense", "foreign", "liberation"] }
+    "1": {
+      "number": 1,
+      "sanskrit": [
+        "Tanu",
+        "Lagna"
+      ],
+      "en": "Self",
+      "natural_karaka": "sun",
+      "body_part": "head",
+      "purushartha": "dharma",
+      "class": [
+        "kendra",
+        "trikona"
+      ],
+      "signifies": [
+        "self",
+        "body",
+        "appearance",
+        "personality",
+        "vitality",
+        "overall life direction",
+        "temperament"
+      ],
+      "keywords": [
+        "self",
+        "identity",
+        "body",
+        "vitality"
+      ],
+      "hi": "स्वयं",
+      "alt_hi": "तनु / लग्न"
+    },
+    "2": {
+      "number": 2,
+      "sanskrit": [
+        "Dhana"
+      ],
+      "en": "Wealth & Speech",
+      "natural_karaka": "jupiter",
+      "body_part": "face/mouth/eyes",
+      "purushartha": "artha",
+      "class": [
+        "maraka",
+        "panapara"
+      ],
+      "signifies": [
+        "accumulated wealth",
+        "family",
+        "speech",
+        "food",
+        "early childhood",
+        "values",
+        "savings"
+      ],
+      "keywords": [
+        "wealth",
+        "family",
+        "speech",
+        "values"
+      ],
+      "hi": "धन व वाणी",
+      "alt_hi": "धन"
+    },
+    "3": {
+      "number": 3,
+      "sanskrit": [
+        "Sahaja",
+        "Bhratru"
+      ],
+      "en": "Courage & Siblings",
+      "natural_karaka": "mars",
+      "body_part": "arms/hands/shoulders",
+      "purushartha": "kama",
+      "class": [
+        "upachaya",
+        "apoklima"
+      ],
+      "signifies": [
+        "courage",
+        "younger siblings",
+        "communication",
+        "short journeys",
+        "skills/hobbies",
+        "effort",
+        "self-promotion"
+      ],
+      "keywords": [
+        "courage",
+        "siblings",
+        "effort",
+        "communication"
+      ],
+      "hi": "साहस व भाई-बहन",
+      "alt_hi": "सहज"
+    },
+    "4": {
+      "number": 4,
+      "sanskrit": [
+        "Sukha",
+        "Bandhu"
+      ],
+      "en": "Home & Mother",
+      "natural_karaka": "moon",
+      "body_part": "chest/heart",
+      "purushartha": "moksha",
+      "class": [
+        "kendra"
+      ],
+      "signifies": [
+        "mother",
+        "home",
+        "happiness",
+        "land & property",
+        "vehicles",
+        "comfort",
+        "inner peace",
+        "basic education"
+      ],
+      "keywords": [
+        "mother",
+        "home",
+        "comfort",
+        "property"
+      ],
+      "hi": "घर व माता",
+      "alt_hi": "सुख / बंधु"
+    },
+    "5": {
+      "number": 5,
+      "sanskrit": [
+        "Putra",
+        "Suta"
+      ],
+      "en": "Creativity & Children",
+      "natural_karaka": "jupiter",
+      "body_part": "stomach/upper abdomen",
+      "purushartha": "dharma",
+      "class": [
+        "trikona",
+        "panapara"
+      ],
+      "signifies": [
+        "children",
+        "intelligence",
+        "creativity",
+        "romance",
+        "speculation",
+        "past-life merit (purva punya)",
+        "mantra/devotion"
+      ],
+      "keywords": [
+        "children",
+        "intelligence",
+        "creativity",
+        "romance"
+      ],
+      "hi": "संतान व सृजन",
+      "alt_hi": "पुत्र"
+    },
+    "6": {
+      "number": 6,
+      "sanskrit": [
+        "Ari",
+        "Roga",
+        "Ripu"
+      ],
+      "en": "Enemies & Health",
+      "natural_karaka": [
+        "mars",
+        "saturn"
+      ],
+      "body_part": "intestines/lower belly",
+      "purushartha": "artha",
+      "class": [
+        "upachaya",
+        "dusthana",
+        "apoklima"
+      ],
+      "signifies": [
+        "enemies",
+        "disease",
+        "debt",
+        "obstacles",
+        "daily work/service",
+        "competition",
+        "litigation",
+        "maternal uncle"
+      ],
+      "keywords": [
+        "enemies",
+        "health",
+        "debt",
+        "service"
+      ],
+      "hi": "शत्रु व रोग",
+      "alt_hi": "अरि / रोग"
+    },
+    "7": {
+      "number": 7,
+      "sanskrit": [
+        "Yuvati",
+        "Kalatra"
+      ],
+      "en": "Partnership & Marriage",
+      "natural_karaka": "venus",
+      "body_part": "lower abdomen/pelvis",
+      "purushartha": "kama",
+      "class": [
+        "kendra",
+        "maraka"
+      ],
+      "signifies": [
+        "spouse",
+        "marriage",
+        "business partnership",
+        "public dealings",
+        "trade",
+        "passion",
+        "open relationships"
+      ],
+      "keywords": [
+        "spouse",
+        "partnership",
+        "marriage",
+        "business"
+      ],
+      "hi": "विवाह व साझेदारी",
+      "alt_hi": "युवति / कलत्र"
+    },
+    "8": {
+      "number": 8,
+      "sanskrit": [
+        "Randhra",
+        "Ayur"
+      ],
+      "en": "Transformation",
+      "natural_karaka": "saturn",
+      "body_part": "genitals/excretory",
+      "purushartha": "moksha",
+      "class": [
+        "dusthana",
+        "panapara"
+      ],
+      "signifies": [
+        "longevity",
+        "death & rebirth",
+        "transformation",
+        "occult",
+        "inheritance",
+        "sudden events",
+        "chronic illness",
+        "research",
+        "hidden things"
+      ],
+      "keywords": [
+        "transformation",
+        "longevity",
+        "occult",
+        "sudden change"
+      ],
+      "hi": "रूपांतरण",
+      "alt_hi": "रंध्र / आयु"
+    },
+    "9": {
+      "number": 9,
+      "sanskrit": [
+        "Dharma",
+        "Bhagya"
+      ],
+      "en": "Fortune & Dharma",
+      "natural_karaka": [
+        "jupiter",
+        "sun"
+      ],
+      "body_part": "hips/thighs",
+      "purushartha": "dharma",
+      "class": [
+        "trikona",
+        "apoklima"
+      ],
+      "signifies": [
+        "fortune/luck",
+        "father",
+        "guru",
+        "dharma",
+        "higher education",
+        "religion/philosophy",
+        "long journeys",
+        "pilgrimage",
+        "ethics"
+      ],
+      "keywords": [
+        "fortune",
+        "father",
+        "dharma",
+        "higher learning"
+      ],
+      "hi": "भाग्य व धर्म",
+      "alt_hi": "धर्म / भाग्य"
+    },
+    "10": {
+      "number": 10,
+      "sanskrit": [
+        "Karma"
+      ],
+      "en": "Career & Status",
+      "natural_karaka": [
+        "sun",
+        "mercury",
+        "jupiter",
+        "saturn"
+      ],
+      "body_part": "knees",
+      "purushartha": "artha",
+      "class": [
+        "kendra",
+        "upachaya"
+      ],
+      "signifies": [
+        "career",
+        "profession",
+        "status",
+        "authority",
+        "reputation",
+        "government",
+        "public life",
+        "action/karma"
+      ],
+      "keywords": [
+        "career",
+        "status",
+        "authority",
+        "reputation"
+      ],
+      "hi": "कर्म व पद",
+      "alt_hi": "कर्म"
+    },
+    "11": {
+      "number": 11,
+      "sanskrit": [
+        "Labha",
+        "Aya"
+      ],
+      "en": "Gains & Networks",
+      "natural_karaka": "jupiter",
+      "body_part": "calves/ankles",
+      "purushartha": "kama",
+      "class": [
+        "upachaya",
+        "panapara"
+      ],
+      "signifies": [
+        "gains/income",
+        "fulfillment of desires",
+        "elder siblings",
+        "friends",
+        "networks",
+        "aspirations",
+        "large groups"
+      ],
+      "keywords": [
+        "gains",
+        "income",
+        "friends",
+        "aspirations"
+      ],
+      "hi": "लाभ व संपर्क",
+      "alt_hi": "लाभ / आय"
+    },
+    "12": {
+      "number": 12,
+      "sanskrit": [
+        "Vyaya",
+        "Moksha"
+      ],
+      "en": "Loss & Liberation",
+      "natural_karaka": [
+        "saturn",
+        "ketu"
+      ],
+      "body_part": "feet",
+      "purushartha": "moksha",
+      "class": [
+        "dusthana",
+        "apoklima"
+      ],
+      "signifies": [
+        "loss",
+        "expenses",
+        "liberation (moksha)",
+        "foreign lands",
+        "isolation/retreat",
+        "bed pleasures",
+        "hidden enemies",
+        "spirituality",
+        "sleep"
+      ],
+      "keywords": [
+        "loss",
+        "expense",
+        "foreign",
+        "liberation"
+      ],
+      "hi": "व्यय व मोक्ष",
+      "alt_hi": "व्यय / मोक्ष"
+    }
   },
-
   "dignity_rules": {
     "description": "Resolve a planet's dignity in a sign by checking, in priority order. Use this to label strength in interpretations.",
-    "order": ["exalted", "moolatrikona", "own_sign", "great_friend", "friend", "neutral", "enemy", "great_enemy", "debilitated"],
-    "exalted": { "label": "Exalted (Uccha)", "strength": "very strong", "meaning": "Planet expresses its highest, most refined significations." },
-    "debilitated": { "label": "Debilitated (Neecha)", "strength": "very weak", "meaning": "Significations are strained or distorted unless cancelled (Neecha Bhanga)." },
-    "moolatrikona": { "label": "Mooltrikona", "strength": "strong", "meaning": "Near-peak strength; planet acts with full, comfortable authority." },
-    "own_sign": { "label": "Own Sign (Swakshetra)", "strength": "strong", "meaning": "Planet is at home, stable and self-assured." },
-    "friend_enemy": { "label": "Friendship by sign lord", "strength": "varies", "meaning": "Compute from the dispositor (the sign's ruler) using the natural relationships table. Strong in a friend's sign, weak in an enemy's." },
+    "order": [
+      "exalted",
+      "moolatrikona",
+      "own_sign",
+      "great_friend",
+      "friend",
+      "neutral",
+      "enemy",
+      "great_enemy",
+      "debilitated"
+    ],
+    "exalted": {
+      "label": "Exalted (Uccha)",
+      "strength": "very strong",
+      "meaning": "Planet expresses its highest, most refined significations."
+    },
+    "debilitated": {
+      "label": "Debilitated (Neecha)",
+      "strength": "very weak",
+      "meaning": "Significations are strained or distorted unless cancelled (Neecha Bhanga)."
+    },
+    "moolatrikona": {
+      "label": "Mooltrikona",
+      "strength": "strong",
+      "meaning": "Near-peak strength; planet acts with full, comfortable authority."
+    },
+    "own_sign": {
+      "label": "Own Sign (Swakshetra)",
+      "strength": "strong",
+      "meaning": "Planet is at home, stable and self-assured."
+    },
+    "friend_enemy": {
+      "label": "Friendship by sign lord",
+      "strength": "varies",
+      "meaning": "Compute from the dispositor (the sign's ruler) using the natural relationships table. Strong in a friend's sign, weak in an enemy's."
+    },
     "neecha_bhanga_note": "Debilitation can be cancelled (Neecha Bhanga Raja Yoga) under specific conditions, e.g., the dispositor is in a kendra from Lagna/Moon, or the debilitation lord is exalted. Engine should flag the possibility, not auto-resolve it.",
     "compute_hint": "function dignity(planet, sign): if sign == exaltation.sign -> exalted; if sign in mooltrikona -> moolatrikona; if sign in own_signs -> own_sign; if sign == debilitation.sign -> debilitated; else classify by relationships[planet] vs rashis[sign].ruler."
   },
-
   "aspect_rules": {
     "description": "Graha drishti (planetary aspects), counted as houses forward from the planet's own position. All grahas aspect the 7th fully. Special aspects add to that.",
-    "all_planets_aspect": [7],
+    "all_planets_aspect": [
+      7
+    ],
     "special": {
-      "mars": [4, 8],
-      "jupiter": [5, 9],
-      "saturn": [3, 10],
-      "rahu": [5, 9],
-      "ketu": [5, 9]
+      "mars": [
+        4,
+        8
+      ],
+      "jupiter": [
+        5,
+        9
+      ],
+      "saturn": [
+        3,
+        10
+      ],
+      "rahu": [
+        5,
+        9
+      ],
+      "ketu": [
+        5,
+        9
+      ]
     },
     "_note_nodes": "Nodal special aspects (5/9) are school-dependent. Make this a config flag in the engine: nodal_aspects = 'jupiter_like' | 'seventh_only'.",
-    "note": "This is graha drishti (whole-house, Parashari). Distinct from rashi drishti (sign aspects) and from Western degree-based aspects \u2014 do not mix the systems."
+    "note": "This is graha drishti (whole-house, Parashari). Distinct from rashi drishti (sign aspects) and from Western degree-based aspects — do not mix the systems."
   },
-
   "house_classifications": {
-    "kendra":     { "houses": [1, 4, 7, 10], "meaning": "Angular / pillars of strength. Planets here gain power to act." },
-    "trikona":    { "houses": [1, 5, 9],     "meaning": "Trines / dharma houses. The most auspicious; sources of fortune and grace." },
-    "dusthana":   { "houses": [6, 8, 12],    "meaning": "Difficult houses of loss, struggle and dissolution.", "_note": "Some traditions add the 3rd as a mild dusthana (trik sthana)." },
-    "upachaya":   { "houses": [3, 6, 10, 11],"meaning": "Growing houses \u2014 results improve over time; malefics can do well here." },
-    "maraka":     { "houses": [2, 7],        "meaning": "Death-inflicting houses; significant in longevity/timing analysis." },
-    "panapara":   { "houses": [2, 5, 8, 11], "meaning": "Succedent houses (follow the kendras)." },
-    "apoklima":   { "houses": [3, 6, 9, 12], "meaning": "Cadent houses (precede the kendras)." },
-    "purushartha":{ "dharma": [1, 5, 9], "artha": [2, 6, 10], "kama": [3, 7, 11], "moksha": [4, 8, 12], "meaning": "The four aims of life mapped to house quadruplicities." }
+    "kendra": {
+      "houses": [
+        1,
+        4,
+        7,
+        10
+      ],
+      "meaning": "Angular / pillars of strength. Planets here gain power to act."
+    },
+    "trikona": {
+      "houses": [
+        1,
+        5,
+        9
+      ],
+      "meaning": "Trines / dharma houses. The most auspicious; sources of fortune and grace."
+    },
+    "dusthana": {
+      "houses": [
+        6,
+        8,
+        12
+      ],
+      "meaning": "Difficult houses of loss, struggle and dissolution.",
+      "_note": "Some traditions add the 3rd as a mild dusthana (trik sthana)."
+    },
+    "upachaya": {
+      "houses": [
+        3,
+        6,
+        10,
+        11
+      ],
+      "meaning": "Growing houses — results improve over time; malefics can do well here."
+    },
+    "maraka": {
+      "houses": [
+        2,
+        7
+      ],
+      "meaning": "Death-inflicting houses; significant in longevity/timing analysis."
+    },
+    "panapara": {
+      "houses": [
+        2,
+        5,
+        8,
+        11
+      ],
+      "meaning": "Succedent houses (follow the kendras)."
+    },
+    "apoklima": {
+      "houses": [
+        3,
+        6,
+        9,
+        12
+      ],
+      "meaning": "Cadent houses (precede the kendras)."
+    },
+    "purushartha": {
+      "dharma": [
+        1,
+        5,
+        9
+      ],
+      "artha": [
+        2,
+        6,
+        10
+      ],
+      "kama": [
+        3,
+        7,
+        11
+      ],
+      "moksha": [
+        4,
+        8,
+        12
+      ],
+      "meaning": "The four aims of life mapped to house quadruplicities."
+    }
   },
-
   "vimshottari": {
     "description": "120-year Vimshottari Dasha cycle. Sequence starts from the nakshatra lord of the natal Moon. Sum of years = 120.",
-    "order": ["ketu", "venus", "sun", "moon", "mars", "rahu", "jupiter", "saturn", "mercury"],
-    "years": { "ketu": 7, "venus": 20, "sun": 6, "moon": 10, "mars": 7, "rahu": 18, "jupiter": 16, "saturn": 19, "mercury": 17 },
+    "order": [
+      "ketu",
+      "venus",
+      "sun",
+      "moon",
+      "mars",
+      "rahu",
+      "jupiter",
+      "saturn",
+      "mercury"
+    ],
+    "years": {
+      "ketu": 7,
+      "venus": 20,
+      "sun": 6,
+      "moon": 10,
+      "mars": 7,
+      "rahu": 18,
+      "jupiter": 16,
+      "saturn": 19,
+      "mercury": 17
+    },
     "total_years": 120
   },
-
   "interpretation_model": {
-    "description": "The Planet + House + Sign formula the tutor teaches and the engine composes. Never store pre-written sentences for all 9\u00d712\u00d712 = 1296 combinations \u2014 compose them at runtime from the three pillars + dignity + aspects.",
+    "description": "The Planet + House + Sign formula the tutor teaches and the engine composes. Never store pre-written sentences for all 9×12×12 = 1296 combinations — compose them at runtime from the three pillars + dignity + aspects.",
     "composition": [
       "1. PLANET = what (karaka_of, keywords). 'Saturn brings discipline, delay and structure.'",
-      "2. HOUSE = where / which life area (bhava.signifies). 'In the 10th house \u2014 career, status, authority.'",
-      "3. SIGN = how / the flavor (rashi.keywords + ruler). 'In Capricorn \u2014 ambitious and structured.'",
+      "2. HOUSE = where / which life area (bhava.signifies). 'In the 10th house — career, status, authority.'",
+      "3. SIGN = how / the flavor (rashi.keywords + ruler). 'In Capricorn — ambitious and structured.'",
       "4. DIGNITY = strength dial (dignity_rules). Modifies whether the expression is refined or strained.",
       "5. ASPECTS / CONJUNCTIONS = who else is influencing (aspect_rules). Layer last.",
       "6. Optionally weight by house class (kendra/trikona strengthen; dusthana stresses)."
     ],
     "example": {
-      "input": { "planet": "saturn", "house": 10, "sign": "capricorn" },
-      "derivation": "Saturn (discipline/karma) in the 10th (career/status) in Capricorn (its own sign \u2192 dignity = own_sign, strong). 10th is a kendra. \u2192 Strong, self-made career through sustained discipline; authority earned slowly but durably.",
-      "note": "Same planet+house in Aries (debilitated) flips the reading: career ambition undermined by impatience or restriction. The dignity dial does the work \u2014 this is why it must be data-driven, not canned."
+      "input": {
+        "planet": "saturn",
+        "house": 10,
+        "sign": "capricorn"
+      },
+      "derivation": "Saturn (discipline/karma) in the 10th (career/status) in Capricorn (its own sign → dignity = own_sign, strong). 10th is a kendra. → Strong, self-made career through sustained discipline; authority earned slowly but durably.",
+      "note": "Same planet+house in Aries (debilitated) flips the reading: career ambition undermined by impatience or restriction. The dignity dial does the work — this is why it must be data-driven, not canned."
     }
   },
-
   "_next_layers": {
     "nakshatras": "All 27: lord (already in grahas.nakshatras_ruled), deity, symbol, gana, pada/navamsha mapping, shakti. Needed for Moon-sign nuance, Dasha start, and muhurta.",
     "dasha_phala": "Result rules for Mahadasha/Antardasha of each planet by house lordship and placement.",

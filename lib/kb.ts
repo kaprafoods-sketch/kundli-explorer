@@ -15,6 +15,8 @@ export interface Graha {
   en: string;
   sanskrit: string;
   alt_sanskrit?: string;
+  hi?: string;
+  alt_hi?: string;
   glyph: string;
   gender: string;
   nature: string;
@@ -44,6 +46,7 @@ export interface Rashi {
   number: number;
   en: string;
   sanskrit: string;
+  hi?: string;
   symbol: string;
   ruler: GrahaId;
   co_ruler?: GrahaId;
@@ -58,6 +61,8 @@ export interface Bhava {
   number: number;
   sanskrit: string[];
   en: string;
+  hi?: string;
+  alt_hi?: string;
   natural_karaka: string | string[];
   purushartha: string;
   class: string[];
@@ -93,6 +98,38 @@ export interface KB {
 // ── Singleton ────────────────────────────────────────────────────────────────
 
 export const kb = kbRaw as unknown as KB;
+
+// ── Language + term resolver ─────────────────────────────────────────────────
+// The single source of truth for rendering astrological NAMES in the active
+// language. UI chrome lives in the i18n layer (lib/i18n); names live here, in
+// the KB. Never hardcode planet/sign/house names in components — call getName().
+
+export type Lang = "en" | "hi" | "sa";
+
+/** Any KB entity that carries multilingual names (graha, rashi, bhava). */
+export interface NamedEntity {
+  en: string;
+  /** string for grahas/rashis; string[] for bhavas (traditional names). */
+  sanskrit?: string | string[];
+  hi?: string;
+}
+
+/**
+ * Resolve an entity's display name in the active language.
+ *   en → entity.en   |   sa → entity.sanskrit   |   hi → entity.hi
+ * Falls back to English when the requested field is missing — never a blank.
+ * For bhavas, `sanskrit` is an array of traditional names, joined with " / ".
+ */
+export function getName(entity: NamedEntity | null | undefined, lang: Lang): string {
+  if (!entity) return "";
+  if (lang === "hi" && entity.hi) return entity.hi;
+  if (lang === "sa" && entity.sanskrit != null) {
+    return Array.isArray(entity.sanskrit)
+      ? entity.sanskrit.join(" / ")
+      : entity.sanskrit;
+  }
+  return entity.en;
+}
 
 // ── Convenience lookups ──────────────────────────────────────────────────────
 
