@@ -1,8 +1,8 @@
 "use client";
 
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import {
-  Stars, AdaptiveDpr, PerformanceMonitor, Float, Html, Environment,
+  Stars, AdaptiveDpr, PerformanceMonitor, Float, Html, Environment, OrbitControls,
 } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import * as THREE from "three";
@@ -65,6 +65,7 @@ function Sun({ onHover, onClick }: {
   const meshRef = useRef<THREE.Mesh>(null!);
   const coronaRef = useRef<THREE.Mesh>(null!);
   const [hovered, setHovered] = useState(false);
+  const dragOrigin = useRef({ x: 0, y: 0 });
   const cfg = GRAHAS[0]; // sun
 
   useFrame(({ clock }) => {
@@ -88,9 +89,10 @@ function Sun({ onHover, onClick }: {
         {/* Core sphere */}
         <mesh
           ref={meshRef}
+          onPointerDown={(e) => { e.stopPropagation(); dragOrigin.current = { x: e.nativeEvent.clientX, y: e.nativeEvent.clientY }; }}
           onPointerOver={(e) => { e.stopPropagation(); setHovered(true); onHover("sun"); document.body.style.cursor = "pointer"; }}
           onPointerOut={() => { setHovered(false); onHover(null); document.body.style.cursor = "auto"; }}
-          onClick={(e) => { e.stopPropagation(); onClick(cfg); }}
+          onClick={(e) => { e.stopPropagation(); const dx = e.nativeEvent.clientX - dragOrigin.current.x; const dy = e.nativeEvent.clientY - dragOrigin.current.y; if (Math.hypot(dx, dy) < 5) onClick(cfg); }}
         >
           <sphereGeometry args={[cfg.size, 32, 32]} />
           <meshStandardMaterial
@@ -136,6 +138,7 @@ function Planet({ cfg, initialAngle, reduced, onHover, onClick }: {
   const matRef   = useRef<THREE.MeshPhysicalMaterial>(null!);
   const glowRef  = useRef<THREE.MeshBasicMaterial>(null!);
   const [hovered, setHovered] = useState(false);
+  const dragOrigin = useRef({ x: 0, y: 0 });
 
   // Rahu and Ketu are always opposite — offset Ketu by π
   const angleOffset = cfg.id === "ketu" ? initialAngle + Math.PI : initialAngle;
@@ -166,9 +169,10 @@ function Planet({ cfg, initialAngle, reduced, onHover, onClick }: {
   return (
     <group ref={groupRef}>
       <mesh
+        onPointerDown={(e) => { e.stopPropagation(); dragOrigin.current = { x: e.nativeEvent.clientX, y: e.nativeEvent.clientY }; }}
         onPointerOver={(e) => { e.stopPropagation(); setHovered(true); onHover(cfg.id); document.body.style.cursor = "pointer"; }}
         onPointerOut={() => { setHovered(false); onHover(null); document.body.style.cursor = "auto"; }}
-        onClick={(e) => { e.stopPropagation(); onClick(cfg); }}
+        onClick={(e) => { e.stopPropagation(); const dx = e.nativeEvent.clientX - dragOrigin.current.x; const dy = e.nativeEvent.clientY - dragOrigin.current.y; if (Math.hypot(dx, dy) < 5) onClick(cfg); }}
       >
         <sphereGeometry args={[cfg.size, 28, 28]} />
         <meshPhysicalMaterial
@@ -216,21 +220,6 @@ function Planet({ cfg, initialAngle, reduced, onHover, onClick }: {
   );
 }
 
-// ── Camera controller (pointer parallax) ─────────────────────────────────────
-
-function CameraController({ reduced }: { reduced: boolean }) {
-  const { camera, pointer } = useThree();
-
-  useFrame(() => {
-    if (reduced) return;
-    camera.position.x = THREE.MathUtils.lerp(camera.position.x, pointer.x * 1.0, 0.025);
-    camera.position.y = THREE.MathUtils.lerp(camera.position.y, 3.2 + pointer.y * 0.5, 0.025);
-    camera.lookAt(0, 0, 0);
-  });
-
-  return null;
-}
-
 // ── Full scene ────────────────────────────────────────────────────────────────
 
 function Scene({ reduced, onHover, onClick }: {
@@ -257,7 +246,19 @@ function Scene({ reduced, onHover, onClick }: {
       <Stars radius={90} depth={60} count={reduced ? 2000 : 5000} factor={3.5} saturation={0} fade />
       <Environment preset="night" />
 
-      <CameraController reduced={reduced} />
+      <OrbitControls
+        enableRotate
+        enablePan={false}
+        enableZoom
+        enableDamping
+        dampingFactor={0.08}
+        rotateSpeed={0.6}
+        minPolarAngle={0}
+        maxPolarAngle={Math.PI}
+        minDistance={4}
+        maxDistance={16}
+        target={[0, 0, 0]}
+      />
 
       {/* Orbit rings */}
       {GRAHAS.filter(g => g.orbit > 0).map((g, i) => (
@@ -362,7 +363,7 @@ export default function SolarSystemHero() {
         camera={{ position: [0, 3.2, 9], fov: 48 }}
         gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
         dpr={[1, 2]}
-        style={{ display: "block" }}
+        style={{ display: "block", touchAction: "none" }}
       >
         <AdaptiveDpr pixelated />
         <PerformanceMonitor>

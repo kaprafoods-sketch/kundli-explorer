@@ -1,8 +1,8 @@
 "use client";
 
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import {
-  Stars, AdaptiveDpr, PerformanceMonitor, Html, Float,
+  Stars, AdaptiveDpr, PerformanceMonitor, Html, Float, OrbitControls,
 } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import * as THREE from "three";
@@ -102,6 +102,7 @@ function PlanetOrb({ data, focused, hoveredId, onHover, onClick, reduced }: {
   const groupRef  = useRef<THREE.Group>(null!);
   const meshRef   = useRef<THREE.Mesh>(null!);
   const glowRef   = useRef<THREE.Mesh>(null!);
+  const dragOrigin = useRef({ x: 0, y: 0 });
   const hovered   = hoveredId === data.grahaId;
 
   const graha = kb.grahas[data.grahaId];
@@ -136,9 +137,10 @@ function PlanetOrb({ data, focused, hoveredId, onHover, onClick, reduced }: {
       {/* Planet body */}
       <mesh
         ref={meshRef}
+        onPointerDown={(e) => { e.stopPropagation(); dragOrigin.current = { x: e.nativeEvent.clientX, y: e.nativeEvent.clientY }; }}
         onPointerOver={(e) => { e.stopPropagation(); onHover(data.grahaId); document.body.style.cursor = "pointer"; }}
         onPointerOut={() => { onHover(null); document.body.style.cursor = "auto"; }}
-        onClick={(e) => { e.stopPropagation(); onClick(data.grahaId); }}
+        onClick={(e) => { e.stopPropagation(); const dx = e.nativeEvent.clientX - dragOrigin.current.x; const dy = e.nativeEvent.clientY - dragOrigin.current.y; if (Math.hypot(dx, dy) < 5) onClick(data.grahaId); }}
       >
         <sphereGeometry args={[data.size, 32, 32]} />
         <meshPhysicalMaterial
@@ -198,6 +200,7 @@ function ShadowNebula({ data, onHover, onClick }: {
   const groupRef = useRef<THREE.Group>(null!);
   const pointsRef = useRef<THREE.Points>(null!);
   const [hovered, setHovered] = useState(false);
+  const dragOrigin = useRef({ x: 0, y: 0 });
 
   const geo = useMemo(() => {
     const pos  = new Float32Array(N * 3);
@@ -250,9 +253,10 @@ function ShadowNebula({ data, onHover, onClick }: {
     <group
       ref={groupRef}
       position={data.worldPos}
+      onPointerDown={(e) => { e.stopPropagation(); dragOrigin.current = { x: e.nativeEvent.clientX, y: e.nativeEvent.clientY }; }}
       onPointerOver={(e) => { e.stopPropagation(); setHovered(true); onHover(data.grahaId); document.body.style.cursor = "pointer"; }}
       onPointerOut={() => { setHovered(false); onHover(null); document.body.style.cursor = "auto"; }}
-      onClick={(e) => { e.stopPropagation(); onClick(data.grahaId); }}
+      onClick={(e) => { e.stopPropagation(); const dx = e.nativeEvent.clientX - dragOrigin.current.x; const dy = e.nativeEvent.clientY - dragOrigin.current.y; if (Math.hypot(dx, dy) < 5) onClick(data.grahaId); }}
     >
       <points ref={pointsRef} geometry={geo}>
         <pointsMaterial
@@ -372,41 +376,11 @@ function ElementParticles({ element, palette }: {
   );
 }
 
-// ── Camera rig — orrery view + zoom-to-planet ─────────────────────────────────
-
-function CameraRig({ target, reduced }: {
-  target: THREE.Vector3 | null;
-  reduced: boolean;
-}) {
-  const { camera, pointer } = useThree();
-  const lookTarget = useRef(new THREE.Vector3(0, 0, 0));
-
-  useFrame(() => {
-    if (reduced) return;
-    if (!target) {
-      // Orrery overview with pointer parallax
-      camera.position.x = THREE.MathUtils.lerp(camera.position.x, pointer.x * 0.9, 0.025);
-      camera.position.y = THREE.MathUtils.lerp(camera.position.y, 4.2 + pointer.y * 0.4, 0.025);
-      camera.position.z = THREE.MathUtils.lerp(camera.position.z, 10.5, 0.025);
-      lookTarget.current.lerp(new THREE.Vector3(0, 0, 0), 0.06);
-    } else {
-      // Zoom into focused planet
-      const dest = new THREE.Vector3(target.x * 0.6, target.y + 0.35, target.z + 2.6);
-      camera.position.lerp(dest, 0.045);
-      lookTarget.current.lerp(target, 0.08);
-    }
-    camera.lookAt(lookTarget.current);
-  });
-
-  return null;
-}
-
 // ── Full orrery scene ─────────────────────────────────────────────────────────
 
-function OrreryScene({ planets, focusedId, focusTarget, onHover, onClick, reduced }: {
+function OrreryScene({ planets, focusedId, onHover, onClick, reduced }: {
   planets: PlanetData[];
   focusedId: string | null;
-  focusTarget: THREE.Vector3 | null;
   onHover: (id: string | null) => void;
   onClick: (id: string) => void;
   reduced: boolean;
@@ -421,6 +395,7 @@ function OrreryScene({ planets, focusedId, focusTarget, onHover, onClick, reduce
 
   const sun = planets.find(p => p.grahaId === "sun");
   const others = planets.filter(p => p.grahaId !== "sun");
+  const sunDragOrigin = useRef({ x: 0, y: 0 });
 
   return (
     <>
@@ -430,7 +405,19 @@ function OrreryScene({ planets, focusedId, focusTarget, onHover, onClick, reduce
       <directionalLight position={[-6, -2, -5]} intensity={1.6} color="#5530b0" />
 
       <Stars radius={80} depth={60} count={reduced ? 1400 : 3800} factor={3.2} saturation={0} fade />
-      <CameraRig target={focusTarget} reduced={reduced} />
+      <OrbitControls
+        enableRotate
+        enablePan={false}
+        enableZoom
+        enableDamping
+        dampingFactor={0.08}
+        rotateSpeed={0.6}
+        minPolarAngle={0}
+        maxPolarAngle={Math.PI}
+        minDistance={4}
+        maxDistance={18}
+        target={[0, 0, 0]}
+      />
       <OrbitRings radii={orbitRadii} />
 
       {/* Sun at center */}
@@ -438,9 +425,10 @@ function OrreryScene({ planets, focusedId, focusTarget, onHover, onClick, reduce
         <Float speed={0.7} floatIntensity={0.05} rotationIntensity={0.03}>
           <group>
             <mesh
+              onPointerDown={(e) => { e.stopPropagation(); sunDragOrigin.current = { x: e.nativeEvent.clientX, y: e.nativeEvent.clientY }; }}
               onPointerOver={(e) => { e.stopPropagation(); handleHover("sun"); document.body.style.cursor = "pointer"; }}
               onPointerOut={() => { handleHover(null); document.body.style.cursor = "auto"; }}
-              onClick={(e) => { e.stopPropagation(); onClick("sun"); }}
+              onClick={(e) => { e.stopPropagation(); const dx = e.nativeEvent.clientX - sunDragOrigin.current.x; const dy = e.nativeEvent.clientY - sunDragOrigin.current.y; if (Math.hypot(dx, dy) < 5) onClick("sun"); }}
             >
               <sphereGeometry args={[sun.size, 32, 32]} />
               <meshStandardMaterial color={sun.glowColor} emissive="#ff5a00" emissiveIntensity={3.5} roughness={0.9} />
@@ -717,7 +705,6 @@ export default function PlanetsTab({ chart }: Props) {
   }, [chart.placements]);
 
   const focusedPlanet = planets.find(p => p.grahaId === focusedId) ?? null;
-  const focusTarget   = focusedPlanet?.worldPos.clone() ?? null;
 
   const handleClick = useCallback((id: string) => {
     setFocusedId(prev => prev === id ? null : id);
@@ -731,14 +718,13 @@ export default function PlanetsTab({ chart }: Props) {
         camera={{ position: [0, 4.2, 10.5], fov: 48 }}
         gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
         dpr={[1, 2]}
-        style={{ width: "100%", height: "calc(100vh - 110px)" }}
+        style={{ width: "100%", height: "calc(100vh - 110px)", touchAction: "none" }}
       >
         <AdaptiveDpr pixelated />
         <PerformanceMonitor>
           <OrreryScene
             planets={planets}
             focusedId={focusedId}
-            focusTarget={focusTarget}
             onHover={handleHover}
             onClick={handleClick}
             reduced={reduced}
