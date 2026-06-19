@@ -41,7 +41,7 @@ const CHIP_LABEL: Partial<Record<LifeAreaId, string>> = {
   health: "Health & Vitality",
   money: "Money & Wealth",
   personality: "Personality & Self",
-  spirituality: "Meaning & Spirit",
+  spiritual: "Meaning & Spirit",
   learning: "Learn Astrology",
 };
 

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Markdown from "./Markdown";
 import ReadingFeedback from "./ReadingFeedback";
+import type { SuggestedQuestion } from "@/lib/suggestQuestions";
 
 const ERROR_TEXT = "Something went wrong. Please try again.";
 
@@ -20,9 +21,12 @@ interface Props {
   chartId: string;
   focus?: GrahaFocus;
   compact?: boolean;
-  /** Life-area ids the user picked at onboarding — used to rank cold-start chips.
-   *  (Phase 2 replaces this simple ordering with the suggestQuestions engine.) */
+  /** Life-area ids the user picked at onboarding — used to rank cold-start chips
+   *  when `suggested` is not provided. */
   interests?: string[];
+  /** Server-ranked starter questions (merit-based, Phase 2A). When present and
+   *  non-empty, these replace the static/interest-ordered cold-start chips. */
+  suggested?: SuggestedQuestion[];
 }
 
 const STARTERS: Record<string, string[]> = {
@@ -55,7 +59,7 @@ const INTEREST_STARTERS: Record<string, string> = {
   health: "What does my chart show about my vitality?",
   money: "What does my chart show about wealth and finances?",
   personality: "What are the core traits of my personality?",
-  spirituality: "What does my chart show about my spiritual path?",
+  spiritual: "What does my chart show about my spiritual path?",
   learning: "Where should I start learning my own chart?",
   family: "What does my chart show about home and family?",
   education: "What does my chart show about my studies?",
@@ -73,7 +77,7 @@ function buildGeneralStarters(interests?: string[]): string[] {
   return Array.from(new Set([...interestQs, ...base])).slice(0, 5);
 }
 
-export default function GrahaAIChat({ chartId, focus, compact, interests }: Props) {
+export default function GrahaAIChat({ chartId, focus, compact, interests, suggested }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
@@ -176,9 +180,15 @@ export default function GrahaAIChat({ chartId, focus, compact, interests }: Prop
 
   // ── Compact chat (embedded in ExplorePanel) ──────────────────────────────────
 
-  // Focus-specific chips when a planet/house/lagna is selected; otherwise
-  // interest-ranked cold-start chips.
-  const starters = focus ? STARTERS[focus.kind] : buildGeneralStarters(interests);
+  // Chip selection priority:
+  //  1. Focused (planet/house/lagna) → focus-specific STARTERS (unchanged).
+  //  2. General + server-ranked `suggested` present → merit-based chips.
+  //  3. General cold-start → interest-ordered fallback.
+  const starters: string[] = focus
+    ? STARTERS[focus.kind]
+    : suggested && suggested.length > 0
+      ? suggested.map((q) => q.text)
+      : buildGeneralStarters(interests);
 
   const wrapStyle: React.CSSProperties = compact
     ? {

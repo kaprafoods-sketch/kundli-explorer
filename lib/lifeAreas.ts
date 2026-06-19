@@ -8,10 +8,10 @@ import { kb, GRAHA_IDS, type GrahaId } from "@/lib/kb";
 // ── Types ────────────────────────────────────────────────────────────────────
 
 // NOTE (engagement engine): onboarding's "What brings you here?" step offers a
-// curated 7 interests — love, career, health, money, personality, spirituality,
-// learning. The spec asked to add "spiritual" + "learning"; "spirituality"
-// already covers life-meaning/moksha, so we reuse it and add only "learning"
-// (wanting to learn jyotish itself), which was genuinely missing.
+// curated 7 interests — love, career, health, money, personality, spiritual,
+// learning. The canonical spiritual id is "spiritual" (life-meaning/moksha) and
+// "learning" = wanting to learn jyotish itself. These two ids are shared by the
+// suggestQuestions QUESTION_BANK, so interest-matching lines up exactly.
 export const LIFE_AREA_IDS = [
   "love",
   "career",
@@ -21,7 +21,7 @@ export const LIFE_AREA_IDS = [
   "family",
   "education",
   "travel",
-  "spirituality",
+  "spiritual",
   "learning",
 ] as const;
 
@@ -34,7 +34,7 @@ export const ONBOARDING_INTEREST_IDS: readonly LifeAreaId[] = [
   "health",
   "money",
   "personality",
-  "spirituality",
+  "spiritual",
   "learning",
 ];
 
@@ -156,7 +156,7 @@ const AREA_CONFIG: Record<LifeAreaId, AreaConfig> = {
     emoji: "☊",
     keywords: ["travel", "foreign", "journey", "pilgrimage"],
   },
-  spirituality: {
+  spiritual: {
     label: "Spirituality & Liberation",
     emoji: "☋",
     keywords: [

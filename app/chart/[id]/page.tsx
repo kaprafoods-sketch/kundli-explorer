@@ -3,6 +3,9 @@ import Link from "next/link";
 import { cookies } from "next/headers";
 import { supabase } from "@/lib/supabase";
 import type { NatalChart } from "@/lib/astro/computeChart";
+import { computeTransits, type TransitPlanet } from "@/lib/astro/transits";
+import { suggestQuestions, type SuggestedQuestion } from "@/lib/suggestQuestions";
+import type { LifeAreaId } from "@/lib/lifeAreas";
 import ChartExplorer from "@/components/chart/ChartExplorer";
 import ProfileSwitcher from "@/components/ProfileSwitcher";
 import Logo from "@/components/Logo";
@@ -24,6 +27,25 @@ export default async function ChartPage({ params }: Props) {
   if (error || !record) notFound();
 
   const chart = record.data as NatalChart;
+  const interests = (record.interests ?? []) as LifeAreaId[];
+
+  // ── Merit-based starter chips (Phase 2A) ────────────────────────
+  // Transits are computed server-side (sweph is server-only) and passed into the
+  // pure ranker; on failure we degrade to dasha + dignity + novelty.
+  let transits: TransitPlanet[] | undefined;
+  try {
+    transits = await computeTransits(chart.lagnaSign, "LAHIRI");
+  } catch (e) {
+    console.error("[chart] computeTransits failed; ranking without transits:", e);
+  }
+  // TODO: derive `explored` from this chart's TutorMessage history (which
+  // planets/houses the user has already opened) to drive the novelty term.
+  // Passing [] for now — the ranker degrades gracefully.
+  const suggested: SuggestedQuestion[] = suggestQuestions(
+    chart,
+    { interests },
+    { transits, explored: [] }
+  );
 
   // Load profiles for the switcher (only if the visitor has a token)
   const hasToken = !!jar.get("kx_owner")?.value;
@@ -73,7 +95,7 @@ export default async function ChartPage({ params }: Props) {
         </div>
       </header>
 
-      <ChartExplorer chart={chart} chartId={id} interests={record.interests ?? []} />
+      <ChartExplorer chart={chart} chartId={id} interests={interests} suggested={suggested} />
     </main>
   );
 }

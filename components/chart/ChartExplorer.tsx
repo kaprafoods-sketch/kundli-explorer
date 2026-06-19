@@ -9,6 +9,7 @@ import DashaCard from "./DashaCard";
 import GrahaAIDock from "./GrahaAIDock";
 import ClientPlanetsTab from "./ClientPlanetsTab";
 import { type ChartPlacements } from "@/components/GrahaAI";
+import type { SuggestedQuestion } from "@/lib/suggestQuestions";
 
 type Tab = "chart" | "planets" | "transits";
 
@@ -17,6 +18,8 @@ interface Props {
   chartId: string;
   /** Life-area ids from onboarding — used to rank GRAHA AI starter chips. */
   interests?: string[];
+  /** Server-ranked starter questions for the general GRAHA AI chat. */
+  suggested?: SuggestedQuestion[];
 }
 
 const TABS: { id: Tab; label: string; glyph: string }[] = [
@@ -25,7 +28,7 @@ const TABS: { id: Tab; label: string; glyph: string }[] = [
   { id: "transits", label: "Transits", glyph: "☄" },
 ];
 
-export default function ChartExplorer({ chart, chartId, interests = [] }: Props) {
+export default function ChartExplorer({ chart, chartId, interests = [], suggested }: Props) {
   const [tab, setTab] = useState<Tab>("chart");
   const [selectedHouse, setSelectedHouse] = useState<number | null>(null);
   const [selectedBody, setSelectedBody] = useState<string | null>(null);
@@ -197,7 +200,7 @@ export default function ChartExplorer({ chart, chartId, interests = [] }: Props)
 
       {/* Unified GRAHA AI dock — single thumb-zone control with two modes
           (AI Astrologer chat + Astro Guru learn). Hidden on the sample chart. */}
-      {chartId && <GrahaAIDock chartId={chartId} placements={placements} interests={interests} />}
+      {chartId && <GrahaAIDock chartId={chartId} placements={placements} interests={interests} suggested={suggested} />}
     </div>
   );
 }

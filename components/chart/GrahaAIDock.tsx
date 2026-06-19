@@ -14,6 +14,7 @@
 import { useState, useEffect } from "react";
 import GrahaAIChat from "./GrahaAIChat";
 import GrahaAI, { type ChartPlacements } from "@/components/GrahaAI";
+import type { SuggestedQuestion } from "@/lib/suggestQuestions";
 
 type Mode = "astrologer" | "guru";
 
@@ -22,6 +23,8 @@ interface Props {
   placements: ChartPlacements;
   /** Onboarding life-area ids — rank the chat's cold-start chips. */
   interests?: string[];
+  /** Server-ranked starter questions (merit-based). */
+  suggested?: SuggestedQuestion[];
 }
 
 const MODES: { id: Mode; label: string; sub: string; glyph: string }[] = [
@@ -29,7 +32,7 @@ const MODES: { id: Mode; label: string; sub: string; glyph: string }[] = [
   { id: "guru",       label: "Astro Guru",    sub: "Learn the fundamentals", glyph: "📖" },
 ];
 
-export default function GrahaAIDock({ chartId, placements, interests }: Props) {
+export default function GrahaAIDock({ chartId, placements, interests, suggested }: Props) {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<Mode>("astrologer");
 
@@ -228,7 +231,7 @@ export default function GrahaAIDock({ chartId, placements, interests }: Props) {
             <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
               {mode === "astrologer" ? (
                 <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "0 16px 12px" }}>
-                  <GrahaAIChat chartId={chartId} interests={interests} />
+                  <GrahaAIChat chartId={chartId} interests={interests} suggested={suggested} />
                 </div>
               ) : (
                 <GrahaAI chart={placements} embedded />
