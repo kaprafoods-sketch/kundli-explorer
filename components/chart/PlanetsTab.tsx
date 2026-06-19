@@ -162,9 +162,9 @@ function PlanetOrb({ data, focused, hoveredId, onHover, onClick, reduced }: {
         </mesh>
       )}
 
-      {/* Hover tooltip */}
-      {hovered && (
-        <Html center position={[0, data.size + 0.32, 0]} style={{ pointerEvents: "none" }}>
+      {/* Name label — always visible; upgrades to full tooltip on hover */}
+      <Html center position={[0, data.size + 0.32, 0]} style={{ pointerEvents: "none" }}>
+        {hovered ? (
           <div style={{
             background: "rgba(10,15,36,0.95)",
             border: `1px solid ${data.palette.core}`,
@@ -183,8 +183,21 @@ function PlanetOrb({ data, focused, hoveredId, onHover, onClick, reduced }: {
               House {data.placement.house} · {bhava?.en}
             </div>
           </div>
-        </Html>
-      )}
+        ) : (
+          <div style={{
+            fontSize: 11,
+            fontWeight: 600,
+            color: data.palette.core,
+            fontFamily: "system-ui",
+            whiteSpace: "nowrap",
+            textShadow: "0 0 10px rgba(0,0,0,1), 0 0 4px rgba(0,0,0,0.9)",
+            letterSpacing: "0.05em",
+            textAlign: "center",
+          }}>
+            {graha?.sanskrit}
+          </div>
+        )}
+      </Html>
     </group>
   );
 }
@@ -268,8 +281,9 @@ function ShadowNebula({ data, onHover, onClick }: {
           blending={THREE.AdditiveBlending}
         />
       </points>
-      {hovered && (
-        <Html center position={[0, 0.55, 0]} style={{ pointerEvents: "none" }}>
+      {/* Name label — always visible; upgrades to full tooltip on hover */}
+      <Html center position={[0, 0.55, 0]} style={{ pointerEvents: "none" }}>
+        {hovered ? (
           <div style={{
             background: "rgba(10,15,36,0.95)",
             border: `1px solid ${data.palette.core}`,
@@ -288,8 +302,21 @@ function ShadowNebula({ data, onHover, onClick }: {
               House {data.placement.house} · {bhava?.en}
             </div>
           </div>
-        </Html>
-      )}
+        ) : (
+          <div style={{
+            fontSize: 11,
+            fontWeight: 600,
+            color: data.palette.core,
+            fontFamily: "system-ui",
+            whiteSpace: "nowrap",
+            textShadow: "0 0 10px rgba(0,0,0,1), 0 0 4px rgba(0,0,0,0.9)",
+            letterSpacing: "0.05em",
+            textAlign: "center",
+          }}>
+            {graha?.sanskrit}
+          </div>
+        )}
+      </Html>
     </group>
   );
 }
@@ -417,6 +444,8 @@ function OrreryScene({ planets, focusedId, onHover, onClick, reduced }: {
         minDistance={4}
         maxDistance={18}
         target={[0, 0, 0]}
+        autoRotate
+        autoRotateSpeed={-0.5}
       />
       <OrbitRings radii={orbitRadii} />
 
@@ -442,9 +471,9 @@ function OrreryScene({ planets, focusedId, onHover, onClick, reduced }: {
             {focusedId === "sun" && (
               <ElementParticles element={sun.element} palette={sun.palette} />
             )}
-            {/* Hover tooltip */}
-            {hoveredId === "sun" && (
-              <Html center position={[0, sun.size + 0.34, 0]} style={{ pointerEvents: "none" }}>
+            {/* Name label — always visible; upgrades to full tooltip on hover */}
+            <Html center position={[0, sun.size + 0.34, 0]} style={{ pointerEvents: "none" }}>
+              {hoveredId === "sun" ? (
                 <div style={{
                   background: "rgba(10,15,36,0.95)", border: "1px solid #ff8a2b",
                   borderRadius: 8, padding: "5px 12px", whiteSpace: "nowrap",
@@ -457,8 +486,21 @@ function OrreryScene({ planets, focusedId, onHover, onClick, reduced }: {
                     House {sun.placement.house} · {kb.bhavas[String(sun.placement.house)]?.en}
                   </div>
                 </div>
-              </Html>
-            )}
+              ) : (
+                <div style={{
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: "#ff8a2b",
+                  fontFamily: "system-ui",
+                  whiteSpace: "nowrap",
+                  textShadow: "0 0 10px rgba(0,0,0,1), 0 0 4px rgba(0,0,0,0.9)",
+                  letterSpacing: "0.05em",
+                  textAlign: "center",
+                }}>
+                  {kb.grahas.sun?.sanskrit}
+                </div>
+              )}
+            </Html>
           </group>
         </Float>
       )}
@@ -712,7 +754,7 @@ export default function PlanetsTab({ chart }: Props) {
   const handleHover = useCallback((id: string | null) => setHoveredId(id), []);
 
   return (
-    <div style={{ position: "relative", minHeight: "calc(100vh - 110px)" }}>
+    <div style={{ position: "relative", minHeight: "calc(100vh - 110px)", overflow: "hidden" }}>
       <Canvas
         aria-hidden="true"
         camera={{ position: [0, 4.2, 10.5], fov: 48 }}
