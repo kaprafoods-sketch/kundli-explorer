@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import type { ChartRow } from "@/lib/supabase";
+import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
 
 interface Props {
   currentId: string;
@@ -127,6 +128,10 @@ export default function ProfileSwitcher({ currentId, profiles }: Props) {
             >
               + Add new profile
             </Link>
+          </div>
+          {/* Language preference */}
+          <div style={{ borderTop: "1px solid var(--faint)", padding: "12px 14px" }}>
+            <LanguageSwitcher />
           </div>
         </div>
       )}

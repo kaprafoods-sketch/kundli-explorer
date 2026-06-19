@@ -5,6 +5,7 @@ import ClientSolarSystem from "@/components/ClientSolarSystem";
 import AnimatedKundliHero from "@/components/AnimatedKundliHero";
 import ProfilesGrid from "@/components/ProfilesGrid";
 import Logo from "@/components/Logo";
+import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
 import { listMyProfiles } from "@/app/actions/profiles";
 import type { ChartRow } from "@/lib/supabase";
 
@@ -47,6 +48,19 @@ export default async function Home() {
         className="relative min-h-screen flex flex-col"
         style={{ zIndex: 10 }}
       >
+        {/* Language switcher — top-right, reachable before any chart exists */}
+        <div
+          style={{
+            position: "absolute",
+            top: "calc(10px + var(--safe-top))",
+            right: "max(12px, var(--safe-right))",
+            zIndex: 20,
+            pointerEvents: "auto",
+          }}
+        >
+          <LanguageSwitcher withLabel={false} compact />
+        </div>
+
         {/* Welcome back banner — only when profiles exist */}
         {profiles.length > 0 && (
           <div
