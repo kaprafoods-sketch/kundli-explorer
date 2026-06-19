@@ -1,85 +1,271 @@
+import { cookies } from "next/headers";
+import Link from "next/link";
 import BirthForm from "@/components/BirthForm";
 import ClientSolarSystem from "@/components/ClientSolarSystem";
+import AnimatedKundliHero from "@/components/AnimatedKundliHero";
+import ProfilesGrid from "@/components/ProfilesGrid";
+import { listMyProfiles } from "@/app/actions/profiles";
+import type { ChartRow } from "@/lib/supabase";
 
-export default function Home() {
+export default async function Home() {
+  // Read owner token to surface saved profiles
+  const jar = await cookies();
+  const hasToken = !!jar.get("kx_owner")?.value;
+  const profiles: ChartRow[] = hasToken ? await listMyProfiles() : [];
+
   return (
     <main className="relative min-h-screen" style={{ background: "var(--bg)" }}>
-      {/* Full-screen 3D solar system — decorative background */}
+      {/* ── Layer 0: Full-screen 3D solar system ───────────────────── */}
       <div
         aria-hidden="true"
-        style={{
-          position: "fixed", inset: 0, zIndex: 0,
-          pointerEvents: "auto",
-        }}
+        style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "auto" }}
       >
         <ClientSolarSystem />
       </div>
 
-      {/* Content overlay — sits above the canvas */}
+      {/* ── Layer 1: Animated kundli — decorative background motif ─── */}
       <div
-        className="relative flex flex-col min-h-screen"
-        style={{ zIndex: 10, pointerEvents: "none" }}
+        aria-hidden="true"
+        style={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          zIndex: 1,
+          pointerEvents: "none",
+        }}
       >
-        {/* Hero text */}
-        <section
-          className="flex flex-col items-center justify-center pt-16 pb-6 px-6 text-center"
-          style={{ pointerEvents: "none" }}
-        >
-          <p
-            className="font-display text-xs tracking-[0.35em] uppercase mb-3"
-            style={{ color: "var(--brass)", letterSpacing: "0.3em" }}
-          >
-            Vedic Astrology · Jyotish
-          </p>
-          <h1
-            className="font-display font-semibold leading-tight mb-3"
-            style={{
-              fontSize: "clamp(2.4rem, 5vw, 3.6rem)",
-              color: "var(--parchment)",
-              textShadow: "0 2px 24px rgba(10,15,36,0.8)",
-            }}
-          >
-            Kundli Explorer
-          </h1>
-          <p
-            className="text-lg max-w-lg leading-relaxed mb-1"
-            style={{
-              color: "var(--muted)",
-              textShadow: "0 1px 12px rgba(10,15,36,0.9)",
-            }}
-          >
-            Learn astrology through your own kundli.
-          </p>
-          <p
-            className="text-sm max-w-md leading-relaxed"
-            style={{
-              color: "var(--faint)",
-              textShadow: "0 1px 8px rgba(10,15,36,0.9)",
-            }}
-          >
-            This is education, not prediction — click any planet to explore its cosmic role.
-          </p>
-        </section>
+        <AnimatedKundliHero
+          size={340}
+          style={{ opacity: 0.22 }}
+        />
+      </div>
 
-        {/* Birth form — glass card */}
-        <section
-          className="flex justify-center px-4 pb-20"
-          style={{ pointerEvents: "auto" }}
-        >
+      {/* ── Layer 2: Content overlay ────────────────────────────────── */}
+      <div
+        className="relative min-h-screen flex flex-col"
+        style={{ zIndex: 10 }}
+      >
+        {/* Welcome back banner — only when profiles exist */}
+        {profiles.length > 0 && (
           <div
-            className="w-full max-w-lg rounded-2xl"
+            className="flex items-center justify-between px-6 py-2.5"
             style={{
-              background: "rgba(11,16,38,0.82)",
-              border: "1px solid rgba(200,162,74,0.25)",
-              backdropFilter: "blur(20px)",
-              WebkitBackdropFilter: "blur(20px)",
-              boxShadow: "0 8px 48px rgba(0,0,0,0.5), 0 0 0 1px rgba(200,162,74,0.08)",
-              padding: "2rem",
+              background: "rgba(11,16,38,0.75)",
+              borderBottom: "1px solid rgba(200,162,74,0.18)",
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+              pointerEvents: "auto",
             }}
           >
-            <BirthForm />
+            <span style={{ fontSize: "0.82rem", color: "var(--muted)" }}>
+              <span style={{ color: "var(--brass)" }}>✦ Welcome back</span>
+              {" — "}
+              {profiles.length === 1 ? "1 saved kundli" : `${profiles.length} saved kundlis`}
+            </span>
+            <div style={{ display: "flex", gap: 8 }}>
+              {profiles.slice(0, 3).map((p) => (
+                <a
+                  key={p.id}
+                  href={`/chart/${p.id}`}
+                  style={{
+                    fontSize: "0.78rem",
+                    color: "var(--parchment)",
+                    textDecoration: "none",
+                    background: "rgba(200,162,74,0.1)",
+                    border: "1px solid rgba(200,162,74,0.22)",
+                    borderRadius: 5,
+                    padding: "3px 10px",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {p.name}
+                </a>
+              ))}
+              {profiles.length > 3 && (
+                <a
+                  href="#my-kundlis"
+                  style={{ fontSize: "0.78rem", color: "var(--brass)", textDecoration: "none", padding: "3px 6px" }}
+                >
+                  +{profiles.length - 3} more
+                </a>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* ── Hero section ─────────────────────────────────────────── */}
+        <section
+          className="flex-1 flex items-center justify-center px-4 py-10 lg:py-16"
+          style={{ minHeight: profiles.length > 0 ? "calc(100vh - 44px)" : "100vh" }}
+        >
+          {/*
+            Two-column on lg+: branding/kundli on left, form on right.
+            Stacked on mobile: form first (above fold), kundli below.
+          */}
+          <div
+            className="w-full max-w-5xl flex flex-col lg:flex-row items-center lg:items-start gap-10 lg:gap-16"
+          >
+            {/* ── Right col on desktop / First on mobile: Form ──────── */}
+            <div
+              className="w-full max-w-lg order-1 lg:order-2"
+              style={{ pointerEvents: "auto" }}
+            >
+              {/* Form glass card */}
+              <div
+                className="w-full rounded-2xl"
+                style={{
+                  background: "rgba(11,16,38,0.88)",
+                  border: "1px solid rgba(200,162,74,0.28)",
+                  backdropFilter: "blur(24px)",
+                  WebkitBackdropFilter: "blur(24px)",
+                  boxShadow: "0 8px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,162,74,0.08)",
+                  padding: "2rem",
+                }}
+              >
+                <BirthForm />
+              </div>
+
+              {/* Sample kundli link — below form */}
+              <p
+                className="text-center mt-4"
+                style={{ fontSize: "0.82rem", pointerEvents: "auto" }}
+              >
+                <span style={{ color: "var(--faint)" }}>Curious how it looks? </span>
+                <Link
+                  href="/chart/sample"
+                  style={{ color: "var(--brass)", textDecoration: "none", fontWeight: 500 }}
+                >
+                  See a sample kundli →
+                </Link>
+              </p>
+            </div>
+
+            {/* ── Left col on desktop / Second on mobile: Branding ──── */}
+            <div
+              className="w-full lg:max-w-sm order-2 lg:order-1 flex flex-col items-center lg:items-start gap-6 text-center lg:text-left"
+              style={{ pointerEvents: "none" }}
+            >
+              {/* Label */}
+              <p
+                className="font-display text-xs tracking-[0.3em] uppercase"
+                style={{ color: "var(--brass)" }}
+              >
+                Vedic Astrology · Jyotish
+              </p>
+
+              {/* Headline */}
+              <div>
+                <h1
+                  className="font-display font-semibold leading-tight"
+                  style={{
+                    fontSize: "clamp(2.2rem, 4.5vw, 3.2rem)",
+                    color: "var(--parchment)",
+                    textShadow: "0 2px 24px rgba(10,15,36,0.9)",
+                  }}
+                >
+                  Lagna
+                </h1>
+                <p
+                  style={{
+                    fontFamily: "var(--font-sanskrit)",
+                    fontSize: "1.1rem",
+                    color: "var(--brass)",
+                    letterSpacing: "0.05em",
+                    marginTop: 2,
+                  }}
+                >
+                  लग्न
+                </p>
+                <p
+                  className="mt-2 text-lg leading-snug"
+                  style={{
+                    color: "var(--muted)",
+                    textShadow: "0 1px 12px rgba(10,15,36,0.95)",
+                    fontStyle: "italic",
+                  }}
+                >
+                  See what your stars say — free, in under a minute
+                </p>
+              </div>
+
+              {/* Animated kundli — visible on desktop, hidden on mobile (decorative duplicate of the background) */}
+              <div
+                className="hidden lg:block"
+                style={{
+                  background: "rgba(11,16,38,0.45)",
+                  backdropFilter: "blur(8px)",
+                  WebkitBackdropFilter: "blur(8px)",
+                  borderRadius: 16,
+                  padding: "1.25rem",
+                  border: "1px solid rgba(200,162,74,0.15)",
+                }}
+              >
+                <AnimatedKundliHero
+                  size={260}
+                  style={{ opacity: 0.9 }}
+                />
+                <p
+                  style={{
+                    marginTop: 12,
+                    fontSize: "0.72rem",
+                    textAlign: "center",
+                    color: "var(--faint)",
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  Sample birth chart · Mesha lagna
+                </p>
+              </div>
+
+              {/* Value props */}
+              <ul
+                className="flex flex-col gap-2"
+                style={{ listStyle: "none", padding: 0, margin: 0 }}
+              >
+                {[
+                  "Your chart computed with Swiss Ephemeris accuracy",
+                  "Explore every planet, house, and yoga",
+                  "Education, not fortune-telling",
+                ].map((item) => (
+                  <li
+                    key={item}
+                    style={{
+                      fontSize: "0.83rem",
+                      color: "var(--muted)",
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: 8,
+                      textShadow: "0 1px 8px rgba(10,15,36,0.9)",
+                    }}
+                  >
+                    <span style={{ color: "var(--brass)", flexShrink: 0, marginTop: 1 }}>✦</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </section>
+
+        {/* ── My kundlis section (below fold) ──────────────────────── */}
+        {profiles.length > 0 && (
+          <section
+            id="my-kundlis"
+            className="px-4 pb-16"
+            style={{
+              background: "rgba(10,15,36,0.92)",
+              backdropFilter: "blur(20px)",
+              WebkitBackdropFilter: "blur(20px)",
+              pointerEvents: "auto",
+            }}
+          >
+            <div className="max-w-5xl mx-auto">
+              <ProfilesGrid initialProfiles={profiles} />
+            </div>
+          </section>
+        )}
       </div>
     </main>
   );

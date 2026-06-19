@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
-import { db } from "@/lib/db";
+import { supabase } from "@/lib/supabase";
 import { kb } from "@/lib/kb";
 import type { NatalChart } from "@/lib/astro/computeChart";
 import type { GrahaId } from "@/lib/kb";
@@ -30,9 +30,9 @@ Dasha: Currently in ${chart.dasha.current.maha.lord} Mahadasha / ${chart.dasha.c
 (${new Date(chart.dasha.current.maha.start).toDateString()} – ${new Date(chart.dasha.current.maha.end).toDateString()})
 
 TEACHING RULES (non-negotiable):
-1. Always TEACH the reasoning. Explain WHY — cite the actual placement, sign, dignity, and house in your answer. E.g., "Your Saturn is in Scorpio, an enemy sign for Saturn, in the 12th house of losses — this is why it expresses with friction."
+1. Always TEACH the reasoning. Explain WHY — cite the actual placement, sign, dignity, and house in your answer.
 2. NEVER make fatalistic statements ("you will suffer", "bad luck", "danger"). This is an educational tool.
-3. If asked for future predictions, explain what the dasha/transit placement MEANS and how the person can work with its energy — redirect to understanding and agency.
+3. If asked for future predictions, explain what the dasha/transit placement MEANS and how the person can work with its energy.
 4. Follow the Planet + House + Sign + Dignity + Aspects formula when interpreting.
 5. Cite the dignity explicitly (exalted / own / friend / neutral / enemy / debilitated).
 6. Keep answers concise but complete. Use paragraph breaks, not bullet lists by default.
@@ -61,22 +61,19 @@ export async function POST(req: NextRequest) {
     return new Response("Missing chartId or message", { status: 400 });
   }
 
-  const record = await db.chart.findUnique({ where: { id: chartId } });
+  const { data: record } = await supabase.from("Chart").select("*").eq("id", chartId).single();
   if (!record) return new Response("Chart not found", { status: 404 });
 
-  const chart = record.data as unknown as NatalChart;
+  const chart = record.data as NatalChart;
 
-  // Fetch recent history (last 20 turns)
-  const history = await db.tutorMessage.findMany({
-    where: { chartId },
-    orderBy: { createdAt: "asc" },
-    take: 20,
-  });
+  const { data: history } = await supabase
+    .from("TutorMessage")
+    .select("*")
+    .eq("chartId", chartId)
+    .order("createdAt", { ascending: true })
+    .limit(20);
 
-  // Persist user message
-  await db.tutorMessage.create({
-    data: { chartId, role: "user", content: message },
-  });
+  await supabase.from("TutorMessage").insert({ chartId, role: "user", content: message });
 
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
@@ -85,22 +82,18 @@ export async function POST(req: NextRequest) {
     max_tokens: 1024,
     system: SYSTEM_PROMPT(chart),
     messages: [
-      ...history.map((m) => ({ role: m.role as "user" | "assistant", content: m.content })),
+      ...((history ?? []).map((m) => ({ role: m.role as "user" | "assistant", content: m.content }))),
       { role: "user", content: message },
     ],
   });
 
-  // Collect the full response to persist
   let fullResponse = "";
 
   const readableStream = new ReadableStream({
     async start(controller) {
       try {
         for await (const chunk of stream) {
-          if (
-            chunk.type === "content_block_delta" &&
-            chunk.delta.type === "text_delta"
-          ) {
+          if (chunk.type === "content_block_delta" && chunk.delta.type === "text_delta") {
             const text = chunk.delta.text;
             fullResponse += text;
             controller.enqueue(new TextEncoder().encode(text));
@@ -108,11 +101,11 @@ export async function POST(req: NextRequest) {
         }
       } finally {
         controller.close();
-        // Persist assistant response after stream ends
         if (fullResponse) {
-          await db.tutorMessage.create({
-            data: { chartId, role: "assistant", content: fullResponse },
-          }).catch(console.error);
+          await supabase
+            .from("TutorMessage")
+            .insert({ chartId, role: "assistant", content: fullResponse })
+            .then(({ error }) => { if (error) console.error("persist assistant msg:", error); });
         }
       }
     },

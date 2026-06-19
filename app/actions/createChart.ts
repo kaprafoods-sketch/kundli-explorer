@@ -1,8 +1,9 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { db } from "@/lib/db";
-import { computeChart, type ChartInput, type Ayanamsha } from "@/lib/astro/computeChart";
+import { cookies } from "next/headers";
+import { supabase } from "@/lib/supabase";
+import { computeChart, type ChartInput } from "@/lib/astro/computeChart";
 
 export async function createChartAction(formData: FormData) {
   const name = (formData.get("name") as string)?.trim() || "Chart";
@@ -11,7 +12,6 @@ export async function createChartAction(formData: FormData) {
   const timeKnown = formData.get("timeKnown") !== "false";
   const lat = parseFloat(formData.get("lat") as string);
   const lon = parseFloat(formData.get("lon") as string);
-  const tz = (formData.get("tz") as string) || "UTC";
 
   if (!dateStr || isNaN(lat) || isNaN(lon)) {
     throw new Error("Missing required fields: date, latitude, longitude.");
@@ -27,27 +27,41 @@ export async function createChartAction(formData: FormData) {
     minute = m ?? 0;
   }
 
-  const input: ChartInput = {
-    name,
-    year, month, day,
-    hour, minute,
-    lat, lon,
-    timeKnown,
-  };
-
+  const input: ChartInput = { name, year, month, day, hour, minute, lat, lon, timeKnown };
   const chart = await computeChart(input);
 
-  const record = await db.chart.create({
-    data: {
+  // Get or create the anonymous owner token (cookie persists 5 years)
+  const jar = await cookies();
+  let ownerToken = jar.get("kx_owner")?.value;
+  if (!ownerToken) {
+    ownerToken = crypto.randomUUID();
+    jar.set("kx_owner", ownerToken, {
+      httpOnly: true,
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365 * 5,
+      sameSite: "lax",
+    });
+  }
+
+  const { data: record, error } = await supabase
+    .from("Chart")
+    .insert({
       name,
       dob: chart.meta.dob,
       lat,
       lon,
       tz: chart.meta.tz,
       ayanamsha: chart.meta.ayanamsha,
-      data: chart as unknown as Parameters<typeof db.chart.create>[0]["data"]["data"],
-    },
-  });
+      data: chart,
+      ownerToken,
+    })
+    .select("id")
+    .single();
+
+  if (error) {
+    console.error("[createChartAction] insert failed:", error);
+    throw new Error(error.message);
+  }
 
   redirect(`/chart/${record.id}`);
 }

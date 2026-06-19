@@ -7,17 +7,21 @@ datasource db {
 }
 
 model Chart {
-  id        String   @id @default(cuid())
-  name      String
-  dob       String
-  lat       Float
-  lon       Float
-  tz        String
-  ayanamsha String   @default("LAHIRI")
-  data      Json
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  name       String
+  dob        String
+  lat        Float
+  lon        Float
+  tz         String
+  ayanamsha  String   @default("LAHIRI")
+  data       Json
+  createdAt  DateTime @default(now())
+  ownerToken String?
+  relation   String?
 
   messages TutorMessage[]
+
+  @@index([ownerToken])
 }
 
 model TutorMessage {

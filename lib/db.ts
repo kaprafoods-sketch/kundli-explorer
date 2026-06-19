@@ -8,17 +8,18 @@ declare global {
 }
 
 function makePrismaClient() {
+  // DATABASE_URL = pooled PgBouncer URL (port 6543) — publicly reachable from Vercel.
+  // DIRECT_URL (port 5432) is only accessible from Supabase's own network, not serverless.
+  const connStr = process.env.DATABASE_URL!;
   const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: process.env.DATABASE_URL?.includes("supabase.com")
-      ? { rejectUnauthorized: false }
-      : undefined,
+    connectionString: connStr,
+    ssl: connStr.includes("supabase.com") ? { rejectUnauthorized: false } : undefined,
+    max: 1,
   });
   const adapter = new PrismaPg(pool);
-  return new PrismaClient({ adapter } as ConstructorParameters<typeof PrismaClient>[0]);
+  return new PrismaClient({ adapter });
 }
 
-// Singleton: reuse in dev across hot reloads, create fresh in production
 export const db =
   process.env.NODE_ENV === "production"
     ? makePrismaClient()

@@ -120,7 +120,7 @@ export default function BirthForm() {
               className="text-xs underline"
               style={{ color: "var(--brass)" }}
             >
-              {timeKnown ? "I don&apos;t know my time" : "I know my time"}
+              {timeKnown ? "I don't know my time" : "I know my time"}
             </button>
           </label>
         </div>

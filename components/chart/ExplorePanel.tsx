@@ -8,21 +8,21 @@ import {
   composeLagnaReading,
 } from "@/lib/interpret";
 import { kb, GRAHA_GLYPHS, type GrahaId } from "@/lib/kb";
+import InsightSection from "./InsightSection";
 
 interface Props {
   chart: NatalChart;
   placements: Placement[];
   selectedBody: string | null;
   selectedHouse: number | null;
-  isSimulate: boolean;
+  chartId?: string;
 }
 
 export default function ExplorePanel({
-  chart, placements, selectedBody, selectedHouse, isSimulate,
+  chart, placements, selectedBody, selectedHouse, chartId,
 }: Props) {
   const result = useMemo(() => {
     if (selectedBody === "lagna" || selectedBody === null && selectedHouse === null) {
-      // Default or lagna selected
       if (selectedBody === "lagna") {
         return { type: "lagna" as const, data: composeLagnaReading(chart.lagnaSign, placements) };
       }
@@ -35,7 +35,7 @@ export default function ExplorePanel({
       return {
         type: "planet" as const,
         placement: p,
-        data: composePlanetInterpretation(p, placements, isSimulate),
+        data: composePlanetInterpretation(p, placements),
       };
     }
 
@@ -48,7 +48,7 @@ export default function ExplorePanel({
     }
 
     return null;
-  }, [selectedBody, selectedHouse, placements, chart.lagnaSign, isSimulate]);
+  }, [selectedBody, selectedHouse, placements, chart.lagnaSign]);
 
   if (!result) {
     return (
@@ -162,6 +162,14 @@ export default function ExplorePanel({
             ))}
           </div>
         </div>
+
+        {/* AI deep reading — Layer 2 */}
+        {chartId && (
+          <InsightSection
+            chartId={chartId}
+            target={{ kind: "planet", id: placement.body }}
+          />
+        )}
       </div>
     );
   }
@@ -227,6 +235,14 @@ export default function ExplorePanel({
             ))}
           </div>
         </div>
+
+        {/* AI deep reading — Layer 2 */}
+        {chartId && (
+          <InsightSection
+            chartId={chartId}
+            target={{ kind: "house", id: house }}
+          />
+        )}
       </div>
     );
   }
@@ -254,6 +270,14 @@ export default function ExplorePanel({
           <p className="text-xs uppercase tracking-widest mb-2" style={{ color: "var(--faint)" }}>Lagna lord</p>
           <p className="text-sm" style={{ color: "var(--muted)" }}>{data.pillars.planet}</p>
         </div>
+
+        {/* AI deep reading — Layer 2 */}
+        {chartId && (
+          <InsightSection
+            chartId={chartId}
+            target={{ kind: "lagna", id: "lagna" }}
+          />
+        )}
       </div>
     );
   }

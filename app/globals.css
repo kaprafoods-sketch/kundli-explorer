@@ -1,20 +1,42 @@
 @import "tailwindcss";
 
-/* ── Kundli Explorer design tokens ─────────────────────────────── */
+/* ── Lagna design tokens ────────────────────────────────────────── */
 :root {
-  /* Core palette — celestial observatory / Jantar Mantar at night */
-  --bg: #0A0F24;
-  --panel: #111733;
-  --panel-2: #0E1430;
-  --brass: #C8A24A;
-  --brass-bright: #F0CE7A;
-  --parchment: #ECE7D7;
-  --muted: #8E97B8;
-  --faint: #5B648C;
+  /* Brand palette — Lagna · Indigo night sky */
+  --ink: #0A0E24;
+  --ink-1: #0D1330;
+  --ink-2: #161E42;
+  --ink-3: #202a58;
+  --line: rgba(199,162,76,.22);
+  --line-soft: rgba(199,162,76,.12);
+  --brass: #C7A24C;
+  --brass-bright: #E6C56A;
+  --brass-deep: #9C7C34;
+  --parchment: #F3EAD3;
+  --sand: #EFE6CE;
+  --sand-2: #E4D7B6;
+  --muted: #9AA0C0;
+  --muted-2: #6E7399;
+
+  /* Navagraha gem system */
+  --surya: #D8453E;    /* Sun · Ruby */
+  --chandra: #D7DEEC; /* Moon · Pearl */
+  --mangala: #E66A3C; /* Mars · Red Coral */
+  --budha: #2FA06B;   /* Mercury · Emerald */
+  --guru: #E4B23E;    /* Jupiter · Yellow Sapphire */
+  --shukra: #E6C3CE;  /* Venus · Diamond */
+  --shani: #3E63C9;   /* Saturn · Blue Sapphire */
+  --rahu: #B5702F;    /* Rahu · Hessonite */
+  --ketu: #8F948C;    /* Ketu · Cat's Eye */
+
+  /* Semantic aliases — keeps existing components working */
+  --bg: var(--ink-1);
+  --panel: var(--ink-2);
+  --panel-2: var(--ink-3);
+  --faint: var(--muted-2);
 
   /* Semantic states */
-  --whatif: #5FB0B7;      /* simulate/what-if mode ONLY — teal = "not real" */
-  --weak: #D98C6A;        /* debilitated / strained dignity */
+  --weak: #D98C6A;
   --success: #6EBF8B;
   --error: #E07070;
 
@@ -22,9 +44,11 @@
   --background: var(--bg);
   --foreground: var(--parchment);
 
-  /* Typography vars */
-  --font-display: var(--font-cormorant), Georgia, serif;
-  --font-ui: var(--font-inter), system-ui, sans-serif;
+  /* Typography */
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-ui: var(--font-hanken), system-ui, sans-serif;
+  --font-mono: var(--font-ibm-mono), 'Courier New', monospace;
+  --font-sanskrit: var(--font-tiro), serif;
 }
 
 @theme inline {
@@ -105,13 +129,30 @@ body {
   font-weight: 500;
 }
 
+/* ── Kundli hero animations ─────────────────────────────────────── */
+@keyframes kundliLine {
+  from { stroke-dashoffset: 1; }
+  to   { stroke-dashoffset: 0; }
+}
+@keyframes kundliFade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes kundliGlyphIn {
+  from { opacity: 0; transform: scale(0.6); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes kundliPulse {
+  0%, 100% { opacity: 0.28; }
+  50%       { opacity: 0.42; }
+}
+
 /* ── Utility classes ────────────────────────────────────────────── */
 .font-display { font-family: var(--font-display); }
 .text-brass   { color: var(--brass); }
 .text-brass-bright { color: var(--brass-bright); }
 .text-muted   { color: var(--muted); }
 .text-faint   { color: var(--faint); }
-.text-whatif  { color: var(--whatif); }
 .text-weak    { color: var(--weak); }
 .text-parchment { color: var(--parchment); }
 
@@ -149,9 +190,3 @@ body {
 .badge-enemy        { background: rgba(224,112,112,0.12); color: var(--error); border: 1px solid rgba(224,112,112,0.4); }
 .badge-debilitated  { background: rgba(208,140,106,0.18); color: var(--weak); border: 1px solid var(--weak); }
 
-/* What-if mode banner */
-.whatif-banner {
-  background: rgba(95,176,183,0.12);
-  border: 1px solid var(--whatif);
-  color: var(--whatif);
-}

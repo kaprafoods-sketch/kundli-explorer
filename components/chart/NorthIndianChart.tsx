@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import type { Placement } from "@/lib/astro/computeChart";
-import { kb, GRAHA_GLYPHS, type GrahaId } from "@/lib/kb";
+import { GRAHA_GLYPHS, type GrahaId } from "@/lib/kb";
 
 // ── Geometry constants from spec §6 ──────────────────────────────────────────
 
@@ -31,11 +31,6 @@ function signForHouse(lagnaSign: number, house: number): number {
   return ((lagnaSign - 1 + house - 1) % 12) + 1;
 }
 
-const SIGN_SHORT = [
-  "", "Ar", "Ta", "Ge", "Ca", "Le", "Vi",
-  "Li", "Sc", "Sg", "Cp", "Aq", "Pi",
-];
-
 const SIGN_SANSKRIT_SHORT = [
   "", "Mes", "Vrs", "Mit", "Kar", "Sim", "Kan",
   "Tul", "Vri", "Dha", "Mak", "Kum", "Mee",
@@ -48,8 +43,6 @@ interface Props {
   lagnaSign: number;
   selectedHouse: number | null;
   selectedBody: string | null;
-  pickedBody: string | null;
-  isSimulate: boolean;
   onHouseClick: (house: number) => void;
   onBodyClick: (body: string) => void;
   size?: number;
@@ -57,8 +50,7 @@ interface Props {
 
 export default function NorthIndianChart({
   placements, lagnaSign,
-  selectedHouse, selectedBody, pickedBody,
-  isSimulate, onHouseClick, onBodyClick,
+  selectedHouse, selectedBody, onHouseClick, onBodyClick,
   size = 440,
 }: Props) {
   const PAD = 8;
@@ -113,7 +105,6 @@ export default function NorthIndianChart({
         const signNum = signForHouse(lagnaSign, h);
         const planets = housePlanets[h] ?? [];
         const sel = isSelected(h);
-        const hasPicked = planets.some((p) => p.body === pickedBody);
 
         return (
           <g
@@ -128,20 +119,8 @@ export default function NorthIndianChart({
             {/* House fill */}
             <polygon
               points={polyPoints(poly)}
-              fill={
-                sel
-                  ? "rgba(200,162,74,0.12)"
-                  : isSimulate && pickedBody && !hasPicked
-                  ? "rgba(95,176,183,0.05)"
-                  : "transparent"
-              }
-              stroke={
-                sel
-                  ? "var(--brass-bright)"
-                  : isSimulate && pickedBody
-                  ? "var(--whatif)"
-                  : "var(--faint)"
-              }
+              fill={sel ? "rgba(200,162,74,0.12)" : "transparent"}
+              stroke={sel ? "var(--brass-bright)" : "var(--faint)"}
               strokeWidth={sel ? 1.5 : 0.8}
               filter={sel ? "url(#glow)" : undefined}
             />
@@ -178,13 +157,10 @@ export default function NorthIndianChart({
             {planets.map((p, i) => {
               const gid = p.body as GrahaId;
               const glyph = GRAHA_GLYPHS[gid] ?? "?";
-              const isPicked = pickedBody === p.body;
               const isSel = selectedBody === p.body;
-              const totalRows = Math.ceil(planets.length / 2);
               const row = Math.floor(i / 2);
               const col = i % 2;
-              const startY = svgCy + 8;
-              const py = startY + row * 14;
+              const py = svgCy + 8 + row * 14;
               const px = svgCx + (col === 0 ? -8 : 8);
 
               return (
@@ -197,14 +173,8 @@ export default function NorthIndianChart({
                   onClick={(e) => { e.stopPropagation(); onBodyClick(p.body); }}
                   onKeyDown={(e) => { if (e.key === "Enter") { e.stopPropagation(); onBodyClick(p.body); } }}
                 >
-                  {(isPicked || isSel) && (
-                    <circle
-                      cx={px}
-                      cy={py}
-                      r={9}
-                      fill={isPicked ? "rgba(95,176,183,0.3)" : "rgba(200,162,74,0.2)"}
-                      filter="url(#glow)"
-                    />
+                  {isSel && (
+                    <circle cx={px} cy={py} r={9} fill="rgba(200,162,74,0.2)" filter="url(#glow)" />
                   )}
                   <text
                     x={px}
@@ -214,9 +184,7 @@ export default function NorthIndianChart({
                     fontSize={p.retrograde ? 11 : 13}
                     fontFamily="serif"
                     fill={
-                      isPicked
-                        ? "var(--whatif)"
-                        : isSel
+                      isSel
                         ? "var(--brass-bright)"
                         : p.dignity === "debilitated"
                         ? "var(--weak)"

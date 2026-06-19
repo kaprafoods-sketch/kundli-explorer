@@ -162,8 +162,7 @@ function aspectSentence(
 
 export function composePlanetInterpretation(
   placement: Placement,
-  allPlacements: Placement[],
-  hypothetical = false
+  allPlacements: Placement[]
 ): InterpretationResult {
   const grahaId = placement.body as GrahaId;
   const graha = kb.grahas[grahaId];
@@ -209,9 +208,7 @@ export function composePlanetInterpretation(
 
   const houseClassNote = houseClassDesc ? ` ${houseClassDesc}.` : "";
 
-  const headline = hypothetical
-    ? `[What-if] ${graha.sanskrit}/${graha.en} in House ${placement.house} (${rashi.en})`
-    : `${graha.sanskrit}/${graha.en} · House ${placement.house} · ${rashi.en}`;
+  const headline = `${graha.sanskrit}/${graha.en} · House ${placement.house} · ${rashi.en}`;
 
   const body = [
     planetPillar,

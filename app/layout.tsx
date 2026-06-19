@@ -1,26 +1,42 @@
 import type { Metadata } from "next";
-import { Cormorant } from "next/font/google";
-import { Inter } from "next/font/google";
+import { Fraunces, Hanken_Grotesk, IBM_Plex_Mono, Tiro_Devanagari_Sanskrit } from "next/font/google";
 import "./globals.css";
 
-const cormorant = Cormorant({
-  variable: "--font-cormorant",
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["300", "400", "500", "600"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
-const inter = Inter({
-  variable: "--font-inter",
+const hankenGrotesk = Hanken_Grotesk({
+  variable: "--font-hanken",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  display: "swap",
+});
+
+const ibmPlexMono = IBM_Plex_Mono({
+  variable: "--font-ibm-mono",
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  display: "swap",
+});
+
+const tiroDevanagari = Tiro_Devanagari_Sanskrit({
+  variable: "--font-tiro",
+  subsets: ["devanagari", "latin"],
+  weight: ["400"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Kundli Explorer — Learn astrology through your own chart",
+  title: "Lagna — Learn astrology through your own chart",
   description:
     "An educational Vedic astrology tool. Compute your natal chart, understand every placement, and ask an AI tutor grounded in your real kundli.",
-  keywords: ["vedic astrology", "kundli", "birth chart", "jyotish", "learn astrology"],
+  keywords: ["vedic astrology", "kundli", "birth chart", "jyotish", "lagna", "learn astrology"],
 };
 
 export default function RootLayout({
@@ -29,7 +45,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${cormorant.variable} ${inter.variable} h-full`}
+      className={`${fraunces.variable} ${hankenGrotesk.variable} ${ibmPlexMono.variable} ${tiroDevanagari.variable} h-full`}
     >
       <body className="min-h-full flex flex-col antialiased">
         {children}
