@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { supabase } from "@/lib/supabase";
 import { kb } from "@/lib/kb";
 import {
@@ -192,8 +192,8 @@ Do NOT add "## Why this matters for you". Do NOT add any other sections.`;
 // ── Route handler ─────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
-  if (!process.env.ANTHROPIC_API_KEY?.trim()) {
-    return new Response("ANTHROPIC_API_KEY not configured", { status: 503 });
+  if (!process.env.GEMINI_API_KEY?.trim()) {
+    return new Response("GEMINI_API_KEY not configured", { status: 503 });
   }
 
   let chartId: string;
@@ -243,30 +243,23 @@ export async function POST(req: NextRequest) {
     return new Response("Invalid target kind", { status: 400 });
   }
 
-  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.0-flash",
+    systemInstruction: systemPrompt,
+  });
 
-  const stream = anthropic.messages.stream({
-    model: "claude-sonnet-4-6",
-    max_tokens: 900,
-    system: systemPrompt,
-    messages: [
-      {
-        role: "user",
-        content: "Please compose my reading now.",
-      },
-    ],
+  const result = await model.generateContentStream({
+    contents: [{ role: "user", parts: [{ text: "Please compose my reading now." }] }],
+    generationConfig: { maxOutputTokens: 900 },
   });
 
   const readable = new ReadableStream({
     async start(controller) {
       try {
-        for await (const chunk of stream) {
-          if (
-            chunk.type === "content_block_delta" &&
-            chunk.delta.type === "text_delta"
-          ) {
-            controller.enqueue(new TextEncoder().encode(chunk.delta.text));
-          }
+        for await (const chunk of result.stream) {
+          const text = chunk.text();
+          if (text) controller.enqueue(new TextEncoder().encode(text));
         }
       } finally {
         controller.close();

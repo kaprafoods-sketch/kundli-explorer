@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import { supabase } from "@/lib/supabase";
 import { kb } from "@/lib/kb";
 import type { NatalChart } from "@/lib/astro/computeChart";
@@ -42,8 +42,8 @@ Be warm, grounded, and intellectually honest — this is astrology as a tool for
 };
 
 export async function POST(req: NextRequest) {
-  if (!process.env.ANTHROPIC_API_KEY?.trim()) {
-    return new Response("ANTHROPIC_API_KEY not configured", { status: 503 });
+  if (!process.env.GEMINI_API_KEY?.trim()) {
+    return new Response("GEMINI_API_KEY not configured", { status: 503 });
   }
 
   let chartId: string;
@@ -75,26 +75,30 @@ export async function POST(req: NextRequest) {
 
   await supabase.from("TutorMessage").insert({ chartId, role: "user", content: message });
 
-  const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-
-  const stream = anthropic.messages.stream({
-    model: "claude-sonnet-4-6",
-    max_tokens: 1024,
-    system: SYSTEM_PROMPT(chart),
-    messages: [
-      ...((history ?? []).map((m) => ({ role: m.role as "user" | "assistant", content: m.content }))),
-      { role: "user", content: message },
-    ],
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.0-flash",
+    systemInstruction: SYSTEM_PROMPT(chart),
   });
+
+  const contents = [
+    ...((history ?? []).map((m) => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content as string }],
+    }))),
+    { role: "user", parts: [{ text: message }] },
+  ];
+
+  const result = await model.generateContentStream({ contents });
 
   let fullResponse = "";
 
   const readableStream = new ReadableStream({
     async start(controller) {
       try {
-        for await (const chunk of stream) {
-          if (chunk.type === "content_block_delta" && chunk.delta.type === "text_delta") {
-            const text = chunk.delta.text;
+        for await (const chunk of result.stream) {
+          const text = chunk.text();
+          if (text) {
             fullResponse += text;
             controller.enqueue(new TextEncoder().encode(text));
           }
