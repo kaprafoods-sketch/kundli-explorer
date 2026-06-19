@@ -121,7 +121,9 @@ export default async function Home() {
                   backdropFilter: "blur(24px)",
                   WebkitBackdropFilter: "blur(24px)",
                   boxShadow: "0 8px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,162,74,0.08)",
-                  padding: "2rem",
+                  maxHeight: "calc(100vh - 120px)",
+                  overflowY: "auto",
+                  scrollbarWidth: "none",
                 }}
               >
                 <BirthForm />

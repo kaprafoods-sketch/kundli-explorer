@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { NatalChart } from "@/lib/astro/computeChart";
 import NorthIndianChart from "./NorthIndianChart";
 import ExplorePanel from "./ExplorePanel";
@@ -8,6 +8,7 @@ import TransitsTab from "./TransitsTab";
 import DashaCard from "./DashaCard";
 import GrahaAILauncher from "./GrahaAILauncher";
 import ClientPlanetsTab from "./ClientPlanetsTab";
+import GrahaAI, { type ChartPlacements } from "@/components/GrahaAI";
 
 type Tab = "chart" | "planets" | "transits";
 
@@ -26,6 +27,16 @@ export default function ChartExplorer({ chart, chartId }: Props) {
   const [tab, setTab] = useState<Tab>("chart");
   const [selectedHouse, setSelectedHouse] = useState<number | null>(null);
   const [selectedBody, setSelectedBody] = useState<string | null>(null);
+
+  const placements = useMemo<ChartPlacements>(() => {
+    const m: ChartPlacements = {};
+    for (const p of chart.placements) {
+      if (p.body !== "lagna") {
+        m[p.body] = { house: p.house, signId: p.sign };
+      }
+    }
+    return m;
+  }, [chart.placements]);
 
   function handleHouseClick(house: number) {
     setSelectedHouse(house);
@@ -104,6 +115,9 @@ export default function ChartExplorer({ chart, chartId }: Props) {
 
       {/* GRAHA AI floating launcher — hidden on sample chart (chartId === "") */}
       {chartId && <GrahaAILauncher chartId={chartId} />}
+
+      {/* GRAHA AI educational assistant */}
+      <GrahaAI chart={chartId ? placements : undefined} />
     </div>
   );
 }
