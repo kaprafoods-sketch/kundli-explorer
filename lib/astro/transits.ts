@@ -28,12 +28,13 @@ export interface TransitPlanet {
 }
 
 /**
- * Compute today's sidereal transit positions and map them to natal whole-sign houses.
- * Lahiri ayanamsha (matches natal chart default).
+ * Compute sidereal transit positions for a given date and map to natal whole-sign houses.
+ * Defaults to right now. Lahiri ayanamsha (matches natal chart default).
  */
 export async function computeTransits(
   natalLagnaSign: number,
-  ayanamsha: "LAHIRI" | "RAMAN" | "KP" = "LAHIRI"
+  ayanamsha: "LAHIRI" | "RAMAN" | "KP" = "LAHIRI",
+  date?: Date
 ): Promise<TransitPlanet[]> {
   const AYANAMSHA_MODES: Record<string, number> = { LAHIRI: 1, RAMAN: 3, KP: 36 };
 
@@ -41,7 +42,7 @@ export async function computeTransits(
   const c = s.constants;
   s.set_sid_mode(AYANAMSHA_MODES[ayanamsha] ?? 1, 0, 0);
 
-  const now = DateTime.utc();
+  const now = date ? DateTime.fromJSDate(date, { zone: "utc" }) : DateTime.utc();
   const jd: number = s.julday(
     now.year, now.month, now.day,
     now.hour + now.minute / 60 + now.second / 3600,
