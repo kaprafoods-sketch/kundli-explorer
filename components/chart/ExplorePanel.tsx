@@ -16,10 +16,11 @@ interface Props {
   selectedBody: string | null;
   selectedHouse: number | null;
   chartId?: string;
+  interests?: string[];
 }
 
 export default function ExplorePanel({
-  chart, placements, selectedBody, selectedHouse, chartId,
+  chart, placements, selectedBody, selectedHouse, chartId, interests,
 }: Props) {
   const result = useMemo(() => {
     if (selectedBody === "lagna" || selectedBody === null && selectedHouse === null) {
@@ -168,6 +169,7 @@ export default function ExplorePanel({
           <GrahaAIChat
             chartId={chartId}
             focus={{ kind: "planet", id: placement.body }}
+            interests={interests}
             compact
           />
         )}
@@ -242,6 +244,7 @@ export default function ExplorePanel({
           <GrahaAIChat
             chartId={chartId}
             focus={{ kind: "house", id: house }}
+            interests={interests}
             compact
           />
         )}
@@ -278,6 +281,7 @@ export default function ExplorePanel({
           <GrahaAIChat
             chartId={chartId}
             focus={{ kind: "lagna" }}
+            interests={interests}
             compact
           />
         )}

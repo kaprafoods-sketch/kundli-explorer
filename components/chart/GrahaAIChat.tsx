@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import Markdown from "./Markdown";
+import ReadingFeedback from "./ReadingFeedback";
+
+const ERROR_TEXT = "Something went wrong. Please try again.";
 
 export type GrahaFocus =
   | { kind: "planet"; id: string }
@@ -17,6 +20,9 @@ interface Props {
   chartId: string;
   focus?: GrahaFocus;
   compact?: boolean;
+  /** Life-area ids the user picked at onboarding — used to rank cold-start chips.
+   *  (Phase 2 replaces this simple ordering with the suggestQuestions engine.) */
+  interests?: string[];
 }
 
 const STARTERS: Record<string, string[]> = {
@@ -42,7 +48,32 @@ const STARTERS: Record<string, string[]> = {
   ],
 };
 
-export default function GrahaAIChat({ chartId, focus, compact }: Props) {
+// One interest-leaning opener per life area, grounded in the chart (not generic).
+const INTEREST_STARTERS: Record<string, string> = {
+  love: "What does my chart show about relationships?",
+  career: "What does my chart show about my career path?",
+  health: "What does my chart show about my vitality?",
+  money: "What does my chart show about wealth and finances?",
+  personality: "What are the core traits of my personality?",
+  spirituality: "What does my chart show about my spiritual path?",
+  learning: "Where should I start learning my own chart?",
+  family: "What does my chart show about home and family?",
+  education: "What does my chart show about my studies?",
+  travel: "What does my chart show about travel and foreign lands?",
+};
+
+/** Cold-start chips: interest-matching questions first, then general fallbacks. */
+function buildGeneralStarters(interests?: string[]): string[] {
+  const base = STARTERS.general;
+  if (!interests || interests.length === 0) return base;
+  const interestQs = interests
+    .map((id) => INTEREST_STARTERS[id])
+    .filter((q): q is string => Boolean(q));
+  // interest-first, dedup, then keep general fallbacks; cap at 5 chips.
+  return Array.from(new Set([...interestQs, ...base])).slice(0, 5);
+}
+
+export default function GrahaAIChat({ chartId, focus, compact, interests }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
@@ -98,7 +129,7 @@ export default function GrahaAIChat({ chartId, focus, compact }: Props) {
         const next = [...prev];
         next[next.length - 1] = {
           role: "assistant",
-          content: "Something went wrong. Please try again.",
+          content: ERROR_TEXT,
         };
         return next;
       });
@@ -145,7 +176,9 @@ export default function GrahaAIChat({ chartId, focus, compact }: Props) {
 
   // ── Compact chat (embedded in ExplorePanel) ──────────────────────────────────
 
-  const starters = STARTERS[focus?.kind ?? "general"];
+  // Focus-specific chips when a planet/house/lagna is selected; otherwise
+  // interest-ranked cold-start chips.
+  const starters = focus ? STARTERS[focus.kind] : buildGeneralStarters(interests);
 
   const wrapStyle: React.CSSProperties = compact
     ? {
@@ -232,25 +265,34 @@ export default function GrahaAIChat({ chartId, focus, compact }: Props) {
                 {m.content}
               </div>
             ) : (
-              <div
-                style={{
-                  maxWidth: "95%",
-                  padding: "10px 13px",
-                  borderRadius: 10,
-                  border: "1px solid var(--faint)",
-                  background: "rgba(200,162,74,0.04)",
-                }}
-              >
-                {m.content ? (
-                  <Markdown text={m.content} />
-                ) : (
-                  <span
-                    className="animate-pulse"
-                    style={{ fontSize: "0.78rem", color: "var(--faint)" }}
-                  >
-                    thinking…
-                  </span>
-                )}
+              <div style={{ maxWidth: "95%", display: "flex", flexDirection: "column" }}>
+                <div
+                  style={{
+                    padding: "10px 13px",
+                    borderRadius: 10,
+                    border: "1px solid var(--faint)",
+                    background: "rgba(200,162,74,0.04)",
+                  }}
+                >
+                  {m.content ? (
+                    <Markdown text={m.content} />
+                  ) : (
+                    <span
+                      className="animate-pulse"
+                      style={{ fontSize: "0.78rem", color: "var(--faint)" }}
+                    >
+                      thinking…
+                    </span>
+                  )}
+                </div>
+
+                {/* Feedback — only after the message has fully streamed, and not
+                    for the error fallback. */}
+                {m.content &&
+                  m.content !== ERROR_TEXT &&
+                  !(streaming && i === messages.length - 1) && (
+                    <ReadingFeedback chartId={chartId} content={m.content} />
+                  )}
               </div>
             )}
           </div>

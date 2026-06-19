@@ -73,7 +73,7 @@ export default async function ChartPage({ params }: Props) {
         </div>
       </header>
 
-      <ChartExplorer chart={chart} chartId={id} />
+      <ChartExplorer chart={chart} chartId={id} interests={record.interests ?? []} />
     </main>
   );
 }

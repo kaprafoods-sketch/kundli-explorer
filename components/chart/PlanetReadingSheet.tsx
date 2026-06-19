@@ -17,6 +17,7 @@ interface Props {
   placement: Placement;
   chart: NatalChart;
   chartId?: string;
+  interests?: string[];
   /** Rendered inside an orrery canvas overlay (dark bg, slide-in) */
   variant?: "orrery" | "panel";
   onBack?: () => void;
@@ -27,6 +28,7 @@ export default function PlanetReadingSheet({
   placement,
   chart,
   chartId,
+  interests,
   variant = "panel",
   onBack,
   backLabel = "← Back",
@@ -205,6 +207,7 @@ export default function PlanetReadingSheet({
         <GrahaAIChat
           chartId={chartId}
           focus={{ kind: "planet", id: placement.body }}
+          interests={interests}
           compact
         />
       )}

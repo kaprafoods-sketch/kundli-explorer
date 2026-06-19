@@ -545,9 +545,10 @@ function OrreryScene({ planets, focusedId, onHover, onClick, reduced }: {
 interface Props {
   chart: NatalChart;
   chartId: string;
+  interests?: string[];
 }
 
-export default function PlanetsTab({ chart }: Props) {
+export default function PlanetsTab({ chart, chartId, interests }: Props) {
   const reduced = useReducedMotion();
   const [focusedId, setFocusedId] = useState<string | null>(null);
   const [, setHoveredId] = useState<string | null>(null);
@@ -621,6 +622,8 @@ export default function PlanetsTab({ chart }: Props) {
         <PlanetReadingSheet
           placement={focusedPlanet.placement}
           chart={chart}
+          chartId={chartId || undefined}
+          interests={interests}
           variant="orrery"
           onBack={() => setFocusedId(null)}
           backLabel="← Orrery"

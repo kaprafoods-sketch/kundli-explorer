@@ -20,6 +20,8 @@ type Mode = "astrologer" | "guru";
 interface Props {
   chartId: string;
   placements: ChartPlacements;
+  /** Onboarding life-area ids — rank the chat's cold-start chips. */
+  interests?: string[];
 }
 
 const MODES: { id: Mode; label: string; sub: string; glyph: string }[] = [
@@ -27,7 +29,7 @@ const MODES: { id: Mode; label: string; sub: string; glyph: string }[] = [
   { id: "guru",       label: "Astro Guru",    sub: "Learn the fundamentals", glyph: "📖" },
 ];
 
-export default function GrahaAIDock({ chartId, placements }: Props) {
+export default function GrahaAIDock({ chartId, placements, interests }: Props) {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<Mode>("astrologer");
 
@@ -226,7 +228,7 @@ export default function GrahaAIDock({ chartId, placements }: Props) {
             <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
               {mode === "astrologer" ? (
                 <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", padding: "0 16px 12px" }}>
-                  <GrahaAIChat chartId={chartId} />
+                  <GrahaAIChat chartId={chartId} interests={interests} />
                 </div>
               ) : (
                 <GrahaAI chart={placements} embedded />

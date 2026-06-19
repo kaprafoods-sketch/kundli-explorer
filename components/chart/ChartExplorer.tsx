@@ -15,6 +15,8 @@ type Tab = "chart" | "planets" | "transits";
 interface Props {
   chart: NatalChart;
   chartId: string;
+  /** Life-area ids from onboarding — used to rank GRAHA AI starter chips. */
+  interests?: string[];
 }
 
 const TABS: { id: Tab; label: string; glyph: string }[] = [
@@ -23,7 +25,7 @@ const TABS: { id: Tab; label: string; glyph: string }[] = [
   { id: "transits", label: "Transits", glyph: "☄" },
 ];
 
-export default function ChartExplorer({ chart, chartId }: Props) {
+export default function ChartExplorer({ chart, chartId, interests = [] }: Props) {
   const [tab, setTab] = useState<Tab>("chart");
   const [selectedHouse, setSelectedHouse] = useState<number | null>(null);
   const [selectedBody, setSelectedBody] = useState<string | null>(null);
@@ -176,13 +178,14 @@ export default function ChartExplorer({ chart, chartId }: Props) {
               selectedBody={selectedBody}
               selectedHouse={selectedHouse}
               chartId={chartId}
+              interests={interests}
             />
           </div>
         </div>
       )}
 
       {tab === "planets" && (
-        <ClientPlanetsTab chart={chart} chartId={chartId} />
+        <ClientPlanetsTab chart={chart} chartId={chartId} interests={interests} />
       )}
 
       {tab === "transits" && (
@@ -194,7 +197,7 @@ export default function ChartExplorer({ chart, chartId }: Props) {
 
       {/* Unified GRAHA AI dock — single thumb-zone control with two modes
           (AI Astrologer chat + Astro Guru learn). Hidden on the sample chart. */}
-      {chartId && <GrahaAIDock chartId={chartId} placements={placements} />}
+      {chartId && <GrahaAIDock chartId={chartId} placements={placements} interests={interests} />}
     </div>
   );
 }

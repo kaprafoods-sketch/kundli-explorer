@@ -26,8 +26,9 @@ const PlanetsTab = dynamic(() => import("./PlanetsTab"), {
 interface Props {
   chart: NatalChart;
   chartId: string;
+  interests?: string[];
 }
 
-export default function ClientPlanetsTab({ chart, chartId }: Props) {
-  return <PlanetsTab chart={chart} chartId={chartId} />;
+export default function ClientPlanetsTab({ chart, chartId, interests }: Props) {
+  return <PlanetsTab chart={chart} chartId={chartId} interests={interests} />;
 }
