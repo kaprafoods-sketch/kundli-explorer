@@ -8,7 +8,7 @@ import {
   composeLagnaReading,
 } from "@/lib/interpret";
 import { kb, GRAHA_GLYPHS, type GrahaId } from "@/lib/kb";
-import InsightSection from "./InsightSection";
+import GrahaAIChat from "./GrahaAIChat";
 
 interface Props {
   chart: NatalChart;
@@ -163,11 +163,12 @@ export default function ExplorePanel({
           </div>
         </div>
 
-        {/* AI deep reading — Layer 2 */}
+        {/* GRAHA AI — focused on this placement */}
         {chartId && (
-          <InsightSection
+          <GrahaAIChat
             chartId={chartId}
-            target={{ kind: "planet", id: placement.body }}
+            focus={{ kind: "planet", id: placement.body }}
+            compact
           />
         )}
       </div>
@@ -236,11 +237,12 @@ export default function ExplorePanel({
           </div>
         </div>
 
-        {/* AI deep reading — Layer 2 */}
+        {/* GRAHA AI — focused on this house */}
         {chartId && (
-          <InsightSection
+          <GrahaAIChat
             chartId={chartId}
-            target={{ kind: "house", id: house }}
+            focus={{ kind: "house", id: house }}
+            compact
           />
         )}
       </div>
@@ -271,11 +273,12 @@ export default function ExplorePanel({
           <p className="text-sm" style={{ color: "var(--muted)" }}>{data.pillars.planet}</p>
         </div>
 
-        {/* AI deep reading — Layer 2 */}
+        {/* GRAHA AI — focused on Lagna */}
         {chartId && (
-          <InsightSection
+          <GrahaAIChat
             chartId={chartId}
-            target={{ kind: "lagna", id: "lagna" }}
+            focus={{ kind: "lagna" }}
+            compact
           />
         )}
       </div>

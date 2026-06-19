@@ -5,11 +5,11 @@ import type { NatalChart } from "@/lib/astro/computeChart";
 import NorthIndianChart from "./NorthIndianChart";
 import ExplorePanel from "./ExplorePanel";
 import TransitsTab from "./TransitsTab";
-import TutorTab from "./TutorTab";
 import DashaCard from "./DashaCard";
+import GrahaAILauncher from "./GrahaAILauncher";
 import ClientPlanetsTab from "./ClientPlanetsTab";
 
-type Tab = "chart" | "planets" | "transits" | "tutor";
+type Tab = "chart" | "planets" | "transits";
 
 interface Props {
   chart: NatalChart;
@@ -17,10 +17,9 @@ interface Props {
 }
 
 const TABS: { id: Tab; label: string }[] = [
-  { id: "chart",   label: "Chart" },
-  { id: "planets", label: "Planets" },
-  { id: "transits",label: "Transits" },
-  { id: "tutor",   label: "AI Tutor" },
+  { id: "chart",    label: "Chart" },
+  { id: "planets",  label: "Planets" },
+  { id: "transits", label: "Transits" },
 ];
 
 export default function ChartExplorer({ chart, chartId }: Props) {
@@ -103,9 +102,8 @@ export default function ChartExplorer({ chart, chartId }: Props) {
         <TransitsTab chart={chart} />
       )}
 
-      {tab === "tutor" && (
-        <TutorTab chart={chart} chartId={chartId} />
-      )}
+      {/* GRAHA AI floating launcher — hidden on sample chart (chartId === "") */}
+      {chartId && <GrahaAILauncher chartId={chartId} />}
     </div>
   );
 }
