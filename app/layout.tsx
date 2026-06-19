@@ -33,10 +33,10 @@ const tiroDevanagari = Tiro_Devanagari_Sanskrit({
 });
 
 export const metadata: Metadata = {
-  title: "Lagna — Learn astrology through your own chart",
+  title: "GRAHA — Read Your Universe",
   description:
-    "An educational Vedic astrology tool. Compute your natal chart, understand every placement, and ask an AI tutor grounded in your real kundli.",
-  keywords: ["vedic astrology", "kundli", "birth chart", "jyotish", "lagna", "learn astrology"],
+    "An immersive Vedic astrology learning platform. Compute your natal chart, explore planetary placements in 3D, and learn through your own kundli.",
+  keywords: ["vedic astrology", "kundli", "birth chart", "jyotish", "graha", "planets", "learn astrology"],
 };
 
 export default function RootLayout({

@@ -4,6 +4,7 @@ import BirthForm from "@/components/BirthForm";
 import ClientSolarSystem from "@/components/ClientSolarSystem";
 import AnimatedKundliHero from "@/components/AnimatedKundliHero";
 import ProfilesGrid from "@/components/ProfilesGrid";
+import Logo from "@/components/Logo";
 import { listMyProfiles } from "@/app/actions/profiles";
 import type { ChartRow } from "@/lib/supabase";
 
@@ -148,8 +149,8 @@ export default async function Home() {
             >
               {/* Label */}
               <p
-                className="font-display text-xs tracking-[0.3em] uppercase"
-                style={{ color: "var(--brass)" }}
+                className="text-xs tracking-[0.25em] uppercase"
+                style={{ color: "var(--muted)", fontFamily: "var(--font-mono)" }}
               >
                 Vedic Astrology · Jyotish
               </p>
@@ -157,35 +158,28 @@ export default async function Home() {
               {/* Headline */}
               <div>
                 <h1
-                  className="font-display font-semibold leading-tight"
                   style={{
-                    fontSize: "clamp(2.2rem, 4.5vw, 3.2rem)",
                     color: "var(--parchment)",
-                    textShadow: "0 2px 24px rgba(10,15,36,0.9)",
+                    textShadow: "0 2px 24px rgba(6,11,24,0.95)",
+                    margin: 0,
                   }}
                 >
-                  Lagna
+                  <Logo
+                    variant="full"
+                    size={32}
+                    showSanskrit
+                    style={{ color: "var(--parchment)" }}
+                  />
                 </h1>
                 <p
-                  style={{
-                    fontFamily: "var(--font-sanskrit)",
-                    fontSize: "1.1rem",
-                    color: "var(--brass)",
-                    letterSpacing: "0.05em",
-                    marginTop: 2,
-                  }}
-                >
-                  लग्न
-                </p>
-                <p
-                  className="mt-2 text-lg leading-snug"
+                  className="mt-3 text-lg leading-snug"
                   style={{
                     color: "var(--muted)",
-                    textShadow: "0 1px 12px rgba(10,15,36,0.95)",
+                    textShadow: "0 1px 12px rgba(6,11,24,0.95)",
                     fontStyle: "italic",
                   }}
                 >
-                  See what your stars say — free, in under a minute
+                  Read Your Universe
                 </p>
               </div>
 

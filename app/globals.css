@@ -1,54 +1,105 @@
 @import "tailwindcss";
 
-/* ── Lagna design tokens ────────────────────────────────────────── */
+/* ── GRAHA design tokens ─────────────────────────────────────────── */
 :root {
-  /* Brand palette — Lagna · Indigo night sky */
-  --ink: #0A0E24;
-  --ink-1: #0D1330;
-  --ink-2: #161E42;
-  --ink-3: #202a58;
-  --line: rgba(199,162,76,.22);
-  --line-soft: rgba(199,162,76,.12);
+  /* ── Neutral palette — deep space / precision instrument ─────── */
+  --ink: #060B18;              /* void — true space black         */
+  --ink-1: #0A1020;            /* page base                       */
+  --ink-2: #111827;            /* raised surface / card           */
+  --ink-3: #1A2436;            /* elevated / hover                */
+  --ink-4: #222E42;            /* active / selected               */
+  --line: rgba(139,150,178,0.15);     /* cool slate hairline       */
+  --line-soft: rgba(139,150,178,0.08);
+  --line-brass: rgba(199,162,76,0.18); /* brass hairline — use sparingly */
+
+  /* ── Cool accent — interactive states, affordances ─────────── */
+  --accent: #6B7FDB;
+  --accent-bright: #8A9AE8;
+  --accent-deep: #4A5CB8;
+
+  /* ── Brass — one restrained warm accent (chart lines, data) ── */
   --brass: #C7A24C;
   --brass-bright: #E6C56A;
   --brass-deep: #9C7C34;
-  --parchment: #F3EAD3;
-  --sand: #EFE6CE;
-  --sand-2: #E4D7B6;
-  --muted: #9AA0C0;
-  --muted-2: #6E7399;
 
-  /* Navagraha gem system */
-  --surya: #D8453E;    /* Sun · Ruby */
-  --chandra: #D7DEEC; /* Moon · Pearl */
-  --mangala: #E66A3C; /* Mars · Red Coral */
-  --budha: #2FA06B;   /* Mercury · Emerald */
+  /* ── Text ────────────────────────────────────────────────────── */
+  --parchment: #E2E8F4;        /* primary text — cool near-white  */
+  --sand: #C5CEDF;             /* secondary text                  */
+  --sand-2: #B0BBCE;           /* tertiary                        */
+  --muted: #8B96B2;            /* muted slate                     */
+  --muted-2: #5E6883;          /* faint                           */
+
+  /* ── Navagraha gem system ─────────────────────────────────────── */
+  /* SYNC: mirrors GRAHA_COLORS in lib/grahaColors.ts               */
+  --surya: #D8453E;    /* Sun · Ruby             */
+  --chandra: #D7DEEC; /* Moon · Pearl            */
+  --mangala: #E66A3C; /* Mars · Red Coral        */
+  --budha: #2FA06B;   /* Mercury · Emerald       */
   --guru: #E4B23E;    /* Jupiter · Yellow Sapphire */
-  --shukra: #E6C3CE;  /* Venus · Diamond */
-  --shani: #3E63C9;   /* Saturn · Blue Sapphire */
-  --rahu: #B5702F;    /* Rahu · Hessonite */
-  --ketu: #8F948C;    /* Ketu · Cat's Eye */
+  --shukra: #E6C3CE;  /* Venus · Diamond         */
+  --shani: #3E63C9;   /* Saturn · Blue Sapphire  */
+  --rahu: #B5702F;    /* Rahu · Hessonite        */
+  --ketu: #8F948C;    /* Ketu · Cat's Eye        */
 
-  /* Semantic aliases — keeps existing components working */
+  /* ── Semantic aliases — keeps existing components working ─────── */
   --bg: var(--ink-1);
   --panel: var(--ink-2);
   --panel-2: var(--ink-3);
   --faint: var(--muted-2);
 
-  /* Semantic states */
+  /* ── Semantic states ─────────────────────────────────────────── */
   --weak: #D98C6A;
-  --success: #6EBF8B;
+  --success: #5DB87C;
   --error: #E07070;
 
-  /* Backgrounds (always dark — no light mode for this product) */
+  /* ── Backgrounds (dark-only) ─────────────────────────────────── */
   --background: var(--bg);
   --foreground: var(--parchment);
 
-  /* Typography */
+  /* ── Typography stacks ───────────────────────────────────────── */
   --font-display: var(--font-fraunces), Georgia, serif;
   --font-ui: var(--font-hanken), system-ui, sans-serif;
   --font-mono: var(--font-ibm-mono), 'Courier New', monospace;
   --font-sanskrit: var(--font-tiro), serif;
+
+  /* ── Type scale ──────────────────────────────────────────────── */
+  --text-2xl: clamp(2rem, 4.5vw, 3.5rem);
+  --text-xl:  clamp(1.5rem, 3vw, 2.25rem);
+  --text-lg:  1.25rem;
+  --text-md:  1rem;
+  --text-base: 0.9375rem;
+  --text-sm:  0.8125rem;
+  --text-xs:  0.75rem;
+  --text-2xs: 0.6875rem;
+
+  /* ── Spacing ─────────────────────────────────────────────────── */
+  --sp-1: 4px;   --sp-2: 8px;   --sp-3: 12px;  --sp-4: 16px;
+  --sp-5: 20px;  --sp-6: 24px;  --sp-8: 32px;  --sp-10: 40px;
+  --sp-12: 48px; --sp-16: 64px; --sp-20: 80px; --sp-24: 96px;
+
+  /* ── Radius ──────────────────────────────────────────────────── */
+  --r-xs: 3px; --r-sm: 5px;  --r-md: 8px;
+  --r-lg: 12px; --r-xl: 16px; --r-2xl: 24px; --r-pill: 9999px;
+
+  /* ── Elevation / shadow ──────────────────────────────────────── */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.5);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.55);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.6);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.65);
+  --shadow-xl: 0 16px 64px rgba(0,0,0,0.7);
+  --shadow-brass: 0 0 20px rgba(199,162,76,0.22);
+  --shadow-accent: 0 0 20px rgba(107,127,219,0.28);
+
+  /* ── Duration ────────────────────────────────────────────────── */
+  --dur-fast: 100ms;   --dur-normal: 180ms;
+  --dur-slow: 320ms;   --dur-gentle: 480ms; --dur-orbital: 700ms;
+
+  /* ── Easing ──────────────────────────────────────────────────── */
+  --ease-out:    cubic-bezier(0.0, 0.0, 0.2, 1);
+  --ease-in:     cubic-bezier(0.4, 0.0, 1, 1);
+  --ease-inout:  cubic-bezier(0.4, 0.0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-decel:  cubic-bezier(0.0, 0.0, 0.2, 1);
 }
 
 @theme inline {
@@ -56,6 +107,9 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-ui);
   --font-serif: var(--font-display);
+  --color-brass: var(--brass);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
 }
 
 /* ── Base styles ────────────────────────────────────────────────── */
@@ -75,13 +129,13 @@ body {
 
 /* Selection */
 ::selection {
-  background: var(--brass);
-  color: var(--bg);
+  background: var(--accent);
+  color: var(--ink-1);
 }
 
-/* Focus rings — visible, brass-tinted */
+/* Focus rings — cool accent */
 :focus-visible {
-  outline: 2px solid var(--brass);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
   border-radius: 2px;
 }

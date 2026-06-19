@@ -10,20 +10,13 @@ import { useRef, useState, useEffect, useMemo, useCallback } from "react";
 import type { NatalChart, Placement } from "@/lib/astro/computeChart";
 import { kb, GRAHA_GLYPHS, type GrahaId } from "@/lib/kb";
 import { composePlanetInterpretation } from "@/lib/interpret";
+import { GRAHA_COLORS } from "@/lib/grahaColors";
 
-// ── Visual constants (from bhava-explorer.html reference) ─────────────────────
+// ── Visual constants — derived from canonical GRAHA_COLORS ────────────────────
 
-const PALETTE: Record<string, { core: string; accent: string }> = {
-  sun:     { core: "#D8453E", accent: "#F08080" },  // Ruby
-  moon:    { core: "#D7DEEC", accent: "#FFFFFF" },  // Pearl
-  mars:    { core: "#E66A3C", accent: "#F4A882" },  // Red Coral
-  mercury: { core: "#2FA06B", accent: "#7DD4A8" },  // Emerald
-  jupiter: { core: "#E4B23E", accent: "#F5D380" },  // Yellow Sapphire
-  venus:   { core: "#E6C3CE", accent: "#F5E0E8" },  // Diamond
-  saturn:  { core: "#3E63C9", accent: "#7A9AE8" },  // Blue Sapphire
-  rahu:    { core: "#B5702F", accent: "#D4A06A" },  // Hessonite
-  ketu:    { core: "#8F948C", accent: "#C0C4C0" },  // Cat's Eye
-};
+const PALETTE = Object.fromEntries(
+  Object.entries(GRAHA_COLORS).map(([k, v]) => [k, { core: v.core, accent: v.accent }])
+) as Record<string, { core: string; accent: string }>;
 
 // element → particle motion archetype
 const ELEMENT_MOTION: Record<string, { speed: number; turb: number }> = {

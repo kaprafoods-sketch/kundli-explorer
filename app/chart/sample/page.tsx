@@ -1,5 +1,6 @@
 import Link from "next/link";
 import ChartExplorer from "@/components/chart/ChartExplorer";
+import Logo from "@/components/Logo";
 import { computeChart } from "@/lib/astro/computeChart";
 
 // Force dynamic — computeChart uses native sweph + geo-tz binaries
@@ -21,12 +22,8 @@ export default async function SampleChartPage() {
         className="sticky top-0 z-30 flex items-center justify-between px-6 py-3 border-b"
         style={{ background: "var(--panel)", borderColor: "var(--faint)" }}
       >
-        <Link
-          href="/"
-          className="font-display text-lg font-semibold tracking-wide transition-opacity hover:opacity-70"
-          style={{ color: "var(--brass)" }}
-        >
-          Lagna
+        <Link href="/" className="transition-opacity hover:opacity-70" aria-label="GRAHA home">
+          <Logo size={22} style={{ color: "var(--parchment)" }} />
         </Link>
         <div className="flex flex-col items-end">
           <span className="text-sm font-semibold" style={{ color: "var(--parchment)" }}>

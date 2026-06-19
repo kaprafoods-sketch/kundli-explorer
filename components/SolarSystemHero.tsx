@@ -7,38 +7,27 @@ import {
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import * as THREE from "three";
 import { useRef, useState, useEffect, useMemo, useCallback } from "react";
+import { GRAHA_COLORS, type GrahaColorKey } from "@/lib/grahaColors";
 
 // ── Jyotish graha configuration ──────────────────────────────────────────────
 
-const GRAHAS = [
-  { id: "sun",     sanskrit: "Surya",   en: "Sun",     glyph: "☉",
-    color: "#D8453E", emissive: "#A01A15", orbit: 0,   speed: 0,     size: 0.34,
-    rings: false, keywords: "Soul · Vitality · Father" },
-  { id: "moon",    sanskrit: "Chandra", en: "Moon",    glyph: "☽",
-    color: "#D7DEEC", emissive: "#8890A8", orbit: 1.9, speed: 0.52,  size: 0.17,
-    rings: false, keywords: "Mind · Emotions · Mother" },
-  { id: "mercury", sanskrit: "Budha",   en: "Mercury", glyph: "☿",
-    color: "#2FA06B", emissive: "#1A5E3F", orbit: 1.4, speed: 0.48,  size: 0.14,
-    rings: false, keywords: "Intellect · Speech · Commerce" },
-  { id: "venus",   sanskrit: "Shukra",  en: "Venus",   glyph: "♀",
-    color: "#E6C3CE", emissive: "#A8707E", orbit: 2.2, speed: 0.42,  size: 0.17,
-    rings: false, keywords: "Beauty · Love · Pleasures" },
-  { id: "mars",    sanskrit: "Mangala", en: "Mars",    glyph: "♂",
-    color: "#E66A3C", emissive: "#A03A18", orbit: 3.0, speed: 0.35,  size: 0.16,
-    rings: false, keywords: "Energy · Courage · Conflict" },
-  { id: "rahu",    sanskrit: "Rahu",    en: "Rahu",    glyph: "☊",
-    color: "#B5702F", emissive: "#7A4A18", orbit: 3.8, speed: -0.19, size: 0.14,
-    rings: false, keywords: "Desire · Obsession · Foreign" },
-  { id: "ketu",    sanskrit: "Ketu",    en: "Ketu",    glyph: "☋",
-    color: "#8F948C", emissive: "#555A53", orbit: 3.8, speed: -0.19, size: 0.14,
-    rings: false, keywords: "Liberation · Past life · Moksha" },
-  { id: "jupiter", sanskrit: "Guru",    en: "Jupiter", glyph: "♃",
-    color: "#E4B23E", emissive: "#9A7020", orbit: 4.8, speed: 0.18,  size: 0.29,
-    rings: false, keywords: "Wisdom · Expansion · Grace" },
-  { id: "saturn",  sanskrit: "Shani",   en: "Saturn",  glyph: "♄",
-    color: "#3E63C9", emissive: "#1E3A7A", orbit: 6.0, speed: 0.11,  size: 0.26,
-    rings: true,  keywords: "Karma · Discipline · Patience" },
+const GRAHAS_CONFIG = [
+  { id: "sun",     sanskrit: "Surya",   en: "Sun",     glyph: "☉", orbit: 0,   speed: 0,     size: 0.34, rings: false, keywords: "Soul · Vitality · Father" },
+  { id: "moon",    sanskrit: "Chandra", en: "Moon",    glyph: "☽", orbit: 1.9, speed: 0.52,  size: 0.17, rings: false, keywords: "Mind · Emotions · Mother" },
+  { id: "mercury", sanskrit: "Budha",   en: "Mercury", glyph: "☿", orbit: 1.4, speed: 0.48,  size: 0.14, rings: false, keywords: "Intellect · Speech · Commerce" },
+  { id: "venus",   sanskrit: "Shukra",  en: "Venus",   glyph: "♀", orbit: 2.2, speed: 0.42,  size: 0.17, rings: false, keywords: "Beauty · Love · Pleasures" },
+  { id: "mars",    sanskrit: "Mangala", en: "Mars",    glyph: "♂", orbit: 3.0, speed: 0.35,  size: 0.16, rings: false, keywords: "Energy · Courage · Conflict" },
+  { id: "rahu",    sanskrit: "Rahu",    en: "Rahu",    glyph: "☊", orbit: 3.8, speed: -0.19, size: 0.14, rings: false, keywords: "Desire · Obsession · Foreign" },
+  { id: "ketu",    sanskrit: "Ketu",    en: "Ketu",    glyph: "☋", orbit: 3.8, speed: -0.19, size: 0.14, rings: false, keywords: "Liberation · Past life · Moksha" },
+  { id: "jupiter", sanskrit: "Guru",    en: "Jupiter", glyph: "♃", orbit: 4.8, speed: 0.18,  size: 0.29, rings: false, keywords: "Wisdom · Expansion · Grace" },
+  { id: "saturn",  sanskrit: "Shani",   en: "Saturn",  glyph: "♄", orbit: 6.0, speed: 0.11,  size: 0.26, rings: true,  keywords: "Karma · Discipline · Patience" },
 ] as const;
+
+const GRAHAS = GRAHAS_CONFIG.map(g => ({
+  ...g,
+  color:    GRAHA_COLORS[g.id as GrahaColorKey].core,
+  emissive: GRAHA_COLORS[g.id as GrahaColorKey].emissive,
+}));
 
 type GrahaConfig = typeof GRAHAS[number];
 

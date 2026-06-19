@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import type { NatalChart } from "@/lib/astro/computeChart";
 import ChartExplorer from "@/components/chart/ChartExplorer";
 import ProfileSwitcher from "@/components/ProfileSwitcher";
+import Logo from "@/components/Logo";
 import { listMyProfiles } from "@/app/actions/profiles";
 import type { ChartRow } from "@/lib/supabase";
 
@@ -35,12 +36,8 @@ export default async function ChartPage({ params }: Props) {
         style={{ background: "var(--panel)", borderColor: "var(--faint)" }}
       >
         {/* Logo */}
-        <Link
-          href="/"
-          className="font-display text-lg font-semibold tracking-wide transition-opacity hover:opacity-70 shrink-0"
-          style={{ color: "var(--brass)" }}
-        >
-          Lagna
+        <Link href="/" className="transition-opacity hover:opacity-70 shrink-0" aria-label="GRAHA home">
+          <Logo size={22} style={{ color: "var(--parchment)" }} />
         </Link>
 
         {/* Chart meta — center */}
