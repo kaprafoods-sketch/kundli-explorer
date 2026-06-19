@@ -18,7 +18,7 @@ export async function listMyProfiles(): Promise<ChartRow[]> {
 
   const { data, error } = await supabase
     .from("Chart")
-    .select("id, name, dob, lat, lon, tz, ayanamsha, data, createdAt, ownerToken, relation")
+    .select("id, name, dob, lat, lon, tz, ayanamsha, data, createdAt, ownerToken, relation, interests, depth, intentNote")
     .eq("ownerToken", token)
     .order("createdAt", { ascending: false });
 

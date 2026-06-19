@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  // url / directUrl are supplied by prisma.config.ts (Prisma 7)
 }
 
 model Chart {
@@ -19,6 +20,11 @@ model Chart {
   ownerToken String?
   relation   String?
 
+  // ── Engagement engine ──────────────────────────────────────────
+  interests  String[] @default([]) // life-area ids the user cares about
+  depth      String   @default("deep") // "quick" | "deep" — answer calibration
+  intentNote String?  // optional free-text "anything on your mind?"
+
   messages TutorMessage[]
 
   @@index([ownerToken])
@@ -30,6 +36,11 @@ model TutorMessage {
   role      String
   content   String
   createdAt DateTime @default(now())
+
+  // ── Per-message feedback (analytics / KB-gap / dataset only) ─────
+  rating       String? // "true" | "not_quite"
+  ratingReason String? // "too_generic" | "doesnt_match" | "too_vague"
+  useful       Boolean?
 
   chart Chart @relation(fields: [chartId], references: [id], onDelete: Cascade)
 
