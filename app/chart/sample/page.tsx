@@ -23,7 +23,7 @@ export default async function SampleChartPage() {
         style={{ background: "var(--panel)", borderColor: "var(--faint)" }}
       >
         <Link href="/" className="transition-opacity hover:opacity-70" aria-label="GRAHA home">
-          <Logo size={22} style={{ color: "var(--parchment)" }} />
+          <Logo variant="horizontal" size={36} animated={false} />
         </Link>
         <div className="flex flex-col items-end">
           <span className="text-sm font-semibold" style={{ color: "var(--parchment)" }}>

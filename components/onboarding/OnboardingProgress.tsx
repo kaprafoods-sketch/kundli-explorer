@@ -1,10 +1,15 @@
 "use client";
 
-const STEPS = [
-  { icon: "☀️", label: "Date" },
-  { icon: "🕒", label: "Time" },
-  { icon: "🪐", label: "Place" },
-  { icon: "✨", label: "Focus" },
+import AnimatedIcon from "@/components/AnimatedIcon";
+import type { ComponentProps } from "react";
+
+type IconName = ComponentProps<typeof AnimatedIcon>["name"];
+
+const STEPS: { icon: IconName; label: string }[] = [
+  { icon: "sparkle", label: "Date" },
+  { icon: "clock",   label: "Time" },
+  { icon: "globe",   label: "Place" },
+  { icon: "focus",   label: "Focus" },
 ];
 
 interface Props {
@@ -57,7 +62,7 @@ export default function OnboardingProgress({ step, total = 3 }: Props) {
                   {done ? (
                     <span style={{ fontSize: 14, color: "var(--brass)" }}>✓</span>
                   ) : (
-                    s.icon
+                    <AnimatedIcon name={s.icon} size={22} aria-label={s.label} />
                   )}
                 </div>
                 <span

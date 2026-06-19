@@ -63,6 +63,16 @@
   --font-ui: var(--font-hanken), var(--font-noto-deva), system-ui, sans-serif;
   --font-mono: var(--font-ibm-mono), 'Courier New', monospace;
   --font-sanskrit: var(--font-tiro), serif;
+  --font-wordmark: var(--font-marcellus), Georgia, serif;
+
+  /* ── Graha brand tokens ──────────────────────────────────────── */
+  --graha-void: #05060F;
+  --graha-space: #0B1026;
+  --graha-space-2: #16204A;
+  --graha-gold: #E9C46A;
+  --graha-gold-bright: #FFE9A8;
+  --graha-gold-deep: #B8862F;
+  --graha-pale: #CDD8FF;
 
   /* ── Type scale ──────────────────────────────────────────────── */
   /* Mobile-first floor: body text ≥16px (1rem) to avoid iOS zoom-on-focus

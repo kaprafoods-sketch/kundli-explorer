@@ -71,7 +71,7 @@ export default async function ChartPage({ params }: Props) {
           aria-label="GRAHA home"
           style={{ minWidth: 44, minHeight: 44 }}
         >
-          <Logo size={22} style={{ color: "var(--parchment)" }} />
+          <Logo variant="horizontal" size={36} animated={false} />
         </Link>
 
         {/* Chart meta — center */}

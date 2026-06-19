@@ -7,6 +7,8 @@ import BirthTimeSelector, { type BirthTimeSelectorValue } from "./onboarding/Bir
 import PlaceSearch, { type PlaceValue } from "./onboarding/PlaceSearch";
 import OnboardingProgress from "./onboarding/OnboardingProgress";
 import InterestStep, { type InterestValue, DEFAULT_INTEREST } from "./onboarding/InterestStep";
+import AnimatedIcon from "./AnimatedIcon";
+import Logo from "./Logo";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -203,7 +205,7 @@ function Screen1({ name, onName, date, onDate, onNext }: S1Props) {
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       {/* Hero copy */}
       <div style={{ textAlign: "center" }}>
-        <p style={{ margin: "0 0 6px", fontSize: 28 }}>✨</p>
+        <div style={{ margin: "0 0 8px", display: "flex", justifyContent: "center" }}><AnimatedIcon name="sparkle" size={52} aria-label="Sparkle" /></div>
         <h2
           style={{
             margin: 0,
@@ -287,7 +289,7 @@ function Screen2({ timeVal, onTimeVal, onNext, onBack }: S2Props) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       <div style={{ textAlign: "center" }}>
-        <p style={{ margin: "0 0 6px", fontSize: 28 }}>🕒</p>
+        <div style={{ margin: "0 0 8px", display: "flex", justifyContent: "center" }}><AnimatedIcon name="clock" size={52} aria-label="Clock" /></div>
         <h2
           style={{
             margin: 0,
@@ -329,7 +331,7 @@ function Screen3({ place, onPlace, onBack, onNext }: S3Props) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       <div style={{ textAlign: "center" }}>
-        <p style={{ margin: "0 0 6px", fontSize: 28 }}>📍</p>
+        <div style={{ margin: "0 0 8px", display: "flex", justifyContent: "center" }}><AnimatedIcon name="globe" size={52} aria-label="Globe" /></div>
         <h2
           style={{
             margin: 0,
@@ -445,16 +447,7 @@ function CTAButton({
       }}
     >
       {loading && (
-        <div
-          style={{
-            width: 14,
-            height: 14,
-            border: "2px solid rgba(11,16,38,0.3)",
-            borderTopColor: "var(--bg)",
-            borderRadius: "50%",
-            animation: "spin 0.7s linear infinite",
-          }}
-        />
+        <Logo variant="icon" size={22} animated mono />
       )}
       {children}
     </button>

@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Hanken_Grotesk, IBM_Plex_Mono, Tiro_Devanagari_Sanskrit, Noto_Sans_Devanagari } from "next/font/google";
+import { Fraunces, Hanken_Grotesk, IBM_Plex_Mono, Tiro_Devanagari_Sanskrit, Noto_Sans_Devanagari, Marcellus } from "next/font/google";
 import { cookies } from "next/headers";
 import "./globals.css";
 import { LanguageProvider } from "@/components/i18n/LanguageProvider";
@@ -44,11 +44,23 @@ const notoDevanagari = Noto_Sans_Devanagari({
   display: "swap",
 });
 
+const marcellus = Marcellus({
+  variable: "--font-marcellus",
+  subsets: ["latin"],
+  weight: ["400"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: "GRAHA — Read Your Universe",
+  title: "Graha — Read Your Universe",
   description:
     "An immersive Vedic astrology learning platform. Compute your natal chart, explore planetary placements in 3D, and learn through your own kundli.",
   keywords: ["vedic astrology", "kundli", "birth chart", "jyotish", "graha", "planets", "learn astrology"],
+  openGraph: {
+    title: "Graha — Read Your Universe",
+    description: "Compute your natal chart, explore planetary placements in 3D, and learn Vedic astrology through your own kundli.",
+    type: "website",
+  },
 };
 
 export const viewport: Viewport = {
@@ -67,7 +79,7 @@ export default async function RootLayout({
   return (
     <html
       lang={htmlLang(lang)}
-      className={`${fraunces.variable} ${hankenGrotesk.variable} ${ibmPlexMono.variable} ${tiroDevanagari.variable} ${notoDevanagari.variable} h-full`}
+      className={`${fraunces.variable} ${hankenGrotesk.variable} ${ibmPlexMono.variable} ${tiroDevanagari.variable} ${notoDevanagari.variable} ${marcellus.variable} h-full`}
     >
       <body className="min-h-full flex flex-col antialiased">
         <LanguageProvider initialLang={lang}>{children}</LanguageProvider>

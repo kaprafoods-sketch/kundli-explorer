@@ -171,32 +171,14 @@ export default async function Home() {
                 Vedic Astrology · Jyotish
               </p>
 
-              {/* Headline */}
+              {/* Headline / lockup */}
               <div>
-                <h1
-                  style={{
-                    color: "var(--parchment)",
-                    textShadow: "0 2px 24px rgba(6,11,24,0.95)",
-                    margin: 0,
-                  }}
-                >
-                  <Logo
-                    variant="full"
-                    size={32}
-                    showSanskrit
-                    style={{ color: "var(--parchment)" }}
-                  />
-                </h1>
-                <p
-                  className="mt-3 text-lg leading-snug"
-                  style={{
-                    color: "var(--muted)",
-                    textShadow: "0 1px 12px rgba(6,11,24,0.95)",
-                    fontStyle: "italic",
-                  }}
-                >
-                  Read Your Universe
-                </p>
+                <Logo
+                  variant="lockup"
+                  size={96}
+                  animated
+                  style={{ filter: "drop-shadow(0 2px 24px rgba(6,11,24,0.95))" }}
+                />
               </div>
 
               {/* Animated kundli — visible on desktop, hidden on mobile (decorative duplicate of the background) */}

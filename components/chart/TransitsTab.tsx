@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import type { NatalChart } from "@/lib/astro/computeChart";
 import type { TransitPlanet } from "@/lib/astro/transits";
 import { kb, GRAHA_GLYPHS, getName, type GrahaId } from "@/lib/kb";
+import Logo from "@/components/Logo";
 import { useLang } from "@/components/i18n/LanguageProvider";
 
 interface Props {
@@ -307,9 +308,9 @@ export default function TransitsTab({ chart }: Props) {
 
       {/* Loading */}
       {loading && (
-        <div className="flex items-center gap-2 mb-4" style={{ color: "var(--faint)" }}>
-          <span className="animate-pulse">◌</span>
-          <span>Computing positions for {formatDate(offsetToDate(offset))}…</span>
+        <div className="flex items-center gap-3 mb-4" style={{ color: "var(--faint)" }}>
+          <Logo variant="icon" size={36} animated />
+          <span style={{ fontSize: "0.85rem" }}>Computing positions for {formatDate(offsetToDate(offset))}…</span>
         </div>
       )}
 

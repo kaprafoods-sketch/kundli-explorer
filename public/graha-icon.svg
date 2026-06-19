@@ -1,0 +1,52 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <title>Graha</title>
+  <defs>
+    <radialGradient id="gCore" cx="38%" cy="34%" r="72%">
+      <stop offset="0%" stop-color="#fff7df"/>
+      <stop offset="46%" stop-color="#f3c75f"/>
+      <stop offset="100%" stop-color="#c9892b"/>
+    </radialGradient>
+    <radialGradient id="gHalo" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#e9c46a" stop-opacity="0.55"/>
+      <stop offset="55%" stop-color="#e9c46a" stop-opacity="0.13"/>
+      <stop offset="100%" stop-color="#e9c46a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="pGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffe9a8" stop-opacity="0.5"/>
+      <stop offset="55%" stop-color="#e9c46a" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#e9c46a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="pGold" cx="35%" cy="32%" r="75%">
+      <stop offset="0%" stop-color="#fff7df"/>
+      <stop offset="55%" stop-color="#e9c46a"/>
+      <stop offset="100%" stop-color="#9c6f24"/>
+    </radialGradient>
+    <radialGradient id="pPale" cx="35%" cy="32%" r="75%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="55%" stop-color="#cdd8ff"/>
+      <stop offset="100%" stop-color="#8a97c8"/>
+    </radialGradient>
+    <radialGradient id="pAmber" cx="35%" cy="32%" r="75%">
+      <stop offset="0%" stop-color="#ffd9a0"/>
+      <stop offset="55%" stop-color="#e0922f"/>
+      <stop offset="100%" stop-color="#7d4d12"/>
+    </radialGradient>
+  </defs>
+  <rect width="200" height="200" fill="#0B1026" rx="0"/>
+  <circle cx="100" cy="100" r="38" fill="url(#gHalo)"/>
+  <g transform="rotate(-18 100 100)">
+    <path id="o1s" d="M34,100 a66,24 0 1,0 132,0 a66,24 0 1,0 -132,0" fill="none" stroke="#e9c46a" stroke-opacity="0.42" stroke-width="1"/>
+    <circle r="5" fill="url(#pGold)" transform="translate(34,100)"/>
+  </g>
+  <g transform="rotate(52 100 100)">
+    <path id="o2s" d="M42,100 a58,30 0 1,0 116,0 a58,30 0 1,0 -116,0" fill="none" stroke="#e9c46a" stroke-opacity="0.3" stroke-width="1"/>
+    <circle r="4" fill="url(#pPale)" transform="translate(42,100)"/>
+  </g>
+  <g transform="rotate(108 100 100)">
+    <path id="o3s" d="M50,100 a50,26 0 1,0 100,0 a50,26 0 1,0 -100,0" fill="none" stroke="#e9c46a" stroke-opacity="0.36" stroke-width="1"/>
+    <circle r="3.6" fill="url(#pAmber)" transform="translate(50,100)"/>
+  </g>
+  <circle cx="100" cy="100" r="20" fill="none" stroke="#ffe9a8" stroke-opacity="0.28" stroke-width="1"/>
+  <circle cx="100" cy="100" r="15" fill="url(#gCore)"/>
+  <circle cx="95" cy="95" r="4.6" fill="#fff7df" opacity="0.85"/>
+</svg>
