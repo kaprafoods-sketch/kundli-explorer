@@ -1,6 +1,9 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Hanken_Grotesk, IBM_Plex_Mono, Tiro_Devanagari_Sanskrit } from "next/font/google";
+import { Fraunces, Hanken_Grotesk, IBM_Plex_Mono, Tiro_Devanagari_Sanskrit, Noto_Sans_Devanagari } from "next/font/google";
+import { cookies } from "next/headers";
 import "./globals.css";
+import { LanguageProvider } from "@/components/i18n/LanguageProvider";
+import { LANG_COOKIE, DEFAULT_LANG, htmlLang, isLang } from "@/lib/i18n/config";
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",
@@ -32,6 +35,15 @@ const tiroDevanagari = Tiro_Devanagari_Sanskrit({
   display: "swap",
 });
 
+// Sans Devanagari for UI chrome in Hindi — appended to the font stacks in
+// globals.css so Devanagari glyphs render everywhere (no missing-glyph boxes).
+const notoDevanagari = Noto_Sans_Devanagari({
+  variable: "--font-noto-deva",
+  subsets: ["devanagari", "latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "GRAHA — Read Your Universe",
   description:
@@ -46,16 +58,19 @@ export const viewport: Viewport = {
   themeColor: "#0A1020",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const cookieLang = (await cookies()).get(LANG_COOKIE)?.value;
+  const lang = isLang(cookieLang) ? cookieLang : DEFAULT_LANG;
+
   return (
     <html
-      lang="en"
-      className={`${fraunces.variable} ${hankenGrotesk.variable} ${ibmPlexMono.variable} ${tiroDevanagari.variable} h-full`}
+      lang={htmlLang(lang)}
+      className={`${fraunces.variable} ${hankenGrotesk.variable} ${ibmPlexMono.variable} ${tiroDevanagari.variable} ${notoDevanagari.variable} h-full`}
     >
       <body className="min-h-full flex flex-col antialiased">
-        {children}
+        <LanguageProvider initialLang={lang}>{children}</LanguageProvider>
       </body>
     </html>
   );

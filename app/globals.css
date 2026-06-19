@@ -57,8 +57,10 @@
   --foreground: var(--parchment);
 
   /* ── Typography stacks ───────────────────────────────────────── */
-  --font-display: var(--font-fraunces), Georgia, serif;
-  --font-ui: var(--font-hanken), system-ui, sans-serif;
+  /* Devanagari faces are appended to every text stack so Hindi/Devanagari
+     glyphs render via font-fallback regardless of the active language. */
+  --font-display: var(--font-fraunces), var(--font-noto-deva), Georgia, serif;
+  --font-ui: var(--font-hanken), var(--font-noto-deva), system-ui, sans-serif;
   --font-mono: var(--font-ibm-mono), 'Courier New', monospace;
   --font-sanskrit: var(--font-tiro), serif;
 
