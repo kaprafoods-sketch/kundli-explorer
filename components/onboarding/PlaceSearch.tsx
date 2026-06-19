@@ -151,6 +151,7 @@ export default function PlaceSearch({ value, onChange }: Props) {
                 onMouseDown={() => selectCity(city)}
                 style={{
                   width: "100%",
+                  minHeight: 48,
                   padding: "12px 16px",
                   display: "flex",
                   alignItems: "center",
@@ -164,6 +165,8 @@ export default function PlaceSearch({ value, onChange }: Props) {
                 }}
                 onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(200,162,74,0.07)")}
                 onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+                onTouchStart={(e) => (e.currentTarget.style.background = "rgba(200,162,74,0.12)")}
+                onTouchEnd={(e) => (e.currentTarget.style.background = "none")}
               >
                 <span style={{ fontSize: 18, flexShrink: 0 }}>📍</span>
                 <div>

@@ -382,7 +382,9 @@ function CTAButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
+      className={disabled ? undefined : "press"}
       style={{
+        minHeight: 52,
         padding: "14px 20px",
         borderRadius: 14,
         border: "none",
@@ -390,12 +392,12 @@ function CTAButton({
           ? "rgba(200,162,74,0.25)"
           : "linear-gradient(135deg, var(--brass) 0%, #e8b84b 100%)",
         color: disabled ? "rgba(11,16,38,0.5)" : "var(--bg)",
-        fontSize: 14.5,
+        fontSize: 16,
         fontWeight: 700,
         letterSpacing: "0.02em",
         fontFamily: "var(--font-ui, system-ui)",
         cursor: disabled ? "not-allowed" : "pointer",
-        transition: "all 0.18s ease",
+        transition: "box-shadow 0.18s ease, background 0.18s ease",
         boxShadow: disabled ? "none" : "0 4px 20px rgba(200,162,74,0.3)",
         display: "flex",
         alignItems: "center",
@@ -426,16 +428,18 @@ function BackButton({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
+      className="press"
       style={{
-        padding: "14px 16px",
+        minHeight: 52,
+        padding: "14px 18px",
         borderRadius: 14,
         border: "1.5px solid rgba(255,255,255,0.08)",
         background: "rgba(255,255,255,0.03)",
-        color: "rgba(142,151,184,0.6)",
-        fontSize: 14,
+        color: "rgba(142,151,184,0.85)",
+        fontSize: 16,
         fontFamily: "var(--font-ui, system-ui)",
         cursor: "pointer",
-        transition: "all 0.18s ease",
+        transition: "border-color 0.18s ease, color 0.18s ease",
         flexShrink: 0,
       }}
       onMouseEnter={(e) => {
@@ -444,7 +448,7 @@ function BackButton({ onClick }: { onClick: () => void }) {
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)";
-        e.currentTarget.style.color = "rgba(142,151,184,0.6)";
+        e.currentTarget.style.color = "rgba(142,151,184,0.85)";
       }}
     >
       ← Back
