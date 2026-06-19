@@ -7,6 +7,11 @@ import { kb, GRAHA_IDS, type GrahaId } from "@/lib/kb";
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
+// NOTE (engagement engine): onboarding's "What brings you here?" step offers a
+// curated 7 interests — love, career, health, money, personality, spirituality,
+// learning. The spec asked to add "spiritual" + "learning"; "spirituality"
+// already covers life-meaning/moksha, so we reuse it and add only "learning"
+// (wanting to learn jyotish itself), which was genuinely missing.
 export const LIFE_AREA_IDS = [
   "love",
   "career",
@@ -17,9 +22,21 @@ export const LIFE_AREA_IDS = [
   "education",
   "travel",
   "spirituality",
+  "learning",
 ] as const;
 
 export type LifeAreaId = (typeof LIFE_AREA_IDS)[number];
+
+// The subset surfaced as selectable interests during onboarding (display order).
+export const ONBOARDING_INTEREST_IDS: readonly LifeAreaId[] = [
+  "love",
+  "career",
+  "health",
+  "money",
+  "personality",
+  "spirituality",
+  "learning",
+];
 
 export interface LifeAreaResult {
   id: LifeAreaId;
@@ -149,6 +166,21 @@ const AREA_CONFIG: Record<LifeAreaId, AreaConfig> = {
       "occult",
       "meditation",
       "religion",
+    ],
+  },
+  // "I want to learn astrology itself." Grounded in the chart factors of
+  // learning/wisdom (Mercury/Jupiter, houses of intellect & higher knowledge)
+  // so resolveLifeArea still returns sensible planets/houses.
+  learning: {
+    label: "Learning Astrology",
+    emoji: "☿",
+    keywords: [
+      "learning",
+      "knowledge",
+      "wisdom",
+      "intelligence",
+      "intellect",
+      "higher education",
     ],
   },
 };

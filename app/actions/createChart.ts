@@ -17,6 +17,15 @@ export async function createChartAction(formData: FormData) {
     throw new Error("Missing required fields: date, latitude, longitude.");
   }
 
+  // ── Engagement engine: interests / depth / intent note ──────────
+  const interests = ((formData.get("interests") as string) || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const depthRaw = (formData.get("depth") as string) || "deep";
+  const depth = depthRaw === "quick" ? "quick" : "deep";
+  const intentNote = ((formData.get("intentNote") as string) || "").trim() || null;
+
   const [year, month, day] = dateStr.split("-").map(Number);
   let hour = 12;
   let minute = 0;
@@ -54,6 +63,9 @@ export async function createChartAction(formData: FormData) {
       ayanamsha: chart.meta.ayanamsha,
       data: chart,
       ownerToken,
+      interests,
+      depth,
+      intentNote,
     })
     .select("id")
     .single();

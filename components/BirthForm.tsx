@@ -6,6 +6,7 @@ import DateWheelPicker, { type DateValue } from "./onboarding/DateWheelPicker";
 import BirthTimeSelector, { type BirthTimeSelectorValue } from "./onboarding/BirthTimeSelector";
 import PlaceSearch, { type PlaceValue } from "./onboarding/PlaceSearch";
 import OnboardingProgress from "./onboarding/OnboardingProgress";
+import InterestStep, { type InterestValue, DEFAULT_INTEREST } from "./onboarding/InterestStep";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -39,6 +40,7 @@ export default function BirthForm() {
   const [date, setDate] = useState<DateValue>(DEFAULT_DATE);
   const [timeVal, setTimeVal] = useState<BirthTimeSelectorValue>(DEFAULT_TIME);
   const [place, setPlace] = useState<PlaceValue | null>(null);
+  const [intent, setIntent] = useState<InterestValue>(DEFAULT_INTEREST);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [direction, setDirection] = useState<"forward" | "back">("forward");
@@ -83,6 +85,10 @@ export default function BirthForm() {
     fd.set("timeKnown", String(timeKnown));
     fd.set("lat", String(place.lat));
     fd.set("lon", String(place.lon));
+    // Engagement engine — interests / depth / intent note
+    fd.set("interests", intent.interests.join(","));
+    fd.set("depth", intent.depth);
+    fd.set("intentNote", intent.intentNote.trim());
 
     setPending(true);
     try {
@@ -116,6 +122,13 @@ export default function BirthForm() {
       key="s3"
       place={place}
       onPlace={setPlace}
+      onBack={goBack}
+      onNext={goNext}
+    />,
+    <Screen4
+      key="s4"
+      intent={intent}
+      onIntent={setIntent}
       onBack={goBack}
       onSubmit={submit}
       pending={pending}
@@ -159,7 +172,7 @@ export default function BirthForm() {
         }}
       >
         {/* Progress */}
-        <OnboardingProgress step={step} total={3} />
+        <OnboardingProgress step={step} total={4} />
 
         {/* Screen (animated) */}
         <div
@@ -309,12 +322,10 @@ interface S3Props {
   place: PlaceValue | null;
   onPlace: (v: PlaceValue) => void;
   onBack: () => void;
-  onSubmit: () => void;
-  pending: boolean;
-  error: string;
+  onNext: () => void;
 }
 
-function Screen3({ place, onPlace, onBack, onSubmit, pending, error }: S3Props) {
+function Screen3({ place, onPlace, onBack, onNext }: S3Props) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       <div style={{ textAlign: "center" }}>
@@ -330,15 +341,46 @@ function Screen3({ place, onPlace, onBack, onSubmit, pending, error }: S3Props) 
         >
           Where were you born?
         </h2>
-        <p style={{ margin: "8px 0 0", fontSize: 13, color: "rgba(142,151,184,0.7)", fontFamily: "var(--font-ui, system-ui)" }}>
+        <p style={{ margin: "8px 0 0", fontSize: 14, color: "rgba(142,151,184,0.7)", fontFamily: "var(--font-ui, system-ui)" }}>
           Search for your birth city — we&apos;ll find the exact coordinates.
         </p>
       </div>
 
       <PlaceSearch value={place} onChange={onPlace} />
 
+      <div style={{ display: "flex", gap: 10 }}>
+        <BackButton onClick={onBack} />
+        <CTAButton onClick={onNext} disabled={!place} style={{ flex: 1 }}>
+          Continue →
+        </CTAButton>
+      </div>
+
+      <p style={{ textAlign: "center", margin: 0, fontSize: 10.5, color: "rgba(142,151,184,0.3)", fontFamily: "var(--font-ui, system-ui)" }}>
+        Swiss Ephemeris · Lahiri ayanamsha · Whole-sign houses
+      </p>
+    </div>
+  );
+}
+
+// ── Screen 4: Interests & intent ───────────────────────────────────────────────
+
+interface S4Props {
+  intent: InterestValue;
+  onIntent: (v: InterestValue) => void;
+  onBack: () => void;
+  onSubmit: () => void;
+  pending: boolean;
+  error: string;
+}
+
+function Screen4({ intent, onIntent, onBack, onSubmit, pending, error }: S4Props) {
+  const canSubmit = intent.interests.length >= 2 && !pending;
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+      <InterestStep value={intent} onChange={onIntent} />
+
       {error && (
-        <p style={{ margin: 0, fontSize: 12.5, color: "#E07070", fontFamily: "var(--font-ui, system-ui)", textAlign: "center" }}>
+        <p style={{ margin: 0, fontSize: 13, color: "#E07070", fontFamily: "var(--font-ui, system-ui)", textAlign: "center" }}>
           {error}
         </p>
       )}
@@ -347,17 +389,13 @@ function Screen3({ place, onPlace, onBack, onSubmit, pending, error }: S3Props) 
         <BackButton onClick={onBack} />
         <CTAButton
           onClick={onSubmit}
-          disabled={!place || pending}
+          disabled={!canSubmit}
           loading={pending}
           style={{ flex: 1 }}
         >
           {pending ? "Computing…" : "Reveal My Kundli ✦"}
         </CTAButton>
       </div>
-
-      <p style={{ textAlign: "center", margin: 0, fontSize: 10.5, color: "rgba(142,151,184,0.3)", fontFamily: "var(--font-ui, system-ui)" }}>
-        Swiss Ephemeris · Lahiri ayanamsha · Whole-sign houses
-      </p>
     </div>
   );
 }

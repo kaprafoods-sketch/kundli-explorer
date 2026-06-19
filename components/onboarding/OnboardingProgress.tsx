@@ -4,6 +4,7 @@ const STEPS = [
   { icon: "☀️", label: "Date" },
   { icon: "🕒", label: "Time" },
   { icon: "🪐", label: "Place" },
+  { icon: "✨", label: "Focus" },
 ];
 
 interface Props {
@@ -82,9 +83,9 @@ export default function OnboardingProgress({ step, total = 3 }: Props) {
               {i < STEPS.length - 1 && (
                 <div
                   style={{
-                    width: 48,
+                    width: 40,
                     height: 2,
-                    margin: "0 4px",
+                    margin: "0 3px",
                     marginBottom: 18, // offset for label below
                     borderRadius: 2,
                     background: i < step
