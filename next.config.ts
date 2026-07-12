@@ -3,7 +3,10 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // Bundle Swiss Ephemeris data files into serverless functions
   outputFileTracingIncludes: {
-    "/**": ["./ephe/**"],
+    "/**": [
+      "./ephe/**",
+      "./node_modules/geo-tz/data/**",
+    ],
   },
 
   // sweph is a native Node addon — must run in Node runtime, not Edge
