@@ -9,8 +9,10 @@ const nextConfig: NextConfig = {
     ],
   },
 
-  // sweph is a native Node addon — must run in Node runtime, not Edge
-  serverExternalPackages: ["sweph"],
+  // sweph is a native Node addon — must run in Node runtime, not Edge.
+  // geo-tz must stay unbundled: it resolves its .geo.dat data files via
+  // __dirname, which Turbopack rewrites to a nonexistent /ROOT/ placeholder.
+  serverExternalPackages: ["sweph", "geo-tz"],
 
   // Silence the turbopack/webpack mismatch warning
   turbopack: {},
