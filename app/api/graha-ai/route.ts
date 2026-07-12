@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { getGemini, GEMINI_MODEL } from "@/lib/gemini";
+import { getOpenRouter, OR_MODEL } from "@/lib/openrouter";
 import { supabase } from "@/lib/supabase";
 import { kb } from "@/lib/kb";
 import {
@@ -103,8 +103,8 @@ Center your answers on the Lagna/Ascendant unless the user explicitly asks about
 // ── Route handler ─────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
-  const ai = getGemini();
-  if (!ai) return new Response("GEMINI_API_KEY not configured", { status: 503 });
+  const ai = getOpenRouter();
+  if (!ai) return new Response("OPENROUTER_API_KEY not configured", { status: 503 });
 
   let chartId: string;
   let message: string;
@@ -133,7 +133,7 @@ export async function POST(req: NextRequest) {
 
   const chart = record.data as NatalChart;
 
-  const systemInstruction =
+  const systemPrompt =
     buildBaseInstruction(chart) +
     (focus ? buildFocusBlock(focus, chart) : "");
 
@@ -150,18 +150,20 @@ export async function POST(req: NextRequest) {
     .from("TutorMessage")
     .insert({ chartId, role: "user", content: message });
 
-  const contents = [
+  const messages: { role: "system" | "user" | "assistant"; content: string }[] = [
+    { role: "system", content: systemPrompt },
     ...((history ?? []).map((m) => ({
-      role: m.role === "assistant" ? "model" : "user",
-      parts: [{ text: m.content as string }],
+      role: (m.role === "assistant" ? "assistant" : "user") as "user" | "assistant",
+      content: m.content as string,
     }))),
-    { role: "user", parts: [{ text: message }] },
+    { role: "user", content: message },
   ];
 
-  const response = await ai.models.generateContentStream({
-    model: GEMINI_MODEL,
-    contents,
-    config: { systemInstruction, maxOutputTokens: 1024 },
+  const stream = await ai.chat.completions.create({
+    model: OR_MODEL,
+    messages,
+    max_tokens: 1024,
+    stream: true,
   });
 
   let fullReply = "";
@@ -169,8 +171,8 @@ export async function POST(req: NextRequest) {
   const readable = new ReadableStream({
     async start(controller) {
       try {
-        for await (const chunk of response) {
-          const text = chunk.text;
+        for await (const chunk of stream) {
+          const text = chunk.choices[0]?.delta?.content ?? "";
           if (text) {
             fullReply += text;
             controller.enqueue(new TextEncoder().encode(text));
