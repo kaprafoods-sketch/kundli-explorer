@@ -127,10 +127,12 @@ function Sun({ onHover, onClick }: {
 
 // ── Planet ────────────────────────────────────────────────────────────────────
 
-function Planet({ cfg, initialAngle, reduced, onHover, onClick }: {
+function Planet({ cfg, initialAngle, reduced, paused, speed, onHover, onClick }: {
   cfg: GrahaConfig;
   initialAngle: number;
   reduced: boolean;
+  paused: boolean;
+  speed: number;
   onHover: (id: string | null) => void;
   onClick: (g: GrahaConfig) => void;
 }) {
@@ -139,14 +141,12 @@ function Planet({ cfg, initialAngle, reduced, onHover, onClick }: {
   const glowRef  = useRef<THREE.MeshBasicMaterial>(null!);
   const [hovered, setHovered] = useState(false);
   const dragOrigin = useRef({ x: 0, y: 0 });
+  const angleRef = useRef(cfg.id === "ketu" ? initialAngle + Math.PI : initialAngle);
 
-  // Rahu and Ketu are always opposite — offset Ketu by π
-  const angleOffset = cfg.id === "ketu" ? initialAngle + Math.PI : initialAngle;
-
-  useFrame(({ clock }) => {
+  useFrame((_, delta) => {
     if (!groupRef.current) return;
-    const t = reduced ? 0 : clock.getElapsedTime();
-    const angle = t * cfg.speed + angleOffset;
+    if (!reduced && !paused) angleRef.current += delta * cfg.speed * speed;
+    const angle = angleRef.current;
     groupRef.current.position.x = Math.cos(angle) * cfg.orbit;
     groupRef.current.position.z = Math.sin(angle) * cfg.orbit;
 
@@ -222,8 +222,10 @@ function Planet({ cfg, initialAngle, reduced, onHover, onClick }: {
 
 // ── Full scene ────────────────────────────────────────────────────────────────
 
-function Scene({ reduced, onHover, onClick }: {
+function Scene({ reduced, paused, speed, onHover, onClick }: {
   reduced: boolean;
+  paused: boolean;
+  speed: number;
   onHover: (id: string | null) => void;
   onClick: (g: GrahaConfig) => void;
 }) {
@@ -275,6 +277,8 @@ function Scene({ reduced, onHover, onClick }: {
           cfg={g}
           initialAngle={initialAngles[i + 1] ?? 0}
           reduced={reduced}
+          paused={paused}
+          speed={speed}
           onHover={onHover}
           onClick={onClick}
         />
@@ -341,7 +345,13 @@ function PlanetCard({ graha, onClose }: { graha: GrahaConfig; onClose: () => voi
 
 // ── Root export ───────────────────────────────────────────────────────────────
 
-export default function SolarSystemHero() {
+export default function SolarSystemHero({
+  paused = false,
+  speed = 1,
+}: {
+  paused?: boolean;
+  speed?: number;
+}) {
   const reduced = useReducedMotion();
   const [activeGraha, setActiveGraha] = useState<GrahaConfig | null>(null);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
@@ -367,7 +377,13 @@ export default function SolarSystemHero() {
       >
         <AdaptiveDpr pixelated />
         <PerformanceMonitor>
-          <Scene reduced={reduced} onHover={handleHover} onClick={handleClick} />
+          <Scene
+            reduced={reduced}
+            paused={paused || reduced}
+            speed={speed}
+            onHover={handleHover}
+            onClick={handleClick}
+          />
         </PerformanceMonitor>
       </Canvas>
 
