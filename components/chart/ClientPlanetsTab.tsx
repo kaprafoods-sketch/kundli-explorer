@@ -27,8 +27,9 @@ interface Props {
   chart: NatalChart;
   chartId: string;
   interests?: string[];
+  onFocusChange?: (focus: { kind: "planet"; id: string } | { kind: "house"; id: number } | null) => void;
 }
 
-export default function ClientPlanetsTab({ chart, chartId, interests }: Props) {
-  return <PlanetsTab chart={chart} chartId={chartId} interests={interests} />;
+export default function ClientPlanetsTab({ chart, chartId, interests, onFocusChange }: Props) {
+  return <PlanetsTab chart={chart} chartId={chartId} interests={interests} onFocusChange={onFocusChange} />;
 }

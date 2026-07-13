@@ -101,16 +101,16 @@ export default function ExplorePanel({
               {getName(graha, lang)}
             </h2>
             <p className="text-sm mt-0.5" style={{ color: "var(--muted)" }}>
-              House {placement.house} · {getName(kb.rashis[placement.sign], lang)}
+              {t("explore.house")} {placement.house} · {getName(kb.rashis[placement.sign], lang)}
               {placement.retrograde && (
-                <span className="ml-2" style={{ color: "var(--weak)" }}>℞ Retrograde</span>
+                <span className="ml-2" style={{ color: "var(--weak)" }}>℞ {t("explore.retrograde")}</span>
               )}
             </p>
             <div className="flex items-center gap-2 mt-2">
               <span className={`badge ${data.dignityClass}`}>{data.dignityLabel}</span>
               {placement.neechaBhanga && (
                 <span className="badge" style={{ background: "rgba(200,162,74,0.15)", color: "var(--brass)", border: "1px solid var(--brass)" }}>
-                  Neecha Bhanga?
+                  {t("explore.neechaBhanga")}
                 </span>
               )}
               {data.houseClass.map((c) => (
@@ -122,20 +122,20 @@ export default function ExplorePanel({
 
         <Divider />
 
-        <ReadingSection label="The Planet — what it brings">
+        <ReadingSection label={t("explore.section.planet")}>
           {data.pillars.planet}
         </ReadingSection>
-        <ReadingSection label="The House — where it acts">
+        <ReadingSection label={t("explore.section.house")}>
           {data.pillars.house}
         </ReadingSection>
-        <ReadingSection label="The Sign — how it expresses">
+        <ReadingSection label={t("explore.section.sign")}>
           {data.pillars.sign}
         </ReadingSection>
-        <ReadingSection label="Dignity — strength dial">
+        <ReadingSection label={t("explore.section.dignity")}>
           {data.pillars.dignity}
         </ReadingSection>
         {data.pillars.aspects && (
-          <ReadingSection label="Conjunctions &amp; Aspects">
+          <ReadingSection label={t("explore.section.aspects")}>
             {data.pillars.aspects}
           </ReadingSection>
         )}
@@ -144,15 +144,15 @@ export default function ExplorePanel({
 
         {/* Nakshatra */}
         <div>
-          <span className="text-xs uppercase tracking-widest" style={{ color: "var(--faint)" }}>Nakshatra</span>
+          <span className="text-xs uppercase tracking-widest" style={{ color: "var(--faint)" }}>{t("explore.nakshatra")}</span>
           <p className="text-sm mt-1" style={{ color: "var(--parchment)" }}>
-            {getName(kb.nakshatras.find((n) => n.id === placement.nakshatra), lang) || placement.nakshatra} · Pada {placement.pada}
+            {getName(kb.nakshatras.find((n) => n.id === placement.nakshatra), lang) || placement.nakshatra} · {t("explore.pada")} {placement.pada}
           </p>
         </div>
 
         {/* Karaka chips */}
         <div>
-          <span className="text-xs uppercase tracking-widest" style={{ color: "var(--faint)" }}>Signifies</span>
+          <span className="text-xs uppercase tracking-widest" style={{ color: "var(--faint)" }}>{t("explore.signifies")}</span>
           <div className="flex flex-wrap gap-1.5 mt-2">
             {graha?.karaka_of?.map((k) => (
               <span
@@ -185,13 +185,13 @@ export default function ExplorePanel({
       <div className="flex flex-col gap-5">
         <div>
           <p className="text-xs uppercase tracking-widest mb-1" style={{ color: "var(--faint)" }}>
-            House {house}
+            {t("explore.house")} {house}
           </p>
           <h2 className="font-display text-2xl font-semibold" style={{ color: "var(--parchment)" }}>
             {data.headline.replace(`House ${house} — `, "")}
           </h2>
           <p className="text-sm mt-1" style={{ color: "var(--muted)" }}>
-            {getName(kb.rashis[signFromNumber(((chart.lagnaSign - 1 + house - 1) % 12) + 1)], lang)} · ruled by {data.sign.ruler}
+            {getName(kb.rashis[signFromNumber(((chart.lagnaSign - 1 + house - 1) % 12) + 1)], lang)} · {t("explore.ruledBy")} {data.sign.ruler}
           </p>
           <div className="flex gap-1.5 mt-2 flex-wrap">
             {data.houseClass.map((c) => (
@@ -208,7 +208,7 @@ export default function ExplorePanel({
 
         {data.planets.length > 0 && (
           <div>
-            <span className="text-xs uppercase tracking-widest" style={{ color: "var(--faint)" }}>Planets in this house</span>
+            <span className="text-xs uppercase tracking-widest" style={{ color: "var(--faint)" }}>{t("explore.planetsInHouse")}</span>
             <div className="flex gap-2 mt-2 flex-wrap">
               {data.planets.map((gid) => {
                 const g = kb.grahas[gid];
@@ -227,7 +227,7 @@ export default function ExplorePanel({
         )}
 
         <div>
-          <span className="text-xs uppercase tracking-widest" style={{ color: "var(--faint)" }}>House signifies</span>
+          <span className="text-xs uppercase tracking-widest" style={{ color: "var(--faint)" }}>{t("explore.houseSignifies")}</span>
           <div className="flex flex-wrap gap-1.5 mt-2">
             {data.significations.map((s) => (
               <span
@@ -259,7 +259,7 @@ export default function ExplorePanel({
     return (
       <div className="flex flex-col gap-5">
         <div>
-          <p className="text-xs uppercase tracking-widest mb-1" style={{ color: "var(--faint)" }}>Ascendant</p>
+          <p className="text-xs uppercase tracking-widest mb-1" style={{ color: "var(--faint)" }}>{t("explore.ascendant")}</p>
           <h2 className="font-display text-2xl font-semibold" style={{ color: "var(--parchment)" }}>
             {data.headline}
           </h2>
@@ -274,7 +274,7 @@ export default function ExplorePanel({
           {data.body}
         </p>
         <div>
-          <p className="text-xs uppercase tracking-widest mb-2" style={{ color: "var(--faint)" }}>Lagna lord</p>
+          <p className="text-xs uppercase tracking-widest mb-2" style={{ color: "var(--faint)" }}>{t("explore.lagnaLord")}</p>
           <p className="text-sm" style={{ color: "var(--muted)" }}>{data.pillars.planet}</p>
         </div>
 

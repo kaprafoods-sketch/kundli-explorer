@@ -120,3 +120,36 @@ suppressions, except three justified per-line disables (native/legitimate patter
     external + lazy is higher-risk than the established convention.
   - `TransitsTab.tsx`: initial data fetch on mount — the loading flag is genuine external-sync state,
     not derivable; a canonical legitimate effect.
+
+## Wave 1 — Four parallel agents (AUTH · I18N · SUGGEST · 3D)
+
+All four ran as parallel subagents on disjoint manifests; orchestrator integrated + gated.
+
+- **AUTH**: @supabase/ssr (Google OAuth + magic link), `getSession()` single accessor,
+  chart claiming on callback (kx_owner → userId, then cookie cleared), ownership enforced
+  server-side (userId OR ownerToken). Schema additive-only; `Message = @@map("TutorMessage")`.
+  **S1 held: migration SQL printed, NOT applied** (also: sandbox could not reach the DB;
+  Prisma 7 dropped --from-url so the diff was produced schema-vs-schema — the pre-edit schema
+  is the live shape). Deviations accepted: `proxy.ts` instead of `middleware.ts` (Next 16
+  renamed the convention — AGENTS.md says heed deprecations); `Feedback` table included
+  (D7: Wave-2 FEEDBACK consumes it; new empty table, zero risk).
+- **I18N**: the layer already existed and was correct; the one real gap was that
+  LanguageSwitcher was never mounted (now in chart header). ~16 chrome keys added
+  (en+hi complete; sa only where established, else `// TODO sa`). New i18n test file (12).
+- **SUGGEST**: bank of 35 (5×7 life areas) in lib/questionBank.ts; engine extended
+  (multi-entity grounding + ≥3-area diversity constraint); chips were already wired.
+  New tests (4). Engine stays pure/deterministic.
+- **3D**: /explore-3d is now a real logged-out page (sample chart, AI auto-disabled via
+  empty chartId); camera fly-to + 12 bhava sectors → dual-mode PlanetReadingSheet fed by
+  composeHouseReading — one interpretation source across 2D/chat/3D.
+- **Orchestrator integration fixes**: (1) AuthButton moved top-LEFT (LanguageSwitcher owns
+  top-right; they collided). (2) **Key-later guard for auth** (`lib/auth/config.ts:authConfigured()`)
+  — proxy.ts skips refresh, AuthButton renders null, /login shows a friendly notice,
+  /auth/callback redirects instead of 500ing. Without this the WHOLE APP 500'd when
+  NEXT_PUBLIC_SUPABASE_* are unset (proxy runs on every request) — mirrors the OpenRouter
+  key-later pattern. (3) Stale "Lagna" brand on /login → "Graha".
+- **Open integration item (→ Wave 3 / AGENT-DESIGN)**: 3D `onFocusChange` bubbles focus out of
+  PlanetsTab/ClientPlanetsTab, but ChartExplorer doesn't yet pass it into GrahaAIDock (dock has
+  no focus prop). Flagged by AGENT-3D; both files were outside its manifest.
+- Gate: lint 0/0 · build clean (14 routes incl. /login, /auth/callback, Proxy) · tests 25/25
+  (9 engine + 12 i18n + 4 suggest) · browser-verified /, /explore-3d, /login.

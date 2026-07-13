@@ -1,9 +1,10 @@
 "use client";
 
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
   Stars, AdaptiveDpr, PerformanceMonitor, Html, Float, OrbitControls,
 } from "@react-three/drei";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import * as THREE from "three";
 import { useRef, useState, useEffect, useMemo, useCallback } from "react"; // useMemo kept for OrreryScene internals
@@ -35,6 +36,22 @@ const ORBIT_RADIUS: Record<string, number> = {
   sun: 0, moon: 1.8, mercury: 2.4, venus: 3.0,
   mars: 3.6, rahu: 4.2, ketu: 4.2, jupiter: 5.0, saturn: 5.8,
 };
+
+// Bhava (house) sector markers sit just outside the outermost planet orbit.
+const HOUSE_RING_RADIUS = 6.6;
+
+/** House 1 at top (−π/2), going clockwise — matches the planet angle formula. */
+function houseAngle(house: number): number {
+  return ((house - 1) / 12) * Math.PI * 2 - Math.PI / 2;
+}
+
+function houseWorldPos(house: number): THREE.Vector3 {
+  const a = houseAngle(house);
+  return new THREE.Vector3(Math.cos(a) * HOUSE_RING_RADIUS, 0, Math.sin(a) * HOUSE_RING_RADIUS);
+}
+
+/** Unified focus target — either a planet or a bhava (house). */
+type Focus = { kind: "planet"; id: string } | { kind: "house"; id: number };
 
 const GRAHA_SIZE: Record<string, number> = {
   sun: 0.34, moon: 0.17, mars: 0.16, mercury: 0.14,
@@ -398,18 +415,137 @@ function ElementParticles({ element, palette }: {
   );
 }
 
+// ── Bhava (house) sector marker — click to open composeHouseReading ──────────
+
+function HouseMarker({ house, focused, hoveredHouse, onHover, onClick, lang }: {
+  house: number;
+  focused: boolean;
+  hoveredHouse: number | null;
+  onHover: (house: number | null) => void;
+  onClick: (house: number) => void;
+  lang: Lang;
+}) {
+  const pos = useMemo(() => houseWorldPos(house), [house]);
+  const hovered = hoveredHouse === house;
+  const bhava = kb.bhavas[String(house)];
+  const dragOrigin = useRef({ x: 0, y: 0 });
+
+  return (
+    <group position={pos}>
+      <mesh
+        onPointerDown={(e) => { e.stopPropagation(); dragOrigin.current = { x: e.nativeEvent.clientX, y: e.nativeEvent.clientY }; }}
+        onPointerOver={(e) => { e.stopPropagation(); onHover(house); document.body.style.cursor = "pointer"; }}
+        onPointerOut={() => { onHover(null); document.body.style.cursor = "auto"; }}
+        onClick={(e) => { e.stopPropagation(); const dx = e.nativeEvent.clientX - dragOrigin.current.x; const dy = e.nativeEvent.clientY - dragOrigin.current.y; if (Math.hypot(dx, dy) < 5) onClick(house); }}
+      >
+        <sphereGeometry args={[0.14, 16, 16]} />
+        <meshBasicMaterial
+          color="#C8A24A"
+          transparent
+          opacity={focused ? 0.85 : hovered ? 0.6 : 0.22}
+        />
+      </mesh>
+      <Html center position={[0, 0.28, 0]} style={{ pointerEvents: "none" }}>
+        {hovered || focused ? (
+          <div style={{
+            background: "rgba(10,15,36,0.95)",
+            border: "1px solid #C8A24A",
+            borderRadius: 8,
+            padding: "5px 12px",
+            whiteSpace: "nowrap",
+            fontSize: 12,
+            color: "#ECE7D7",
+            fontFamily: "system-ui",
+            textAlign: "center",
+          }}>
+            <div style={{ color: "#C8A24A", fontWeight: 600 }}>House {house}</div>
+            <div style={{ color: "#8E97B8", fontSize: 11, marginTop: 2 }}>{getName(bhava, lang)}</div>
+          </div>
+        ) : (
+          <div style={{
+            fontSize: 10,
+            fontWeight: 600,
+            color: "rgba(200,162,74,0.55)",
+            fontFamily: "system-ui",
+            textShadow: "0 0 8px rgba(0,0,0,1)",
+          }}>
+            {house}
+          </div>
+        )}
+      </Html>
+    </group>
+  );
+}
+
+// ── Camera fly-to rig — smoothly moves camera + OrbitControls target toward
+// the focused planet/house, and back to center when nothing is focused ──────
+
+function CameraRig({
+  focusPos,
+  controlsRef,
+  reduced,
+}: {
+  focusPos: THREE.Vector3 | null;
+  controlsRef: React.RefObject<OrbitControlsImpl | null>;
+  reduced: boolean;
+}) {
+  const { camera } = useThree();
+  const desiredPos = useMemo(() => new THREE.Vector3(), []);
+  const origin = useMemo(() => new THREE.Vector3(0, 0, 0), []);
+
+  useFrame(() => {
+    const controls = controlsRef.current;
+    if (!controls) return;
+    const target = focusPos ?? origin;
+    const lerpAmt = reduced ? 1 : 0.07;
+    controls.target.lerp(target, lerpAmt);
+
+    if (focusPos) {
+      const dir = camera.position.clone().sub(controls.target);
+      const len = dir.length() || 1;
+      dir.normalize();
+      const dist = THREE.MathUtils.clamp(len, 3.6, 6.5);
+      desiredPos.copy(controls.target).add(dir.multiplyScalar(dist));
+      if (!reduced) camera.position.lerp(desiredPos, lerpAmt);
+      else camera.position.copy(desiredPos);
+    }
+    controls.update();
+  });
+
+  return null;
+}
+
 // ── Full orrery scene ─────────────────────────────────────────────────────────
 
-function OrreryScene({ planets, focusedId, onHover, onClick, reduced, lang }: {
+function OrreryScene({
+  planets,
+  focus,
+  focusWorldPos,
+  onHoverPlanet,
+  onClickPlanet,
+  onHoverHouse,
+  onClickHouse,
+  reduced,
+  lang,
+}: {
   planets: PlanetData[];
-  focusedId: string | null;
-  onHover: (id: string | null) => void;
-  onClick: (id: string) => void;
+  focus: Focus | null;
+  focusWorldPos: THREE.Vector3 | null;
+  onHoverPlanet: (id: string | null) => void;
+  onClickPlanet: (id: string) => void;
+  onHoverHouse: (house: number | null) => void;
+  onClickHouse: (house: number) => void;
   reduced: boolean;
   lang: Lang;
 }) {
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const handleHover = useCallback((id: string | null) => { setHoveredId(id); onHover(id); }, [onHover]);
+  const [hoveredHouse, setHoveredHouse] = useState<number | null>(null);
+  const controlsRef = useRef<OrbitControlsImpl | null>(null);
+  const handleHover = useCallback((id: string | null) => { setHoveredId(id); onHoverPlanet(id); }, [onHoverPlanet]);
+  const handleHouseHover = useCallback((house: number | null) => { setHoveredHouse(house); onHoverHouse(house); }, [onHoverHouse]);
+
+  const focusedId = focus?.kind === "planet" ? focus.id : null;
+  const focusedHouse = focus?.kind === "house" ? focus.id : null;
 
   const orbitRadii = useMemo(
     () => [...new Set(planets.filter(p => p.orbit > 0).map(p => p.orbit))].sort((a, b) => a - b),
@@ -429,6 +565,7 @@ function OrreryScene({ planets, focusedId, onHover, onClick, reduced, lang }: {
 
       <Stars radius={80} depth={60} count={reduced ? 1400 : 3800} factor={3.2} saturation={0} fade />
       <OrbitControls
+        ref={controlsRef}
         enableRotate
         enablePan={false}
         enableZoom
@@ -437,13 +574,27 @@ function OrreryScene({ planets, focusedId, onHover, onClick, reduced, lang }: {
         rotateSpeed={0.6}
         minPolarAngle={0}
         maxPolarAngle={Math.PI}
-        minDistance={4}
+        minDistance={3}
         maxDistance={18}
         target={[0, 0, 0]}
-        autoRotate
+        autoRotate={!focus && !reduced}
         autoRotateSpeed={-0.5}
       />
-      <OrbitRings radii={orbitRadii} />
+      <CameraRig focusPos={focusWorldPos} controlsRef={controlsRef} reduced={reduced} />
+      <OrbitRings radii={[...orbitRadii, HOUSE_RING_RADIUS]} />
+
+      {/* Bhava (house) sector markers — click to open composeHouseReading */}
+      {Array.from({ length: 12 }, (_, i) => i + 1).map((house) => (
+        <HouseMarker
+          key={house}
+          house={house}
+          focused={focusedHouse === house}
+          hoveredHouse={hoveredHouse}
+          onHover={handleHouseHover}
+          onClick={onClickHouse}
+          lang={lang}
+        />
+      ))}
 
       {/* Sun at center */}
       {sun && (
@@ -453,7 +604,7 @@ function OrreryScene({ planets, focusedId, onHover, onClick, reduced, lang }: {
               onPointerDown={(e) => { e.stopPropagation(); sunDragOrigin.current = { x: e.nativeEvent.clientX, y: e.nativeEvent.clientY }; }}
               onPointerOver={(e) => { e.stopPropagation(); handleHover("sun"); document.body.style.cursor = "pointer"; }}
               onPointerOut={() => { handleHover(null); document.body.style.cursor = "auto"; }}
-              onClick={(e) => { e.stopPropagation(); const dx = e.nativeEvent.clientX - sunDragOrigin.current.x; const dy = e.nativeEvent.clientY - sunDragOrigin.current.y; if (Math.hypot(dx, dy) < 5) onClick("sun"); }}
+              onClick={(e) => { e.stopPropagation(); const dx = e.nativeEvent.clientX - sunDragOrigin.current.x; const dy = e.nativeEvent.clientY - sunDragOrigin.current.y; if (Math.hypot(dx, dy) < 5) onClickPlanet("sun"); }}
             >
               <sphereGeometry args={[sun.size, 32, 32]} />
               <meshStandardMaterial color={sun.glowColor} emissive="#ff5a00" emissiveIntensity={3.5} roughness={0.9} />
@@ -505,14 +656,14 @@ function OrreryScene({ planets, focusedId, onHover, onClick, reduced, lang }: {
       {others.map(data => (
         <group key={data.grahaId}>
           {data.isShadow
-            ? <ShadowNebula data={data} onHover={handleHover} onClick={onClick} lang={lang} />
+            ? <ShadowNebula data={data} onHover={handleHover} onClick={onClickPlanet} lang={lang} />
             : (
               <PlanetOrb
                 data={data}
                 focused={focusedId === data.grahaId}
                 hoveredId={hoveredId}
                 onHover={handleHover}
-                onClick={onClick}
+                onClick={onClickPlanet}
                 reduced={reduced}
                 lang={lang}
               />
@@ -543,13 +694,20 @@ interface Props {
   chart: NatalChart;
   chartId: string;
   interests?: string[];
+  /**
+   * Notified whenever the 3D focus (planet or bhava) changes, so a real chart
+   * page (chartId non-empty) can sync it into GrahaAIDock's chat — e.g. so
+   * "Ask GRAHA AI about this" opens pre-focused. Not wired by any caller yet;
+   * GrahaAIDock currently has no focus prop (see PlanetsTab README note in
+   * final report) — this is the seam a future integration hooks into.
+   */
+  onFocusChange?: (focus: { kind: "planet"; id: string } | { kind: "house"; id: number } | null) => void;
 }
 
-export default function PlanetsTab({ chart, chartId, interests }: Props) {
+export default function PlanetsTab({ chart, chartId, interests, onFocusChange }: Props) {
   const reduced = useReducedMotion();
   const { lang } = useLang();
-  const [focusedId, setFocusedId] = useState<string | null>(null);
-  const [, setHoveredId] = useState<string | null>(null);
+  const [focus, setFocus] = useState<Focus | null>(null);
 
   // Build planet data from real chart placements (house → angle; graha → orbit radius)
   const planets = useMemo<PlanetData[]>(() => {
@@ -587,12 +745,41 @@ export default function PlanetsTab({ chart, chartId, interests }: Props) {
       .filter(Boolean) as PlanetData[];
   }, [chart.placements]);
 
-  const focusedPlanet = planets.find(p => p.grahaId === focusedId) ?? null;
+  const focusedPlanet = focus?.kind === "planet"
+    ? planets.find(p => p.grahaId === focus.id) ?? null
+    : null;
+  const focusedHouse = focus?.kind === "house" ? focus.id : null;
 
-  const handleClick = useCallback((id: string) => {
-    setFocusedId(prev => prev === id ? null : id);
-  }, []);
-  const handleHover = useCallback((id: string | null) => setHoveredId(id), []);
+  // World-space fly-to target for CameraRig — planet position or the house's
+  // bhava-chamber sector, or null (camera drifts back to center) when unfocused.
+  const focusWorldPos = useMemo(() => {
+    if (focus?.kind === "planet") {
+      const p = planets.find(pl => pl.grahaId === focus.id);
+      return p ? p.worldPos.clone() : null;
+    }
+    if (focus?.kind === "house") return houseWorldPos(focus.id);
+    return null;
+  }, [focus, planets]);
+
+  const setFocusAndNotify = useCallback((next: Focus | null) => {
+    setFocus(next);
+    onFocusChange?.(next ? (next.kind === "planet" ? { kind: "planet", id: next.id } : { kind: "house", id: next.id }) : null);
+  }, [onFocusChange]);
+
+  const handleClickPlanet = useCallback((id: string) => {
+    setFocusAndNotify(focus?.kind === "planet" && focus.id === id ? null : { kind: "planet", id });
+  }, [focus, setFocusAndNotify]);
+
+  const handleClickHouse = useCallback((house: number) => {
+    setFocusAndNotify(focus?.kind === "house" && focus.id === house ? null : { kind: "house", id: house });
+  }, [focus, setFocusAndNotify]);
+
+  // Hover events bubble up from OrreryScene but the root has no use for them
+  // yet beyond the in-canvas tooltips (which manage their own local state).
+  const handleHoverPlanet = useCallback(() => {}, []);
+  const handleHoverHouse = useCallback(() => {}, []);
+
+  const handleBack = useCallback(() => setFocusAndNotify(null), [setFocusAndNotify]);
 
   return (
     <div style={{ position: "relative", minHeight: "calc(100vh - 110px)", overflow: "hidden" }}>
@@ -600,23 +787,26 @@ export default function PlanetsTab({ chart, chartId, interests }: Props) {
         aria-hidden="true"
         camera={{ position: [0, 4.2, 10.5], fov: 48 }}
         gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
-        dpr={[1, 2]}
+        dpr={[1, 1.75]}
         style={{ width: "100%", height: "calc(100vh - 110px)", touchAction: "none" }}
       >
         <AdaptiveDpr pixelated />
         <PerformanceMonitor>
           <OrreryScene
             planets={planets}
-            focusedId={focusedId}
-            onHover={handleHover}
-            onClick={handleClick}
+            focus={focus}
+            focusWorldPos={focusWorldPos}
+            onHoverPlanet={handleHoverPlanet}
+            onClickPlanet={handleClickPlanet}
+            onHoverHouse={handleHoverHouse}
+            onClickHouse={handleClickHouse}
             reduced={reduced}
             lang={lang}
           />
         </PerformanceMonitor>
       </Canvas>
 
-      {/* Bhava-chamber reading panel — shared PlanetReadingSheet */}
+      {/* Bhava-chamber reading panel — shared PlanetReadingSheet (planet or house mode) */}
       {focusedPlanet && (
         <PlanetReadingSheet
           placement={focusedPlanet.placement}
@@ -624,13 +814,24 @@ export default function PlanetsTab({ chart, chartId, interests }: Props) {
           chartId={chartId || undefined}
           interests={interests}
           variant="orrery"
-          onBack={() => setFocusedId(null)}
+          onBack={handleBack}
+          backLabel="← Orrery"
+        />
+      )}
+      {focusedHouse != null && !focusedPlanet && (
+        <PlanetReadingSheet
+          houseNum={focusedHouse}
+          chart={chart}
+          chartId={chartId || undefined}
+          interests={interests}
+          variant="orrery"
+          onBack={handleBack}
           backLabel="← Orrery"
         />
       )}
 
       {/* Hint when nothing is focused */}
-      {!focusedId && (
+      {!focus && (
         <div
           style={{
             position: "absolute",

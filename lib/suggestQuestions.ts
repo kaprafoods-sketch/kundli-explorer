@@ -22,6 +22,11 @@
 import type { NatalChart, Placement } from "@/lib/astro/computeChart";
 import type { TransitPlanet } from "@/lib/astro/transits";
 import type { LifeAreaId } from "@/lib/lifeAreas";
+import { QUESTION_BANK as ENTITY_QUESTION_BANK } from "@/lib/questionBank";
+
+// Minimum distinct life areas the top-N chips must span (diversity constraint,
+// AGENT-SUGGEST Wave-1 charter item 2). Only enforced when topN >= this value.
+const MIN_DIVERSE_AREAS = 3;
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -36,6 +41,11 @@ export interface SuggestedQuestion {
   lifeAreas: LifeAreaId[];
   /** Chart element this question is "about" — drives liveness + novelty. */
   element?: ElementRef;
+  /** Multiple chart elements this question is grounded in (from
+   *  lib/questionBank.ts entities.houses/planets). Liveness/novelty take the
+   *  max/any across this list. When both `element` and `elements` are set,
+   *  `element` is treated as just one more member of the list. */
+  elements?: ElementRef[];
   /** Dasha-driven: relevant whenever there's a current period (always). */
   timing?: boolean;
   /** Only enters the pool when its calendar hook fires. */
@@ -132,10 +142,33 @@ export const QUESTION_BANK: SuggestedQuestion[] = [
   { id: "hook-saturn-return", text: "Am I in a Saturn return — and what is it asking of me?", lifeAreas: ["personality", "career", "spiritual"], contextHook: "saturn_return" },
 ];
 
+// ── Reconciled entity bank (lib/questionBank.ts) ───────────────────────────────
+// Converts the 35-question, entities-tagged bank (5 per onboarding life area)
+// into the SuggestedQuestion shape this engine already scores, so both banks
+// flow through one ranking path. Pure — computed once at module load.
+
+const ENTITY_BANK_AS_SUGGESTED: SuggestedQuestion[] = ENTITY_QUESTION_BANK.map((bq) => {
+  const elements: ElementRef[] = [
+    ...(bq.entities.houses ?? []).map((id): ElementRef => ({ kind: "house", id })),
+    ...(bq.entities.planets ?? []).map((id): ElementRef => ({ kind: "planet", id })),
+  ];
+  return {
+    id: bq.id,
+    text: bq.text,
+    lifeAreas: [bq.areaId],
+    elements: elements.length > 0 ? elements : undefined,
+  };
+});
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 export function elementKey(el: ElementRef): string {
   return `${el.kind}:${el.id}`;
+}
+
+function allElements(q: SuggestedQuestion): ElementRef[] {
+  const list = q.elements ?? [];
+  return q.element ? [q.element, ...list] : list;
 }
 
 function intersects(a: readonly string[], b: readonly string[]): boolean {
@@ -211,21 +244,29 @@ function houseIsLive(houseNum: number, transits?: TransitPlanet[]): boolean {
   return transits.some((t) => SLOW_PLANETS.has(t.body) && t.natalHouse === houseNum);
 }
 
+function elementLiveness(el: ElementRef, chart: NatalChart, transits?: TransitPlanet[]): number {
+  if (el.kind === "planet") return planetIsLive(el.id, chart, transits) ? 1 : 0;
+  if (el.kind === "house") return houseIsLive(el.id, transits) ? 1 : 0;
+  return 0; // signs don't carry liveness in v1
+}
+
 function livenessScore(q: SuggestedQuestion, chart: NatalChart, ctx: SuggestContext): number {
   const today = ctx.today ?? new Date();
   if (q.contextHook && hookFires(q.contextHook, chart, today)) return 1;
   if (q.timing && chart?.dasha?.current) return TIMING_LIVENESS;
 
-  const el = q.element;
-  if (!el) return 0;
-  if (el.kind === "planet") return planetIsLive(el.id, chart, ctx.transits) ? 1 : 0;
-  if (el.kind === "house") return houseIsLive(el.id, ctx.transits) ? 1 : 0;
-  return 0; // signs don't carry liveness in v1
+  const els = allElements(q);
+  if (els.length === 0) return 0;
+  // Take the max across every grounded element — a question is "live" if any
+  // one of the houses/planets it's about is currently active.
+  return Math.max(...els.map((el) => elementLiveness(el, chart, ctx.transits)));
 }
 
 function noveltyScore(q: SuggestedQuestion, explored: Set<string>): number {
-  if (!q.element) return 0.5; // elementless (timing/learning) get mild novelty
-  return explored.has(elementKey(q.element)) ? 0 : 1;
+  const els = allElements(q);
+  if (els.length === 0) return 0.5; // elementless (timing/learning) get mild novelty
+  // Novel if at least one grounded element hasn't been explored yet.
+  return els.some((el) => !explored.has(elementKey(el))) ? 1 : 0;
 }
 
 // ── Public API ────────────────────────────────────────────────────────────────
@@ -242,7 +283,9 @@ export function suggestQuestions(
   const asked = new Set(context.askedIds ?? []);
 
   // Context-hook questions only enter the pool when their moment is live.
-  const pool = QUESTION_BANK.filter(
+  // Merge the legacy inline bank with the reconciled entities bank
+  // (lib/questionBank.ts) — same scoring path for both.
+  const pool = [...QUESTION_BANK, ...ENTITY_BANK_AS_SUGGESTED].filter(
     (q) => !q.contextHook || hookFires(q.contextHook, chart, today)
   );
 
@@ -264,5 +307,46 @@ export function suggestQuestions(
   });
 
   scored.sort((a, b) => (b.score - a.score) || (a.idx - b.idx)); // stable tiebreak by bank order
-  return scored.slice(0, topN).map((s) => s.q);
+
+  return selectDiverse(scored, topN);
+}
+
+// ── Diversity constraint ────────────────────────────────────────────────────
+// The top-N chips must span at least MIN_DIVERSE_AREAS distinct life areas
+// (when enough distinct areas exist in the pool at all). Greedy: walk the
+// score-sorted list, always take the next-best question; but once we can see
+// we're about to fill the last slot(s) without meeting the area-diversity
+// floor, prefer the next-best question from an unrepresented area instead.
+// Fully deterministic — no randomness, ties already broken by bank order.
+function selectDiverse(
+  scored: { q: SuggestedQuestion; idx: number; score: number }[],
+  topN: number
+): SuggestedQuestion[] {
+  const distinctAreasAvailable = new Set(scored.flatMap((s) => s.q.lifeAreas)).size;
+  const target = Math.min(MIN_DIVERSE_AREAS, distinctAreasAvailable, topN);
+
+  const picked: { q: SuggestedQuestion; idx: number; score: number }[] = [];
+  const pickedAreas = new Set<string>();
+  const remaining = [...scored];
+
+  while (picked.length < topN && remaining.length > 0) {
+    const slotsLeft = topN - picked.length;
+    const areasStillNeeded = Math.max(0, target - pickedAreas.size);
+
+    // If every remaining slot must be spent to hit the diversity floor,
+    // this pick must come from a currently-unrepresented area.
+    const mustDiversify = areasStillNeeded >= slotsLeft && areasStillNeeded > 0;
+
+    let chosenIdx = 0;
+    if (mustDiversify) {
+      const idx = remaining.findIndex((s) => !s.q.lifeAreas.some((a) => pickedAreas.has(a)));
+      chosenIdx = idx >= 0 ? idx : 0;
+    }
+
+    const [chosen] = remaining.splice(chosenIdx, 1);
+    picked.push(chosen);
+    chosen.q.lifeAreas.forEach((a) => pickedAreas.add(a));
+  }
+
+  return picked.map((s) => s.q);
 }

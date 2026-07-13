@@ -7,6 +7,21 @@ datasource db {
   // url / directUrl are supplied by prisma.config.ts (Prisma 7)
 }
 
+// ── v2 auth: Supabase-backed user identity ─────────────────────────
+// id = Supabase auth uid. Upserted on first authenticated request.
+model User {
+  id                     String    @id // = Supabase auth uid
+  email                  String?   @unique
+  planTier               String    @default("free") // 'free' | 'plus'
+  locale                 String    @default("en")
+  razorpayCustomerId     String?
+  razorpaySubscriptionId String?
+  planRenewsAt           DateTime?
+  createdAt              DateTime  @default(now())
+
+  charts Chart[]
+}
+
 model Chart {
   id         String   @id @default(cuid())
   name       String
@@ -20,31 +35,54 @@ model Chart {
   ownerToken String?
   relation   String?
 
+  // ── v2 auth: nullable FK to User (anonymous charts keep userId = null) ──
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
   // ── Engagement engine ──────────────────────────────────────────
   interests  String[] @default([]) // life-area ids the user cares about
   depth      String   @default("deep") // "quick" | "deep" — answer calibration
   intentNote String?  // optional free-text "anything on your mind?"
 
-  messages TutorMessage[]
+  messages Message[]
 
   @@index([ownerToken])
+  @@index([userId])
 }
 
-model TutorMessage {
+// Prisma model renamed TutorMessage -> Message (DATA-PRESERVING: @@map keeps
+// the existing "TutorMessage" table; zero rows move). Code uses `prisma.message`.
+model Message {
   id        String   @id @default(cuid())
   chartId   String
   role      String
   content   String
   createdAt DateTime @default(now())
 
+  // ── v2 auth: nullable FK column to User (additive, no relation nav) ─────
+  userId String?
+
   // ── Per-message feedback (analytics / KB-gap / dataset only) ─────
   rating       String? // "true" | "not_quite"
   ratingReason String? // "too_generic" | "doesnt_match" | "too_vague"
   useful       Boolean?
 
-  chart Chart @relation(fields: [chartId], references: [id], onDelete: Cascade)
+  chart    Chart     @relation(fields: [chartId], references: [id], onDelete: Cascade)
+  feedback Feedback?
 
   @@index([chartId])
+  @@index([userId])
+  @@map("TutorMessage")
 }
 
-// TODO [STUB] User model + auth — Phase 2
+// Consumed by Wave-2 AGENT-FEEDBACK — new (empty) table, purely additive.
+model Feedback {
+  id        String   @id @default(cuid())
+  messageId String   @unique
+  resonance String? // 'rings_true' | 'not_quite'
+  utility   Boolean?
+  reason    String? // required in UI when resonance = 'not_quite'
+  createdAt DateTime @default(now())
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+}

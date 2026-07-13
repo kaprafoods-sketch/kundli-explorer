@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { supabase } from "@/lib/supabase";
 import { computeChart, type ChartInput } from "@/lib/astro/computeChart";
+import { getSession } from "@/lib/auth/session";
 
 export async function createChartAction(formData: FormData) {
   const name = (formData.get("name") as string)?.trim() || "Chart";
@@ -39,7 +40,12 @@ export async function createChartAction(formData: FormData) {
   const input: ChartInput = { name, year, month, day, hour, minute, lat, lon, timeKnown };
   const chart = await computeChart(input);
 
-  // Get or create the anonymous owner token (cookie persists 5 years)
+  // Attach the chart to the signed-in user when present. Anonymous creation
+  // keeps working (userId stays null) — auth is never required for a first chart.
+  const { user } = await getSession();
+
+  // Get or create the anonymous owner token (cookie persists 5 years).
+  // We keep setting it even for signed-in users so ownership survives sign-out.
   const jar = await cookies();
   let ownerToken = jar.get("kx_owner")?.value;
   if (!ownerToken) {
@@ -63,6 +69,7 @@ export async function createChartAction(formData: FormData) {
       ayanamsha: chart.meta.ayanamsha,
       data: chart,
       ownerToken,
+      userId: user?.id ?? null,
       interests,
       depth,
       intentNote,

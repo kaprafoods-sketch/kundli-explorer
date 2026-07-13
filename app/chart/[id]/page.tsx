@@ -8,6 +8,7 @@ import { suggestQuestions, type SuggestedQuestion } from "@/lib/suggestQuestions
 import type { LifeAreaId } from "@/lib/lifeAreas";
 import ChartExplorer from "@/components/chart/ChartExplorer";
 import ProfileSwitcher from "@/components/ProfileSwitcher";
+import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
 import Logo from "@/components/Logo";
 import { listMyProfiles } from "@/app/actions/profiles";
 import type { ChartRow } from "@/lib/supabase";
@@ -89,8 +90,9 @@ export default async function ChartPage({ params }: Props) {
           </span>
         </div>
 
-        {/* Profile switcher — right */}
-        <div className="shrink-0">
+        {/* Language + profile switchers — right */}
+        <div className="shrink-0 flex items-center gap-2">
+          <LanguageSwitcher withLabel={false} compact />
           <ProfileSwitcher currentId={id} profiles={profiles} />
         </div>
       </header>

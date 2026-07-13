@@ -87,7 +87,7 @@ export default function NorthIndianChart({
   selectedHouse, selectedBody, onHouseClick, onBodyClick,
   size = 440,
 }: Props) {
-  const { lang } = useLang();
+  const { lang, t } = useLang();
   const PAD = size * 0.018;
   const S = size - PAD * 2;
   const containerRef = useRef<HTMLDivElement>(null);
@@ -526,7 +526,7 @@ export default function NorthIndianChart({
               </p>
               {pl && (
                 <p style={{ fontSize: 10, color: "var(--muted)", fontFamily: "var(--font-ui,system-ui)", margin: "3px 0 0", lineHeight: 1.4 }}>
-                  House {pl.house} · {getName(kb.rashis[pl.sign], lang)}
+                  {t("explore.house")} {pl.house} · {getName(kb.rashis[pl.sign], lang)}
                   {pl.retrograde && <span style={{ color: "var(--weak)", marginLeft: 4 }}>℞</span>}
                   {pl.dignity && (
                     <span style={{ color, marginLeft: 5, textTransform: "capitalize", opacity: 0.8 }}>
