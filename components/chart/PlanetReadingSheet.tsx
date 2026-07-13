@@ -179,8 +179,8 @@ export default function PlanetReadingSheet({
         <p style={{ fontSize: "0.68rem", textTransform: "uppercase", letterSpacing: "0.14em", color: "var(--faint)", marginBottom: 4 }}>
           Nakshatra
         </p>
-        <p style={{ fontSize: "0.83rem", color: "var(--parchment)", textTransform: "capitalize" }}>
-          {placement.nakshatra?.replace(/_/g, " ")} · Pada {placement.pada}
+        <p style={{ fontSize: "0.83rem", color: "var(--parchment)" }}>
+          {getName(kb.nakshatras.find((n) => n.id === placement.nakshatra), lang) || placement.nakshatra} · Pada {placement.pada}
         </p>
       </div>
 

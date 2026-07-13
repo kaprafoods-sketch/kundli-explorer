@@ -1412,6 +1412,224 @@
       "alt_hi": "व्यय / मोक्ष"
     }
   },
+  "nakshatras": [
+    {
+      "index": 0,
+      "id": "ashwini",
+      "en": "Ashwini",
+      "sanskrit": "अश्विनी",
+      "hi": "अश्विनी",
+      "pada_count": 4
+    },
+    {
+      "index": 1,
+      "id": "bharani",
+      "en": "Bharani",
+      "sanskrit": "भरणी",
+      "hi": "भरणी",
+      "pada_count": 4
+    },
+    {
+      "index": 2,
+      "id": "krittika",
+      "en": "Krittika",
+      "sanskrit": "कृत्तिका",
+      "hi": "कृत्तिका",
+      "pada_count": 4
+    },
+    {
+      "index": 3,
+      "id": "rohini",
+      "en": "Rohini",
+      "sanskrit": "रोहिणी",
+      "hi": "रोहिणी",
+      "pada_count": 4
+    },
+    {
+      "index": 4,
+      "id": "mrigashira",
+      "en": "Mrigashira",
+      "sanskrit": "मृगशिरा",
+      "hi": "मृगशिरा",
+      "pada_count": 4
+    },
+    {
+      "index": 5,
+      "id": "ardra",
+      "en": "Ardra",
+      "sanskrit": "आर्द्रा",
+      "hi": "आर्द्रा",
+      "pada_count": 4
+    },
+    {
+      "index": 6,
+      "id": "punarvasu",
+      "en": "Punarvasu",
+      "sanskrit": "पुनर्वसु",
+      "hi": "पुनर्वसु",
+      "pada_count": 4
+    },
+    {
+      "index": 7,
+      "id": "pushya",
+      "en": "Pushya",
+      "sanskrit": "पुष्य",
+      "hi": "पुष्य",
+      "pada_count": 4
+    },
+    {
+      "index": 8,
+      "id": "ashlesha",
+      "en": "Ashlesha",
+      "sanskrit": "आश्लेषा",
+      "hi": "आश्लेषा",
+      "pada_count": 4
+    },
+    {
+      "index": 9,
+      "id": "magha",
+      "en": "Magha",
+      "sanskrit": "मघा",
+      "hi": "मघा",
+      "pada_count": 4
+    },
+    {
+      "index": 10,
+      "id": "purva_phalguni",
+      "en": "Purva Phalguni",
+      "sanskrit": "पूर्व फाल्गुनी",
+      "hi": "पूर्व फाल्गुनी",
+      "pada_count": 4
+    },
+    {
+      "index": 11,
+      "id": "uttara_phalguni",
+      "en": "Uttara Phalguni",
+      "sanskrit": "उत्तर फाल्गुनी",
+      "hi": "उत्तर फाल्गुनी",
+      "pada_count": 4
+    },
+    {
+      "index": 12,
+      "id": "hasta",
+      "en": "Hasta",
+      "sanskrit": "हस्त",
+      "hi": "हस्त",
+      "pada_count": 4
+    },
+    {
+      "index": 13,
+      "id": "chitra",
+      "en": "Chitra",
+      "sanskrit": "चित्रा",
+      "hi": "चित्रा",
+      "pada_count": 4
+    },
+    {
+      "index": 14,
+      "id": "swati",
+      "en": "Swati",
+      "sanskrit": "स्वाति",
+      "hi": "स्वाति",
+      "pada_count": 4
+    },
+    {
+      "index": 15,
+      "id": "vishakha",
+      "en": "Vishakha",
+      "sanskrit": "विशाखा",
+      "hi": "विशाखा",
+      "pada_count": 4
+    },
+    {
+      "index": 16,
+      "id": "anuradha",
+      "en": "Anuradha",
+      "sanskrit": "अनुराधा",
+      "hi": "अनुराधा",
+      "pada_count": 4
+    },
+    {
+      "index": 17,
+      "id": "jyeshtha",
+      "en": "Jyeshtha",
+      "sanskrit": "ज्येष्ठा",
+      "hi": "ज्येष्ठा",
+      "pada_count": 4
+    },
+    {
+      "index": 18,
+      "id": "mula",
+      "en": "Mula",
+      "sanskrit": "मूल",
+      "hi": "मूल",
+      "pada_count": 4
+    },
+    {
+      "index": 19,
+      "id": "purva_ashadha",
+      "en": "Purva Ashadha",
+      "sanskrit": "पूर्वाषाढा",
+      "hi": "पूर्वाषाढा",
+      "pada_count": 4
+    },
+    {
+      "index": 20,
+      "id": "uttara_ashadha",
+      "en": "Uttara Ashadha",
+      "sanskrit": "उत्तराषाढा",
+      "hi": "उत्तराषाढा",
+      "pada_count": 4
+    },
+    {
+      "index": 21,
+      "id": "shravana",
+      "en": "Shravana",
+      "sanskrit": "श्रवण",
+      "hi": "श्रवण",
+      "pada_count": 4
+    },
+    {
+      "index": 22,
+      "id": "dhanishta",
+      "en": "Dhanishta",
+      "sanskrit": "धनिष्ठा",
+      "hi": "धनिष्ठा",
+      "pada_count": 4
+    },
+    {
+      "index": 23,
+      "id": "shatabhisha",
+      "en": "Shatabhisha",
+      "sanskrit": "शतभिषा",
+      "hi": "शतभिषा",
+      "pada_count": 4
+    },
+    {
+      "index": 24,
+      "id": "purva_bhadrapada",
+      "en": "Purva Bhadrapada",
+      "sanskrit": "पूर्व भाद्रपदा",
+      "hi": "पूर्व भाद्रपदा",
+      "pada_count": 4
+    },
+    {
+      "index": 25,
+      "id": "uttara_bhadrapada",
+      "en": "Uttara Bhadrapada",
+      "sanskrit": "उत्तर भाद्रपदा",
+      "hi": "उत्तर भाद्रपदा",
+      "pada_count": 4
+    },
+    {
+      "index": 26,
+      "id": "revati",
+      "en": "Revati",
+      "sanskrit": "रेवती",
+      "hi": "रेवती",
+      "pada_count": 4
+    }
+  ],
   "dignity_rules": {
     "description": "Resolve a planet's dignity in a sign by checking, in priority order. Use this to label strength in interpretations.",
     "order": [

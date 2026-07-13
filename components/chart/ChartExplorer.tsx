@@ -8,7 +8,7 @@ import TransitsTab from "./TransitsTab";
 import DashaCard from "./DashaCard";
 import GrahaAIDock from "./GrahaAIDock";
 import ClientPlanetsTab from "./ClientPlanetsTab";
-import { type ChartPlacements } from "@/components/GrahaAI";
+import { type ChartPlacements } from "@/components/KnowledgeBrowser";
 import type { SuggestedQuestion } from "@/lib/suggestQuestions";
 import { useLang } from "@/components/i18n/LanguageProvider";
 import type { MessageKey } from "@/lib/i18n/messages";

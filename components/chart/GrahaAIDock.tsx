@@ -6,14 +6,14 @@
  * One floating button in the thumb zone opens a bottom sheet (phone) / floating
  * panel (desktop) offering two modes:
  *   • AI Astrologer — chart-grounded streamed chat (GrahaAIChat)
- *   • Astro Guru    — the educational KB browser (GrahaAI, embedded)
+ *   • Astro Guru    — the educational KB browser (KnowledgeBrowser, embedded)
  *
- * Replaces the two previously-colliding controls (GrahaAILauncher + GrahaAI FAB).
+ * Unifies the two previously-colliding launcher + FAB controls into one dock.
  */
 
 import { useState, useEffect } from "react";
 import GrahaAIChat from "./GrahaAIChat";
-import GrahaAI, { type ChartPlacements } from "@/components/GrahaAI";
+import KnowledgeBrowser, { type ChartPlacements } from "@/components/KnowledgeBrowser";
 import type { SuggestedQuestion } from "@/lib/suggestQuestions";
 import { useLang } from "@/components/i18n/LanguageProvider";
 import type { MessageKey } from "@/lib/i18n/messages";
@@ -237,7 +237,7 @@ export default function GrahaAIDock({ chartId, placements, interests, suggested 
                   <GrahaAIChat chartId={chartId} interests={interests} suggested={suggested} />
                 </div>
               ) : (
-                <GrahaAI chart={placements} embedded />
+                <KnowledgeBrowser chart={placements} embedded />
               )}
             </div>
           </div>

@@ -11,6 +11,7 @@
 
 import { describe, it, expect, beforeAll } from "vitest";
 import path from "path";
+import { kb } from "@/lib/kb";
 
 // Directly require sweph (not the Next.js server module) so tests run without Next context
 // We test the engine logic inline here, importing the pure computation helpers.
@@ -183,17 +184,22 @@ describe("Engine validation — reference chart 1985-01-01 08:00 New Delhi", () 
     expect(signNum).toBe(EXPECTED_PLACEMENTS.jupiter.sign);
   });
 
-  it("(b) Moon nakshatra is Hasta", () => {
+  it("(b) Moon nakshatra resolves from the KB to the expected slug", () => {
     const NAK_SPAN = 40 / 3;
     const idx = Math.floor(siderealPositions.moon / NAK_SPAN);
-    const NAKSHATRA_NAMES = [
-      "ashwini", "bharani", "krittika", "rohini", "mrigashira",
-      "ardra", "punarvasu", "pushya", "ashlesha", "magha",
-      "purva_phalguni", "uttara_phalguni", "hasta", "chitra", "swati",
-      "vishakha", "anuradha", "jyeshtha", "mula", "purva_ashadha",
-      "uttara_ashadha", "shravana", "dhanishta", "shatabhisha",
-      "purva_bhadrapada", "uttara_bhadrapada", "revati",
-    ];
-    expect(NAKSHATRA_NAMES[idx]).toBe(EXPECTED_MOON_NAKSHATRA);
+    // Names now live in the KB (single source of truth), not a local literal.
+    expect(kb.nakshatras[idx]?.id).toBe(EXPECTED_MOON_NAKSHATRA);
+  });
+
+  it("(b) nakshatra lords equal Vimshottari order repeated 3× (no drift)", () => {
+    const order = kb.vimshottari.order;
+    const derived = [...order, ...order, ...order];
+    expect(derived).toHaveLength(27);
+    // The literal that used to live in computeChart.ts, asserted against the KB.
+    expect(derived).toEqual([
+      "ketu", "venus", "sun", "moon", "mars", "rahu", "jupiter", "saturn", "mercury",
+      "ketu", "venus", "sun", "moon", "mars", "rahu", "jupiter", "saturn", "mercury",
+      "ketu", "venus", "sun", "moon", "mars", "rahu", "jupiter", "saturn", "mercury",
+    ]);
   });
 });

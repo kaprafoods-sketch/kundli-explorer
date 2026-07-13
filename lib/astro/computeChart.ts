@@ -97,22 +97,12 @@ export interface NatalChart {
 
 // ── Nakshatra data ─────────────────────────────────────────────────────────
 
-const NAKSHATRA_LORDS: GrahaId[] = [
-  "ketu", "venus", "sun", "moon", "mars",
-  "rahu", "jupiter", "saturn", "mercury",
-  "ketu", "venus", "sun", "moon", "mars",
-  "rahu", "jupiter", "saturn", "mercury",
-  "ketu", "venus", "sun", "moon", "mars",
-  "rahu", "jupiter", "saturn", "mercury",
-];
-
-const NAKSHATRA_NAMES = [
-  "ashwini", "bharani", "krittika", "rohini", "mrigashira",
-  "ardra", "punarvasu", "pushya", "ashlesha", "magha",
-  "purva_phalguni", "uttara_phalguni", "hasta", "chitra", "swati",
-  "vishakha", "anuradha", "jyeshtha", "mula", "purva_ashadha",
-  "uttara_ashadha", "shravana", "dhanishta", "shatabhisha",
-  "purva_bhadrapada", "uttara_bhadrapada", "revati",
+// Nakshatra lord sequence = Vimshottari order repeated 3× (27 = 9 × 3).
+// Derived from the KB so it can never silently drift from vimshottari.order.
+const nakshatraLords: GrahaId[] = [
+  ...kb.vimshottari.order,
+  ...kb.vimshottari.order,
+  ...kb.vimshottari.order,
 ];
 
 const NAK_SPAN = 40 / 3;  // 13°20′
@@ -123,7 +113,9 @@ function nakshatraOf(lon: number): { name: string; index: number; pada: number }
   const posInNak = lon % NAK_SPAN;
   const pada = Math.floor(posInNak / PADA_SPAN) + 1;
   return {
-    name: NAKSHATRA_NAMES[idx] ?? "unknown",
+    // slug id, resolved from the KB (the single source of truth for names).
+    // Stays the persisted value on chart rows; display goes through getName().
+    name: kb.nakshatras[idx]?.id ?? "unknown",
     index: idx,
     pada: Math.min(pada, 4),
   };
@@ -144,7 +136,7 @@ function computeDasha(
   dashaYears: Record<GrahaId, number>
 ): NatalChart["dasha"] {
   const nak = nakshatraOf(moonLon);
-  const startLord = NAKSHATRA_LORDS[nak.index];
+  const startLord = nakshatraLords[nak.index];
 
   // How far is Moon through the nakshatra?
   const posInNak = moonLon % NAK_SPAN;

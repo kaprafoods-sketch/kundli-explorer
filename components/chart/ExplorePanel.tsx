@@ -145,8 +145,8 @@ export default function ExplorePanel({
         {/* Nakshatra */}
         <div>
           <span className="text-xs uppercase tracking-widest" style={{ color: "var(--faint)" }}>Nakshatra</span>
-          <p className="text-sm mt-1 capitalize" style={{ color: "var(--parchment)" }}>
-            {placement.nakshatra.replace(/_/g, " ")} · Pada {placement.pada}
+          <p className="text-sm mt-1" style={{ color: "var(--parchment)" }}>
+            {getName(kb.nakshatras.find((n) => n.id === placement.nakshatra), lang) || placement.nakshatra} · Pada {placement.pada}
           </p>
         </div>
 

@@ -70,11 +70,22 @@ export interface Bhava {
   keywords: string[];
 }
 
+/** Ordered nakshatra entry — array position == index (0–26), load-bearing. */
+export interface Nakshatra {
+  index: number;
+  id: string;
+  en: string;
+  sanskrit: string; // sa — Devanagari (tatsama; identical to hi by design)
+  hi: string;
+  pada_count: number;
+}
+
 export interface KB {
   meta: Record<string, unknown>;
   grahas: Record<GrahaId, Graha>;
   rashis: Record<SignId, Rashi>;
   bhavas: Record<string, Bhava>;
+  nakshatras: Nakshatra[];
   dignity_rules: {
     order: string[];
     [key: string]: unknown;

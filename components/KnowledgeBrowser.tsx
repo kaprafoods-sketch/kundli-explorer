@@ -1112,7 +1112,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function GrahaAI({ chart, embedded = false }: Props) {
+export default function KnowledgeBrowser({ chart, embedded = false }: Props) {
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<View>({ kind: "home" });
   const [prevView, setPrevView] = useState<View>({ kind: "home" });
