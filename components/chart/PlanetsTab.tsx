@@ -10,6 +10,8 @@ import { useRef, useState, useEffect, useMemo, useCallback } from "react"; // us
 import type { NatalChart, Placement } from "@/lib/astro/computeChart";
 import { kb, GRAHA_GLYPHS, getName, type GrahaId, type Lang } from "@/lib/kb";
 import { GRAHA_COLORS } from "@/lib/grahaColors";
+import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { mulberry32 } from "@/lib/rng";
 import { useLang } from "@/components/i18n/LanguageProvider";
 import PlanetReadingSheet from "./PlanetReadingSheet";
 
@@ -53,19 +55,7 @@ interface PlanetData {
   glowColor: string; // dignity-modified accent color
 }
 
-// ── Hooks ─────────────────────────────────────────────────────────────────────
-
-function useReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(mq.matches);
-    const h = (e: MediaQueryListEvent) => setReduced(e.matches);
-    mq.addEventListener("change", h);
-    return () => mq.removeEventListener("change", h);
-  }, []);
-  return reduced;
-}
+// Reduced-motion: shared hook (lib/hooks/useReducedMotion)
 
 // ── Dignity-tinted glow color ─────────────────────────────────────────────────
 
@@ -219,16 +209,17 @@ function ShadowNebula({ data, onHover, onClick, lang }: {
   const dragOrigin = useRef({ x: 0, y: 0 });
 
   const geo = useMemo(() => {
+    const rand = mulberry32(0xa17e5);
     const pos  = new Float32Array(N * 3);
     const seed = new Float32Array(N);
     for (let i = 0; i < N; i++) {
-      const r = Math.pow(Math.random(), 0.6) * 0.72;
-      const u = Math.random() * Math.PI * 2;
-      const v = Math.acos(2 * Math.random() - 1);
+      const r = Math.pow(rand(), 0.6) * 0.72;
+      const u = rand() * Math.PI * 2;
+      const v = Math.acos(2 * rand() - 1);
       pos[i*3]   = r * Math.sin(v) * Math.cos(u);
       pos[i*3+1] = r * Math.sin(v) * Math.sin(u) * 0.8;
       pos[i*3+2] = r * Math.cos(v);
-      seed[i] = Math.random() * Math.PI * 2;
+      seed[i] = rand() * Math.PI * 2;
     }
     const g = new THREE.BufferGeometry();
     g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
@@ -334,16 +325,17 @@ function ElementParticles({ element, palette }: {
   const ref = useRef<THREE.Points>(null!);
 
   const geo = useMemo(() => {
+    const rand = mulberry32(0xb2f19);
     const pos  = new Float32Array(N * 3);
     const seed = new Float32Array(N);
     for (let i = 0; i < N; i++) {
-      const rad = 1.9 + Math.random() * 2.2;
-      const u = Math.random() * Math.PI * 2;
-      const v = Math.acos(2 * Math.random() - 1);
+      const rad = 1.9 + rand() * 2.2;
+      const u = rand() * Math.PI * 2;
+      const v = Math.acos(2 * rand() - 1);
       pos[i*3]   = rad * Math.sin(v) * Math.cos(u);
       pos[i*3+1] = rad * Math.sin(v) * Math.sin(u);
       pos[i*3+2] = rad * Math.cos(v);
-      seed[i] = Math.random() * Math.PI * 2;
+      seed[i] = rand() * Math.PI * 2;
     }
     const g = new THREE.BufferGeometry();
     g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
@@ -381,12 +373,12 @@ function ElementParticles({ element, palette }: {
       } else if (element === "ether") {
         const e = 1 + Math.sin(t * 0.4 * em.speed + s) * 0.18;
         arr[ix] = hx * e; arr[ix+1] = hy * e; arr[ix+2] = hz * e;
-      } else { // earth — steady slow orbit
-        const c = Math.cos(0.0005 * em.speed), sn = Math.sin(0.0005 * em.speed);
-        const nx = hx * c - hz * sn, nz = hx * sn + hz * c;
-        arr[ix] = nx; home[ix] = nx;
+      } else { // earth — steady slow orbit (absolute-time rotation of the immutable home)
+        const ang = t * 0.03 * em.speed;
+        const c = Math.cos(ang), sn = Math.sin(ang);
+        arr[ix]   = hx * c - hz * sn;
         arr[ix+1] = hy;
-        arr[ix+2] = nz; home[ix+2] = nz;
+        arr[ix+2] = hx * sn + hz * c;
       }
     }
     ref.current.geometry.attributes.position.needsUpdate = true;

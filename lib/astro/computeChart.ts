@@ -21,6 +21,9 @@ let swe: any;
 
 function getSwe() {
   if (!swe) {
+    // sweph is a native CJS addon, lazily loaded server-side only. Matches the
+    // established convention in __tests__/engine.test.ts for this same module.
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     swe = require("sweph");
     if (!sweInitialized) {
       const ephePath = path.join(process.cwd(), "ephe");
@@ -166,7 +169,7 @@ function computeDasha(
   }
 
   // Repeat to cover full 120 years (in case of late birth dasha)
-  let maxEnd = DateTime.fromISO(timeline[timeline.length - 1].end, { zone: "utc" });
+  const maxEnd = DateTime.fromISO(timeline[timeline.length - 1].end, { zone: "utc" });
   let loopStart = maxEnd;
   if (maxEnd.diff(birthDate, "years").years < 110) {
     let lordIdx = (startLordIdx + dashaOrder.length) % dashaOrder.length;
@@ -189,8 +192,6 @@ function computeDasha(
 
   // Compute antardashas for the current maha
   const mahaStart = DateTime.fromISO(currentMaha.start, { zone: "utc" });
-  const mahaEnd = DateTime.fromISO(currentMaha.end, { zone: "utc" });
-  const mahaDurationYears = mahaEnd.diff(mahaStart, "years").years;
   const mahaLordIdx = dashaOrder.indexOf(currentMaha.lord);
   const antars: DashaEntry[] = [];
   let antarCursor = mahaStart;
@@ -461,7 +462,7 @@ export async function computeChart(input: ChartInput): Promise<NatalChart> {
 /** Compute tropical positions for validation comparison (no sidereal flag) */
 export async function computeTropicalPositions(
   year: number, month: number, day: number,
-  hour: number, minute: number, lat: number, lon: number
+  hour: number, minute: number
 ): Promise<Record<GrahaId, number>> {
   const s = getSwe();
   const c = s.constants;

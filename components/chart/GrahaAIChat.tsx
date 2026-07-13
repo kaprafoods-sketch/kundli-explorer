@@ -104,8 +104,6 @@ export default function GrahaAIChat({ chartId, focus, compact, interests, sugges
     setStreaming(true);
     setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
 
-    let accumulated = "";
-
     try {
       const res = await fetch("/api/graha-ai", {
         method: "POST",
@@ -121,10 +119,16 @@ export default function GrahaAIChat({ chartId, focus, compact, interests, sugges
       while (reader) {
         const { done, value } = await reader.read();
         if (done) break;
-        accumulated += decoder.decode(value, { stream: true });
+        const chunk = decoder.decode(value, { stream: true });
+        // Accumulate into the last (assistant) message via the functional update,
+        // so there is no render-captured mutable variable (react-hooks/immutability).
         setMessages((prev) => {
           const next = [...prev];
-          next[next.length - 1] = { role: "assistant", content: accumulated };
+          const last = next[next.length - 1];
+          next[next.length - 1] = {
+            role: "assistant",
+            content: (last?.role === "assistant" ? last.content : "") + chunk,
+          };
           return next;
         });
       }

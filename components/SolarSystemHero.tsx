@@ -6,8 +6,10 @@ import {
 } from "@react-three/drei";
 import { EffectComposer, Bloom, Vignette } from "@react-three/postprocessing";
 import * as THREE from "three";
-import { useRef, useState, useEffect, useMemo, useCallback } from "react";
+import { useRef, useState, useMemo, useCallback } from "react";
 import { GRAHA_COLORS, type GrahaColorKey } from "@/lib/grahaColors";
+import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
+import { mulberry32 } from "@/lib/rng";
 
 // ── Jyotish graha configuration ──────────────────────────────────────────────
 
@@ -31,19 +33,7 @@ const GRAHAS = GRAHAS_CONFIG.map(g => ({
 
 type GrahaConfig = typeof GRAHAS[number];
 
-// ── Reduced-motion hook ───────────────────────────────────────────────────────
-
-function useReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setReduced(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-  return reduced;
-}
+// Reduced-motion: shared hook (lib/hooks/useReducedMotion)
 
 // ── Orbit ring ────────────────────────────────────────────────────────────────
 
@@ -229,11 +219,12 @@ function Scene({ reduced, paused, speed, onHover, onClick }: {
   onHover: (id: string | null) => void;
   onClick: (g: GrahaConfig) => void;
 }) {
-  // Stable random initial angles per planet
-  const initialAngles = useMemo(
-    () => GRAHAS.map((_, i) => (i / GRAHAS.length) * Math.PI * 2 + Math.random() * 0.5),
-    []
-  );
+  // Stable initial angles per planet — deterministic (seeded) so the layout is
+  // idempotent across renders and SSR-safe, not reshuffled each mount.
+  const initialAngles = useMemo(() => {
+    const rand = mulberry32(0x51ede);
+    return GRAHAS.map((_, i) => (i / GRAHAS.length) * Math.PI * 2 + rand() * 0.5);
+  }, []);
 
   return (
     <>
@@ -263,7 +254,7 @@ function Scene({ reduced, paused, speed, onHover, onClick }: {
       />
 
       {/* Orbit rings */}
-      {GRAHAS.filter(g => g.orbit > 0).map((g, i) => (
+      {GRAHAS.filter(g => g.orbit > 0).map((g) => (
         <OrbitRing key={`ring-${g.id}`} radius={g.orbit} />
       ))}
 
@@ -354,7 +345,7 @@ export default function SolarSystemHero({
 }) {
   const reduced = useReducedMotion();
   const [activeGraha, setActiveGraha] = useState<GrahaConfig | null>(null);
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [, setHoveredId] = useState<string | null>(null);
 
   const handleClick = useCallback((g: GrahaConfig) => setActiveGraha(g), []);
   const handleHover = useCallback((id: string | null) => setHoveredId(id), []);

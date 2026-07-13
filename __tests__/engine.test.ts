@@ -67,7 +67,6 @@ function computeJD(
 describe("Engine validation — reference chart 1985-01-01 08:00 New Delhi", () => {
   let s: ReturnType<typeof setupSwe>;
   let jd: number;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let siderealPositions: Record<string, number>;
   let tropicalPositions: Record<string, number>;
   let ayanamshaValue: number;

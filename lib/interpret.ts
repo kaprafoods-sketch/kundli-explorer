@@ -6,13 +6,12 @@
 
 import {
   kb,
-  GRAHA_IDS,
   signFromNumber,
   aspectHouses,
   type GrahaId,
   type SignId,
 } from "@/lib/kb";
-import type { Placement, NatalChart } from "@/lib/astro/computeChart";
+import type { Placement } from "@/lib/astro/computeChart";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 

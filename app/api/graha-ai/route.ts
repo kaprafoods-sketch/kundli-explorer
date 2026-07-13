@@ -7,7 +7,7 @@ import {
   composeHouseReading,
   composeLagnaReading,
 } from "@/lib/interpret";
-import type { NatalChart, Placement } from "@/lib/astro/computeChart";
+import type { NatalChart } from "@/lib/astro/computeChart";
 import type { GrahaId } from "@/lib/kb";
 
 export const runtime = "nodejs";

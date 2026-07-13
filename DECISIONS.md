@@ -90,3 +90,33 @@ Discovered during verification (not in the master prompt):
   `nakshatraIndex` field) still render correctly. Falls back to the raw slug only if lookup fails.
 - KB JSON was full-reserialized (`indent=2, ensure_ascii=False`); verified every pre-existing key
   is byte-identical afterward — the only change is the added `nakshatras` block (218 insertions).
+
+### Wave 0.5b — Lint pass (get §8 "lint clean" green before Wave 1)
+
+The 22 lint errors were all pre-existing (verified: identical count at clean HEAD; Wave 0.5 added
+zero). Reshav chose "fix lint first." All 22 errors + 15 warnings fixed → lint now **0/0**; build +
+9 tests still green; homepage 3D + chart verified in-browser (no console errors). Real fixes, not
+suppressions, except three justified per-line disables (native/legitimate patterns):
+
+- **Reduced-motion (4× `set-state-in-effect`)** → extracted shared `lib/hooks/useReducedMotion.ts`
+  using `useSyncExternalStore` (React-idiomatic external-store read; SSR-safe; no setState-in-effect).
+  Replaced the 4 duplicated inline hooks (AnimatedIcon, KnowledgeBrowser, SolarSystemHero, PlanetsTab).
+- **`Math.random` in `useMemo` (9× `purity`)** → added `lib/rng.ts` (`mulberry32` seeded PRNG).
+  SolarSystemHero initial angles + PlanetsTab two star-fields now deterministic → pure/idempotent AND
+  SSR-stable (no hydration reshuffle). A genuine improvement, not a workaround.
+- **PlanetsTab R3F `home` mutation (2× `immutability`)** → rewrote the "earth" element branch to rotate
+  from the immutable original position by absolute time `t` instead of mutating `home` each frame.
+  Also framerate-independent. No buffer-of-a-hook mutation.
+- **GrahaAIChat streaming (1× `immutability`)** → removed the render-captured `accumulated` variable;
+  the assistant message now accumulates inside the functional `setMessages` update (append chunk to
+  last message content).
+- Trivial: `<a href="/">` → `<Link>` (explore-3d, not-found); `let`→`const`; removed unused
+  vars/imports and 2 stale eslint-disable directives; dropped the unused `lat/lon` params of the
+  callerless `computeTropicalPositions`.
+- **Justified per-line disables (3)** — not blanket check-disabling:
+  - `computeChart.ts` + `transits.ts`: `require("sweph")` — native CJS addon, lazily loaded
+    server-side only. Matches the repo's own precedent (`__tests__/engine.test.ts` already disables
+    `no-require-imports` for this exact module). ESM-importing a native binding that must stay
+    external + lazy is higher-risk than the established convention.
+  - `TransitsTab.tsx`: initial data fetch on mount — the loading flag is genuine external-sync state,
+    not derivable; a canonical legitimate effect.

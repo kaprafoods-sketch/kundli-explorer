@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useRef, useEffect, useCallback } from "react";
+import { useMemo, useState, useRef, useEffect } from "react";
 import type { Placement } from "@/lib/astro/computeChart";
 import { GRAHA_GLYPHS, kb, getName, signFromNumber, type GrahaId } from "@/lib/kb";
 import { GRAHA_COLORS } from "@/lib/grahaColors";

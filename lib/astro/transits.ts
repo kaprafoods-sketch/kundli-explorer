@@ -10,6 +10,8 @@ let swe: any;
 
 function getSwe() {
   if (!swe) {
+    // sweph is a native CJS addon, lazily loaded server-side only (see engine.test.ts).
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
     swe = require("sweph");
     swe.set_ephe_path(path.join(process.cwd(), "ephe"));
   }

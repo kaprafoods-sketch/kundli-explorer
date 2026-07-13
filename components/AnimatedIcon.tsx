@@ -6,7 +6,7 @@
  * Respects prefers-reduced-motion: renders static first frame when motion is off.
  */
 
-import { useEffect, useState } from "react";
+import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 
 type IconName = "sparkle" | "clock" | "globe" | "focus";
 
@@ -14,18 +14,6 @@ interface Props {
   name: IconName;
   size?: number;
   "aria-label"?: string;
-}
-
-function useReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setReduced(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-  return reduced;
 }
 
 // ── Sparkle ───────────────────────────────────────────────────────────────────

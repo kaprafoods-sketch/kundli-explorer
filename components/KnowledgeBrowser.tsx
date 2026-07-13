@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import { useState, useMemo, useCallback, useRef } from "react";
 import {
   kb,
   GRAHA_IDS,
@@ -10,8 +10,8 @@ import {
   type SignId,
 } from "@/lib/kb";
 import { GRAHA_COLORS } from "@/lib/grahaColors";
+import { useReducedMotion } from "@/lib/hooks/useReducedMotion";
 import {
-  computeDignity,
   computeAspects,
   composeReading,
 } from "@/lib/engine";
@@ -1119,17 +1119,8 @@ export default function KnowledgeBrowser({ chart, embedded = false }: Props) {
   const [activeTab, setActiveTab] = useState<BottomTab>("topics");
   const [sanskrit, setSanskrit] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const reducedMotion = useReducedMotion();
   const searchRef = useRef<HTMLInputElement>(null);
-
-  // Check prefers-reduced-motion
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReducedMotion(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
 
   const handleTab = useCallback((tab: BottomTab) => {
     setActiveTab(tab);

@@ -277,6 +277,9 @@ export default function TransitsTab({ chart }: Props) {
   }, [chart.lagnaSign]);
 
   useEffect(() => {
+    // Initial data fetch on mount (and when lagnaSign changes). The loading flag
+    // this sets is genuine external-sync state, not derivable from props/render.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchTransits(0);
   }, [fetchTransits]);
 

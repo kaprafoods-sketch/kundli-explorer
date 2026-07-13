@@ -9,6 +9,8 @@
  *   - Animated time-scrubber
  */
 
+import Link from "next/link";
+
 export default function Explore3D() {
   return (
     <main
@@ -31,13 +33,13 @@ export default function Explore3D() {
         A real-time three.js orbital view of the planets at your birth moment and today.
         Phase 2 — coming soon.
       </p>
-      <a
+      <Link
         href="/"
         className="px-6 py-2.5 rounded-lg text-sm font-semibold"
         style={{ background: "var(--brass)", color: "var(--bg)" }}
       >
         ← Explore your Kundli
-      </a>
+      </Link>
     </main>
   );
 }
