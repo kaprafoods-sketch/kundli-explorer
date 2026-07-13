@@ -1,6 +1,8 @@
 # GRAHA v2 — Claude Code Master Prompt (Multi-Agent Build)
 
-**Repo:** `kaprafoods-sketch/kundli-explorer` · branch `main` · HEAD `f9dba06`
+> Reconciled against feat/i18n-language-switcher @ 4fdab18 on 2026-07-13. §2 and §3 facts verified by direct file read, not assumed. Where the Wave-0.5 reconciliation patch and this document once conflicted, the patch won and its corrections are now folded in here.
+
+**Repo:** `kaprafoods-sketch/kundli-explorer` · branch `feat/i18n-language-switcher` · HEAD `4fdab18`
 **Mode:** Orchestrator + parallel subagents. You (the top-level Claude Code session) are the ORCHESTRATOR. Spawn subagents with the Task tool using the agent charters below, verbatim. Run agents within a wave **in parallel** — their file manifests are disjoint by design. Never let two live agents edit the same file.
 
 ---
@@ -36,10 +38,10 @@
 ## 2. Global invariants — every agent obeys these, no exceptions
 
 1. **Runtime composition, never hardcoding.** All astrological meaning is composed at runtime from `jyotish-knowledge-base.json` via `lib/kb.ts` / `lib/interpret.ts`. No interpretation strings in components. No planet/sign/house name literals in JSX — resolve through the KB.
-2. **Deterministic first, LLM second.** Gemini is only the conversational layer. It receives composed interpretations in its prompt; it never invents placements, dignities, or aspects.
+2. **Deterministic first, LLM second — and the LLM is OpenRouter.** (I-1) The AI layer is OpenRouter; client is `lib/openrouter.ts`; single endpoint `/api/graha-ai`. All prior Gemini invariants are void — do not import, reference, or recreate `lib/gemini.ts`. The model is only the conversational layer: it receives composed interpretations in its prompt and never invents placements, dignities, or aspects. (I-2) `GrahaAIChat` is the **only** AI surface in the application; any second component that makes a model call is a defect.
 3. **`sweph` never leaves `lib/astro/*`** and never runs client-side.
 4. **API keys server-side only.** `GEMINI_API_KEY`, Razorpay secrets, Supabase service key: server. Only `NEXT_PUBLIC_*` vars reach the client.
-5. **Gemini gotchas:** `chunk.text` is a **property**, not a method. Role mapping: `"assistant"` → `"model"`. Client factory is `lib/gemini.ts` — reuse it, don't instantiate elsewhere.
+5. **KB is the single source of truth; terms flow through the i18n accessor.** (I-3) No astrological name may be hardcoded in a component or in `lib/` — interpretations are composed at runtime from the KB. (I-4) Every user-visible astrological term must be reachable through the i18n accessor (`getName`); string-munging a slug for display is a bug, not a shortcut. (I-5) Sidereal only — Lahiri ayanamsha, whole-sign houses, non-negotiable. (I-6) No fabricated probabilities, percentages, or confidence claims; composed signals only, and the banned-lexicon CI test stays green.
 6. **No public PostgREST / Supabase REST surface.** All data access goes through server actions or Next API routes. (Competitor exposes their whole schema this way — we do not.)
 7. **Sanskrit UI chrome policy:** established Sanskrit terms only; if none exists, fall back to English and mark `// TODO sa`. Fabricated pseudo-Sanskrit is prohibited. Sanskrit renders in Roman transliteration; Hindi renders in Devanagari.
 8. **Voice:** educational, agency-focused, anti-fatalist. "This placement gives you the capacity for…" — never "this will make you…". Applies to question bank copy, UI microcopy, and prompts.
@@ -50,16 +52,31 @@
 
 ---
 
-## 3. Repo facts (verified at HEAD `f9dba06` — trust these over assumptions)
+## 3. Repo facts (verified by direct file read on `feat/i18n-language-switcher@4fdab18` — trust these over the earlier master-prompt claims, over training priors, and over any inference)
 
-- Routes: `/` (landing + BirthForm + SolarSystemHero), `/chart/[id]` (ChartExplorer: Chart · Planets · Transits tabs), `/chart/sample`, `/explore-3d` (**static stub**), `app/api/graha-ai` (+`/check`), `app/api/transits`.
-- **Two AI chat surfaces are simultaneously live**: legacy `components/GrahaAI.tsx` (1,479 lines) is imported and rendered in `ChartExplorer.tsx` *alongside* `components/chart/GrahaAIChat.tsx` + `GrahaAILauncher.tsx`. `ChartExplorer` also imports `type ChartPlacements` from the legacy file.
-- Prisma models: `Chart` (has `ownerToken`, no `userId`), `TutorMessage`. `// TODO [STUB] User model + auth`.
+**Corrections to the original (main@f9dba06) draft — each is a verified reversal:**
+
+| Original draft claimed | Verified reality |
+|---|---|
+| `GrahaAI.tsx` — 1,479 lines, a **second competing chat surface**, rendered in `ChartExplorer` next to `GrahaAILauncher` | **1,514 lines. Not a chat surface.** Repurposed as the "Astro Guru" deterministic KB browser. **Renamed to `components/KnowledgeBrowser.tsx`** in Wave 0.5, rendered inside `components/chart/GrahaAIDock.tsx`. `ChartExplorer` imports only the *type* `ChartPlacements`. |
+| `GrahaAILauncher` exists | **Does not exist.** Already refactored away into `GrahaAIDock`. |
+| Two competing AI chat implementations coexist | **Already resolved.** `GrahaAIDock` is a single unified dock with two tabs: "AI Astrologer" (`GrahaAIChat` — the *only* AI surface) and "Astro Guru" (`KnowledgeBrowser` — deterministic KB browser, zero model calls). |
+| KB has no `hi` fields | KB has **`hi` on all 9 grahas + 12 rashis + 12 bhavas**, plus (as of Wave 0.5) a new ordered **`nakshatras`** collection of 27 with `en`/`sanskrit`/`hi`. |
+| `lib/i18n/*` and `LanguageSwitcher` are net-new (AGENT-I18N) | **Already built:** `components/i18n/LanguageProvider.tsx`, `components/i18n/LanguageSwitcher.tsx`, `lib/i18n/config.ts`, `lib/i18n/messages.ts`, and `getName()` in `lib/kb.ts`. |
+| `lib/suggestQuestions.ts` is net-new (AGENT-SUGGEST) | **Already exists.** |
+| Feedback is net-new in Wave 2 (AGENT-FEEDBACK) | `components/chart/ReadingFeedback.tsx` — **already exists** (148 lines). |
+| AI layer is Google Gemini; client is `lib/gemini.ts` | **False. Swapped to OpenRouter.** `/api/graha-ai` imports `lib/openrouter.ts`. `lib/gemini.ts` is dead. |
+
+**Standing repo facts (verified current):**
+
+- Routes: `/` (landing + BirthForm + SolarSystemHero, via `HeroLanding`), `/chart/[id]` (ChartExplorer: Chart · Planets · Transits tabs), `/chart/sample`, `/explore-3d` (**static stub — still the only stub**), `app/api/graha-ai` (+`/check`, +`/feedback`), `app/api/transits`.
+- **DB access is server-only via `lib/supabase.ts`** using `SUPABASE_SERVICE_KEY` (a service-role key, **not** `NEXT_PUBLIC_*`). Client components import **types only** (`import type { ChartRow }`), never the runtime client. No anon/publishable key reaches the browser; the service key bypasses RLS, so RLS-off is not a client-exposure risk. All reads/writes go through server components, server actions, or API routes.
+- Prisma models: `Chart` (has `ownerToken`, no `userId`), `TutorMessage`. `// TODO [STUB] User model + auth`. Note the runtime data path is supabase-js, not Prisma queries — AGENT-AUTH must reconcile this.
 - Identity today: `kx_owner` cookie set by `app/actions/profiles.ts` / `createChart.ts`.
-- 3D planets tab **already exists** inside the chart page (`PlanetsTab.tsx`, 652 lines, R3F) — `/explore-3d` is the only stub.
+- 3D planets tab **already exists** inside the chart page (`PlanetsTab.tsx`, R3F) — `/explore-3d` is the only stub.
 - `lib/lifeAreas.ts` exists — key the question bank off it.
-- KB (`jyotish-knowledge-base.json`, 28KB) has `en` + `sanskrit` fields; **no `hi` fields yet**.
-- Tests: `__tests__/engine.test.ts` via vitest (ayanamsha sanity + reference chart).
+- Nakshatras now live in the KB (`kb.nakshatras`, ordered 27). `NAKSHATRA_NAMES`/`NAKSHATRA_LORDS` literals were removed from `lib/astro/computeChart.ts`; lords are derived from `kb.vimshottari.order` × 3.
+- Tests: `__tests__/engine.test.ts` via vitest (ayanamsha sanity + reference chart + nakshatra/lord-drift guards).
 - `gsap` is installed but unused for orchestrated sequences.
 
 ---
@@ -83,6 +100,8 @@ WAVE 3 (serial)      AGENT-DESIGN
 ## 5. Agent charters
 
 Spawn each as a subagent with its charter below as the full task description. Charters are self-contained.
+
+> **Wave 0.5 D5 — RECONCILE-AND-EXTEND, not CREATE (binding for AGENT-I18N, AGENT-SUGGEST, AGENT-FEEDBACK).** Each of these targets a module that **already exists** on this branch: `lib/i18n/{config,messages}.ts` + `components/i18n/{LanguageProvider,LanguageSwitcher}.tsx` + `getName()` in `lib/kb.ts` (I18N); `lib/suggestQuestions.ts` (SUGGEST); `components/chart/ReadingFeedback.tsx` (FEEDBACK). Any "(new)" marker below for one of these paths is stale — read the existing implementation first, diff it against the brief, and add only what is missing. **Do not** rewrite a working module to match a brief written before it existed, and **do not** create a parallel file under the brief's original name (e.g. do not create `FeedbackBar.tsx` alongside `ReadingFeedback.tsx`, or `strings.ts`/`LangProvider.tsx`/`useLang.ts` alongside the existing i18n files — extend the existing ones). AGENT-3D is unaffected (`/explore-3d` really is a stub).
 
 ---
 
@@ -111,7 +130,7 @@ Spawn each as a subagent with its charter below as the full task description. Ch
 
 **Must not touch:** `app/chart/[id]/page.tsx`, `GrahaAIChat.tsx`, `PlanetsTab.tsx`, `jyotish-knowledge-base.json` (other Wave-1 agents own these).
 
-**Schema v2 (land ALL of it now — D7):**
+**Schema v2 (this block is the eventual TARGET shape; Wave 1 lands only the additive subset permitted by the T4 migration policy below — `Message` keeps `@@map("TutorMessage")` and its existing `chartId`; the `Conversation` cutover and any NOT-NULL constraints come in a later, separate migration):**
 ```prisma
 model User {
   id           String   @id            // = Supabase auth uid
@@ -159,11 +178,16 @@ model Feedback {        // consumed by Wave-2 AGENT-FEEDBACK — create table no
 }
 ```
 
-**Migration — hand-write the SQL, do not accept Prisma's default drop:**
-1. `ALTER TABLE "TutorMessage" RENAME TO "Message";`
-2. Add `conversationId` nullable → backfill: for each distinct `chartId` in Message, `INSERT` one Conversation, `UPDATE` its messages → set `conversationId` NOT NULL → drop old `chartId` column from Message.
-3. Additive `userId` on Chart; keep `ownerToken`.
-4. Run against a shadow/dev DB first; paste the row counts before/after into your summary.
+**Migration — ADDITIVE-ONLY (Wave 0.5 T4 supersedes the original destructive plan; this is binding):**
+1. **`TutorMessage → Message` is a Prisma model rename ONLY, via `@@map("TutorMessage")`.** The database table stays `TutorMessage`; zero rows move; code gets `prisma.message`. Reversible by editing one line. **Do not** `ALTER TABLE ... RENAME`.
+2. Everything else is **additive and nullable**: new `User` table; `userId String?` (nullable, FK) on `Chart` and `Message`; nullable rating fields on `Message`; nullable `interests` / `depth` / `intentNote` on `Chart`. The `Conversation` model and any move of messages under a NOT-NULL `conversationId` (with backfill and `chartId` drop) is **deferred to a separate, later migration** — Message retains its existing `chartId` for now.
+3. **Forbidden in this migration:** `NOT NULL`, `DROP COLUMN`, `DROP TABLE`, `RENAME`, and any data backfill. Constraints tighten later, separately, after a backfill is run and verified.
+4. **Before any DDL touches the live DB, print the generated SQL and STOP for human approval (hard stop S1):**
+   ```bash
+   npx prisma migrate diff --from-url "$DATABASE_URL" --to-schema-datamodel prisma/schema.prisma --script
+   ```
+   If that output contains `RENAME`, `DROP`, or `NOT NULL`, the schema is wrong — fix the schema, do not approve the SQL. Approval is of *that SQL*, not of the concept.
+5. Runtime data path today is **supabase-js with the service key**, not Prisma queries. Reconcile: either wire Prisma for the new reads/writes or extend the supabase-js layer — but keep all DB access server-only (invariant §2.6).
 
 **Auth implementation:**
 - Use **`@supabase/ssr`** (NOT the deprecated auth-helpers): `createServerClient` / `createBrowserClient`, session refresh in `middleware.ts` per current Supabase Next.js App Router docs.
@@ -184,7 +208,7 @@ model Feedback {        // consumed by Wave-2 AGENT-FEEDBACK — create table no
 
 **Mission:** en / hi / sa language layer — two-layer architecture, zero new dependencies (D6).
 
-**Owns (exclusive):** `jyotish-knowledge-base.json`, `lib/kb.ts` (additive: `getName`), `lib/i18n/*` (new: `strings.ts`, `LangProvider.tsx`, `useLang.ts`), `components/LanguageSwitcher.tsx` (new), `app/chart/[id]/page.tsx` (mount switcher in header), `components/chart/NorthIndianChart.tsx` (label resolution only), `components/chart/ExplorePanel.tsx` (headings/labels only), `app/layout.tsx` (wrap LangProvider).
+**Owns (exclusive):** `jyotish-knowledge-base.json`, `lib/kb.ts` (`getName` already exists — extend only), `lib/i18n/*` (**already exists** — `config.ts`, `messages.ts`; reconcile/extend, do not create `strings.ts`/`LangProvider.tsx`/`useLang.ts` as parallels), `components/i18n/LanguageSwitcher.tsx` + `components/i18n/LanguageProvider.tsx` (**already exist** — extend), `app/chart/[id]/page.tsx` (switcher already mounted — verify), `components/chart/NorthIndianChart.tsx` (label resolution only), `components/chart/ExplorePanel.tsx` (headings/labels only), `app/layout.tsx` (LangProvider already wrapped — verify).
 
 **Tasks:**
 1. **KB extension** — add `"hi"` (Devanagari) to all 9 grahas, 12 rashis, 12 bhavas. Use these exact strings, do not improvise spellings:
@@ -205,7 +229,7 @@ model Feedback {        // consumed by Wave-2 AGENT-FEEDBACK — create table no
 
 **Mission:** `lib/suggestQuestions.ts` — deterministic, pure, unit-tested question-suggestion engine + starter chips in chat.
 
-**Owns (exclusive):** `lib/suggestQuestions.ts` (new), `lib/questionBank.ts` (new), `lib/lifeAreas.ts` (extend only), `components/chart/GrahaAIChat.tsx` (starter-chip section only), `__tests__/suggestQuestions.test.ts` (new).
+**Owns (exclusive):** `lib/suggestQuestions.ts` (**already exists** — reconcile/extend, do not recreate), `lib/questionBank.ts` (new), `lib/lifeAreas.ts` (extend only), `components/chart/GrahaAIChat.tsx` (starter-chip section only), `__tests__/suggestQuestions.test.ts` (new).
 
 **Tasks:**
 1. **Question bank (D4):** 35 questions, 5 per life area keyed to `lib/lifeAreas.ts`. Each entry: `{ id, areaId, text, entities: { houses?: number[], planets?: GrahaId[] } }`. Voice = Engine B (invariant 8). Calibration:
@@ -275,7 +299,7 @@ model Feedback {        // consumed by Wave-2 AGENT-FEEDBACK — create table no
 
 **Mission:** Resonance + utility feedback loop on AI answers (Feedback table already exists from Wave 1 — consume, don't migrate).
 
-**Owns (exclusive):** `app/api/feedback/route.ts` (new), `components/chart/FeedbackBar.tsx` (new), `components/chart/GrahaAIChat.tsx` (feedback wiring + 402 upsell card if handed off by AGENT-PAY).
+**Owns (exclusive):** `app/api/graha-ai/feedback/route.ts` (**already exists** — reconcile/extend), `components/chart/ReadingFeedback.tsx` (**already exists, 148 lines** — extend; do NOT create a parallel `FeedbackBar.tsx`), `components/chart/GrahaAIChat.tsx` (feedback wiring + 402 upsell card if handed off by AGENT-PAY).
 
 **Tasks:**
 1. `FeedbackBar` under each completed assistant message: step 1 — "Rings true" / "Not quite". Step 2 (only after step 1) — utility: "Did this help you understand or decide something?" yes/no.
