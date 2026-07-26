@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { NatalChart } from "@/lib/astro/computeChart";
 
 export interface ChartRow {
@@ -79,5 +79,29 @@ function resolveSupabaseKey(): string {
   );
 }
 
-// Server-side only — uses the service key (or anon key when RLS is disabled)
-export const supabase = createClient(resolveSupabaseUrl(), resolveSupabaseKey());
+// Server-side only — uses the service key (or anon key when RLS is disabled).
+//
+// The client is constructed lazily: building it eagerly at module load meant a
+// missing/invalid config threw during *import*, which crashes every Server
+// Component that merely imports this module (the landing page, chart page, …)
+// with an opaque "An error occurred in the Server Components render." By
+// deferring construction to first use, importing the module is always safe, and
+// the clear, actionable config error only surfaces when the DB is actually
+// touched — where callers can catch it and degrade gracefully.
+let _client: SupabaseClient | null = null;
+export function getSupabase(): SupabaseClient {
+  if (!_client) {
+    _client = createClient(resolveSupabaseUrl(), resolveSupabaseKey());
+  }
+  return _client;
+}
+
+// Backwards-compatible proxy: existing callers use `supabase.from(...)` directly.
+// Property access lazily constructs the underlying client on first use.
+export const supabase: SupabaseClient = new Proxy({} as SupabaseClient, {
+  get(_target, prop, receiver) {
+    const client = getSupabase();
+    const value = Reflect.get(client as object, prop, receiver);
+    return typeof value === "function" ? value.bind(client) : value;
+  },
+});

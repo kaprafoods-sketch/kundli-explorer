@@ -16,14 +16,22 @@ export async function listMyProfiles(): Promise<ChartRow[]> {
   const token = await getToken();
   if (!token) return [];
 
-  const { data, error } = await supabase
-    .from("Chart")
-    .select("id, name, dob, lat, lon, tz, ayanamsha, data, createdAt, ownerToken, relation, interests, depth, intentNote")
-    .eq("ownerToken", token)
-    .order("createdAt", { ascending: false });
+  try {
+    const { data, error } = await supabase
+      .from("Chart")
+      .select("id, name, dob, lat, lon, tz, ayanamsha, data, createdAt, ownerToken, relation, interests, depth, intentNote")
+      .eq("ownerToken", token)
+      .order("createdAt", { ascending: false });
 
-  if (error) return [];
-  return (data ?? []) as ChartRow[];
+    if (error) return [];
+    return (data ?? []) as ChartRow[];
+  } catch (e) {
+    // Misconfigured Supabase (or transient failure) must not crash the page
+    // render — degrade to "no saved profiles" so the landing page and signup
+    // form still load.
+    console.error("[listMyProfiles] failed:", e);
+    return [];
+  }
 }
 
 export async function renameProfile(id: string, name: string, relation: string) {

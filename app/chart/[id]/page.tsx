@@ -19,12 +19,21 @@ interface Props {
 export default async function ChartPage({ params }: Props) {
   const { id } = await params;
 
-  const [{ data: record, error }, jar] = await Promise.all([
-    supabase.from("Chart").select("*").eq("id", id).single(),
-    cookies(),
-  ]);
+  const jar = await cookies();
 
-  if (error || !record) notFound();
+  // A misconfigured/unreachable Supabase must surface as a 404, not an opaque
+  // Server Components render error.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let record: any = null;
+  try {
+    const res = await supabase.from("Chart").select("*").eq("id", id).single();
+    if (res.error) throw res.error;
+    record = res.data;
+  } catch (e) {
+    console.error("[ChartPage] chart fetch failed:", e);
+    notFound();
+  }
+  if (!record) notFound();
 
   const chart = record.data as NatalChart;
   const interests = (record.interests ?? []) as LifeAreaId[];
