@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { getGemini, GEMINI_MODEL } from "@/lib/gemini";
+import { streamChatTokens, hasOpenRouterKey, type ChatMessage } from "@/lib/openrouter";
 import { supabase } from "@/lib/supabase";
 import { kb } from "@/lib/kb";
 import {
@@ -7,7 +7,7 @@ import {
   composeHouseReading,
   composeLagnaReading,
 } from "@/lib/interpret";
-import type { NatalChart, Placement } from "@/lib/astro/computeChart";
+import type { NatalChart } from "@/lib/astro/computeChart";
 import type { GrahaId } from "@/lib/kb";
 
 export const runtime = "nodejs";
@@ -103,8 +103,9 @@ Center your answers on the Lagna/Ascendant unless the user explicitly asks about
 // ── Route handler ─────────────────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
-  const ai = getGemini();
-  if (!ai) return new Response("GEMINI_API_KEY not configured", { status: 503 });
+  if (!hasOpenRouterKey()) {
+    return new Response("OPENROUTER_API_KEY not configured", { status: 503 });
+  }
 
   let chartId: string;
   let message: string;
@@ -153,41 +154,39 @@ export async function POST(req: NextRequest) {
     .from("TutorMessage")
     .insert({ chartId, role: "user", content: message });
 
-  const contents = [
-    ...((history ?? []).map((m) => ({
-      role: m.role === "assistant" ? "model" : "user",
-      parts: [{ text: m.content as string }],
+  // OpenAI-style messages: system instruction, prior turns, then the new turn.
+  const messages: ChatMessage[] = [
+    { role: "system", content: systemInstruction },
+    ...((history ?? []).map((m): ChatMessage => ({
+      role: m.role === "assistant" ? "assistant" : "user",
+      content: m.content as string,
     }))),
-    { role: "user", parts: [{ text: message }] },
+    { role: "user", content: message },
   ];
 
-  let response;
+  let tokens: AsyncGenerator<string>;
   try {
-    response = await ai.models.generateContentStream({
-      model: GEMINI_MODEL,
-      contents,
-      config: { systemInstruction, maxOutputTokens: 1024 },
-    });
-  } catch (e) {
-    // Quota exhaustion, bad key, or model errors must not surface as an opaque
-    // unhandled 500 — return a labeled upstream error.
-    console.error("[graha-ai] Gemini request failed:", e);
-    return new Response("AI service error", { status: 502 });
-  }
+    // Start the request and surface an early failure (bad key, model, quota) as
+    // a labeled upstream error before we commit to a streaming Response.
+    tokens = streamChatTokens(messages, { maxTokens: 1024 });
+    const first = await tokens.next();
+    const firstText = first.done ? "" : first.value;
 
-  let fullReply = "";
-
-  const readable = new ReadableStream({
-    async start(controller) {
-      try {
-        for await (const chunk of response) {
-          const text = chunk.text;
-          if (text) {
-            fullReply += text;
-            controller.enqueue(new TextEncoder().encode(text));
+    let fullReply = "";
+    const readable = new ReadableStream({
+      async start(controller) {
+        try {
+          if (firstText) {
+            fullReply += firstText;
+            controller.enqueue(new TextEncoder().encode(firstText));
           }
-        }
-      } finally {
+          for await (const text of tokens) {
+            if (text) {
+              fullReply += text;
+              controller.enqueue(new TextEncoder().encode(text));
+            }
+          }
+        } finally {
         controller.close();
         if (fullReply) {
           await supabase
@@ -201,10 +200,16 @@ export async function POST(req: NextRequest) {
     },
   });
 
-  return new Response(readable, {
-    headers: {
-      "Content-Type": "text/plain; charset=utf-8",
-      "X-Content-Type-Options": "nosniff",
-    },
-  });
+    return new Response(readable, {
+      headers: {
+        "Content-Type": "text/plain; charset=utf-8",
+        "X-Content-Type-Options": "nosniff",
+      },
+    });
+  } catch (e) {
+    // Bad key, unknown model, quota exhaustion, or a network error from
+    // OpenRouter — return a labeled upstream error instead of an opaque 500.
+    console.error("[graha-ai] OpenRouter request failed:", e);
+    return new Response("AI service error", { status: 502 });
+  }
 }
