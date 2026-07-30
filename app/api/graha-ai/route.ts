@@ -123,11 +123,14 @@ export async function POST(req: NextRequest) {
     return new Response("Missing chartId or message", { status: 400 });
   }
 
-  const { data: record } = await supabase
-    .from("Chart")
-    .select("*")
-    .eq("id", chartId)
-    .single();
+  let record: { data?: unknown } | null = null;
+  try {
+    const res = await supabase.from("Chart").select("*").eq("id", chartId).single();
+    record = res.data;
+  } catch (e) {
+    console.error("[graha-ai] chart fetch failed:", e);
+    return new Response("Data store unavailable", { status: 503 });
+  }
 
   if (!record) return new Response("Chart not found", { status: 404 });
 
@@ -158,11 +161,19 @@ export async function POST(req: NextRequest) {
     { role: "user", parts: [{ text: message }] },
   ];
 
-  const response = await ai.models.generateContentStream({
-    model: GEMINI_MODEL,
-    contents,
-    config: { systemInstruction, maxOutputTokens: 1024 },
-  });
+  let response;
+  try {
+    response = await ai.models.generateContentStream({
+      model: GEMINI_MODEL,
+      contents,
+      config: { systemInstruction, maxOutputTokens: 1024 },
+    });
+  } catch (e) {
+    // Quota exhaustion, bad key, or model errors must not surface as an opaque
+    // unhandled 500 — return a labeled upstream error.
+    console.error("[graha-ai] Gemini request failed:", e);
+    return new Response("AI service error", { status: 502 });
+  }
 
   let fullReply = "";
 
