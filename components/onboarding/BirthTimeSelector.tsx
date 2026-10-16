@@ -14,9 +14,9 @@ const APPROX_SLOTS: { id: ApproxSlot; emoji: string; label: string; desc: string
 ];
 
 const MODE_OPTIONS: { id: TimeMode; label: string; icon: string }[] = [
-  { id: "exact",   label: "Exact Time",       icon: "🎯" },
-  { id: "approx",  label: "Approximate",      icon: "〜" },
-  { id: "unknown", label: "I Don't Know",     icon: "?" },
+  { id: "exact",   label: "Exact time",       icon: "◷" },
+  { id: "approx",  label: "Approximate",      icon: "≈" },
+  { id: "unknown", label: "Not sure",         icon: "?" },
 ];
 
 export interface BirthTimeSelectorValue {
@@ -160,7 +160,7 @@ export default function BirthTimeSelector({ value, onChange }: Props) {
               lineHeight: 1.55,
               fontFamily: "var(--font-ui, system-ui)",
             }}>
-              No problem. We&apos;ll generate your chart using noon as a placeholder and offer birth time rectification later.
+              No problem. We&apos;ll use noon as a placeholder and explain which parts of your chart may shift.
             </p>
             <p style={{
               margin: "6px 0 0",
@@ -168,7 +168,7 @@ export default function BirthTimeSelector({ value, onChange }: Props) {
               color: "rgba(142,151,184,0.6)",
               fontFamily: "var(--font-ui, system-ui)",
             }}>
-              Planetary houses may vary, but all other placements will be accurate.
+              Your planetary placements remain useful; rising sign and houses may vary.
             </p>
           </div>
         </div>
