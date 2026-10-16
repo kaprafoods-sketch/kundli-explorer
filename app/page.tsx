@@ -38,7 +38,7 @@ export default async function Home() {
       >
         <AnimatedKundliHero
           size={340}
-          style={{ opacity: 0.22 }}
+          style={{ opacity: 0.14 }}
         />
       </div>
 
@@ -114,13 +114,13 @@ export default async function Home() {
             >
               {/* Form glass card */}
               <div
-                className="w-full rounded-2xl"
+                className="w-full"
                 style={{
-                  background: "rgba(11,16,38,0.88)",
+                  background: "rgba(11,16,38,0.94)",
                   border: "1px solid rgba(200,162,74,0.28)",
-                  backdropFilter: "blur(24px)",
-                  WebkitBackdropFilter: "blur(24px)",
-                  boxShadow: "0 8px 48px rgba(0,0,0,0.55), 0 0 0 1px rgba(200,162,74,0.08)",
+                  backdropFilter: "blur(12px)",
+                  WebkitBackdropFilter: "blur(12px)",
+                  boxShadow: "0 8px 32px rgba(0,0,0,0.42)",
                   maxHeight: "calc(100vh - 120px)",
                   overflowY: "auto",
                   scrollbarWidth: "none",
@@ -192,7 +192,7 @@ export default async function Home() {
                   background: "rgba(11,16,38,0.45)",
                   backdropFilter: "blur(8px)",
                   WebkitBackdropFilter: "blur(8px)",
-                  borderRadius: 16,
+                  borderRadius: 12,
                   padding: "1.25rem",
                   border: "1px solid rgba(200,162,74,0.15)",
                 }}
