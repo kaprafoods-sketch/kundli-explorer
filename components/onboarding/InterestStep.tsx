@@ -2,7 +2,7 @@
 
 /**
  * InterestStep — Step 4 of the onboarding wizard: "What brings you here?"
- * Captures interests (2–3 life areas), answer depth, and an optional intent note.
+ * Captures optional interests (up to 3 life areas), answer depth, and an optional intent note.
  *
  * DECISION FLAG: this is built as wizard Step 4 (writes to the Chart row at
  * creation). If product later wants a post-chart "personalize" card on
@@ -78,20 +78,17 @@ export default function InterestStep({ value, onChange }: Props) {
             fontFamily: "var(--font-ui, system-ui)",
           }}
         >
-          What brings you here?
+          What would you like to explore?
         </h2>
         <p style={{ margin: "8px 0 0", fontSize: 14, color: "rgba(142,151,184,0.7)", fontFamily: "var(--font-ui, system-ui)", lineHeight: 1.5 }}>
-          Pick 2–3 — we&apos;ll surface the parts of your chart that speak to them.
+          Choose up to three topics to personalize your first reading, or skip this step for now.
         </p>
       </div>
 
       {/* Interests — multi-select chips */}
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         <label style={labelStyle}>
-          Your focus
-          <span style={{ marginLeft: 8, color: "rgba(142,151,184,0.5)", textTransform: "none", letterSpacing: 0 }}>
-            {remaining > 0 ? `choose ${remaining} more` : `${value.interests.length}/${MAX_INTERESTS} selected`}
-          </span>
+          Your focus <span style={{ marginLeft: 8, color: "rgba(142,151,184,0.5)", textTransform: "none", letterSpacing: 0 }}>optional · {value.interests.length}/{MAX_INTERESTS} selected</span>
         </label>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           {ONBOARDING_INTEREST_IDS.map((id) => {
