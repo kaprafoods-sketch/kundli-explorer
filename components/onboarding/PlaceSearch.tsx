@@ -27,12 +27,13 @@ export default function PlaceSearch({ value, onChange }: Props) {
   const [results, setResults] = useState<GeoResult[]>([]);
   const [loading, setLoading] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const [manualLat, setManualLat] = useState(value ? String(value.lat) : "");
   const [manualLon, setManualLon] = useState(value ? String(value.lon) : "");
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const search = useCallback(async (q: string) => {
-    if (q.length < 2) { setResults([]); return; }
+    if (q.length < 2) { setResults([]); setActiveIndex(-1); return; }
     setLoading(true);
     try {
       const res = await fetch(
@@ -40,6 +41,7 @@ export default function PlaceSearch({ value, onChange }: Props) {
       );
       const data = await res.json();
       setResults(data.results ?? []);
+      setActiveIndex(-1);
     } catch {
       setResults([]);
     } finally {
@@ -59,9 +61,26 @@ export default function PlaceSearch({ value, onChange }: Props) {
     const display = [city.name, city.admin1, city.country].filter(Boolean).join(", ");
     setQuery(display);
     setResults([]);
+    setActiveIndex(-1);
     setManualLat(city.latitude.toFixed(4));
     setManualLon(city.longitude.toFixed(4));
     onChange({ display, lat: city.latitude, lon: city.longitude });
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "ArrowDown" && results.length) {
+      e.preventDefault();
+      setActiveIndex((i) => Math.min(i + 1, results.length - 1));
+    } else if (e.key === "ArrowUp" && results.length) {
+      e.preventDefault();
+      setActiveIndex((i) => Math.max(i - 1, 0));
+    } else if (e.key === "Enter" && activeIndex >= 0 && results[activeIndex]) {
+      e.preventDefault();
+      selectCity(results[activeIndex]);
+    } else if (e.key === "Escape") {
+      setResults([]);
+      setActiveIndex(-1);
+    }
   }
 
   function applyManual() {
@@ -92,6 +111,7 @@ export default function PlaceSearch({ value, onChange }: Props) {
           type="text"
           value={query}
           onChange={handleInput}
+          onKeyDown={handleKeyDown}
           placeholder="Search city… e.g. Delhi, Mumbai, Jaipur"
           autoComplete="off"
           autoCorrect="off"
@@ -133,6 +153,9 @@ export default function PlaceSearch({ value, onChange }: Props) {
       {/* Autocomplete dropdown */}
       {results.length > 0 && (
         <ul
+          id="birth-place-results"
+          role="listbox"
+          aria-label="Birthplace suggestions"
           style={{
             margin: 0,
             padding: 0,
@@ -147,6 +170,9 @@ export default function PlaceSearch({ value, onChange }: Props) {
           {results.map((city, i) => (
             <li key={i}>
               <button
+                id={`birth-place-option-${i}`}
+                role="option"
+                aria-selected={activeIndex === i}
                 type="button"
                 onMouseDown={() => selectCity(city)}
                 style={{
@@ -156,7 +182,7 @@ export default function PlaceSearch({ value, onChange }: Props) {
                   display: "flex",
                   alignItems: "center",
                   gap: 12,
-                  background: "none",
+                  background: activeIndex === i ? "rgba(200,162,74,0.1)" : "none",
                   border: "none",
                   borderBottom: i < results.length - 1 ? "1px solid rgba(255,255,255,0.05)" : "none",
                   cursor: "pointer",
