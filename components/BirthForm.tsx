@@ -185,6 +185,7 @@ export default function BirthForm() {
           ref={screenRef}
           tabIndex={-1}
           aria-live="polite"
+          className="onboarding-screen"
           style={{
             animation: `${direction === "forward" ? "slideInRight" : "slideInLeft"} 0.3s cubic-bezier(0.34,1.2,0.64,1) both`,
           }}
