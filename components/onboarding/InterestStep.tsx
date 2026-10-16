@@ -63,8 +63,6 @@ export default function InterestStep({ value, onChange }: Props) {
     onChange({ ...value, interests: next });
   }
 
-  const remaining = MIN_INTERESTS - value.interests.length;
-
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
       <div style={{ textAlign: "center" }}>
