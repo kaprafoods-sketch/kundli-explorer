@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createChartAction } from "@/app/actions/createChart";
 import DateWheelPicker, { type DateValue } from "./onboarding/DateWheelPicker";
 import BirthTimeSelector, { type BirthTimeSelectorValue } from "./onboarding/BirthTimeSelector";
@@ -44,6 +44,7 @@ export default function BirthForm() {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const [direction, setDirection] = useState<"forward" | "back">("forward");
+  const screenRef = useRef<HTMLDivElement>(null);
 
   function goNext() {
     setDirection("forward");
@@ -53,6 +54,10 @@ export default function BirthForm() {
     setDirection("back");
     setStep((s) => s - 1);
   }
+
+  useEffect(() => {
+    screenRef.current?.focus();
+  }, [step]);
 
   // Assemble form data and submit
   async function submit() {
@@ -177,6 +182,9 @@ export default function BirthForm() {
         {/* Screen (animated) */}
         <div
           key={step}
+          ref={screenRef}
+          tabIndex={-1}
+          aria-live="polite"
           style={{
             animation: `${direction === "forward" ? "slideInRight" : "slideInLeft"} 0.3s cubic-bezier(0.34,1.2,0.64,1) both`,
           }}
@@ -214,10 +222,10 @@ function Screen1({ name, onName, date, onDate, onNext }: S1Props) {
             lineHeight: 1.3,
           }}
         >
-          Let&apos;s discover your<br />cosmic blueprint
+          Start with your birth details
         </h2>
         <p style={{ margin: "8px 0 0", fontSize: 13, color: "rgba(142,151,184,0.7)", fontFamily: "var(--font-ui, system-ui)", lineHeight: 1.5 }}>
-          Just three details and we&apos;ll map your planets.
+          Four short steps, then we&apos;ll map your planets and show you where to begin.
         </p>
       </div>
 
@@ -229,6 +237,7 @@ function Screen1({ name, onName, date, onDate, onNext }: S1Props) {
           Your name
         </label>
         <input
+          id="birth-name"
           type="text"
           value={name}
           onChange={(e) => onName(e.target.value)}
@@ -297,10 +306,10 @@ function Screen2({ timeVal, onTimeVal, onNext, onBack }: S2Props) {
             fontFamily: "var(--font-ui, system-ui)",
           }}
         >
-          Do you know your birth time?
+          How precise is your birth time?
         </h2>
         <p style={{ margin: "8px 0 0", fontSize: 13, color: "rgba(142,151,184,0.7)", fontFamily: "var(--font-ui, system-ui)" }}>
-          Your birth time determines your rising sign and house positions.
+          Exact time gives the clearest rising sign and house positions. Approximate is still useful.
         </p>
       </div>
 
@@ -342,7 +351,7 @@ function Screen3({ place, onPlace, onBack, onNext }: S3Props) {
           Where were you born?
         </h2>
         <p style={{ margin: "8px 0 0", fontSize: 14, color: "rgba(142,151,184,0.7)", fontFamily: "var(--font-ui, system-ui)" }}>
-          Search for your birth city — we&apos;ll find the exact coordinates.
+          Search for your birth city so we can use the right coordinates and time zone.
         </p>
       </div>
 
@@ -374,13 +383,13 @@ interface S4Props {
 }
 
 function Screen4({ intent, onIntent, onBack, onSubmit, pending, error }: S4Props) {
-  const canSubmit = intent.interests.length >= 2 && !pending;
+  const canSubmit = !pending;
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       <InterestStep value={intent} onChange={onIntent} />
 
       {error && (
-        <p style={{ margin: 0, fontSize: 13, color: "#E07070", fontFamily: "var(--font-ui, system-ui)", textAlign: "center" }}>
+        <p role="alert" style={{ margin: 0, fontSize: 13, color: "var(--error)", fontFamily: "var(--font-ui, system-ui)", textAlign: "center" }}>
           {error}
         </p>
       )}
@@ -393,7 +402,7 @@ function Screen4({ intent, onIntent, onBack, onSubmit, pending, error }: S4Props
           loading={pending}
           style={{ flex: 1 }}
         >
-          {pending ? "Computing…" : "Reveal My Kundli ✦"}
+          {pending ? "Computing…" : "Create my kundli ✦"}
         </CTAButton>
       </div>
     </div>
@@ -424,19 +433,17 @@ function CTAButton({
       style={{
         minHeight: 52,
         padding: "14px 20px",
-        borderRadius: 14,
+        borderRadius: 12,
         border: "none",
-        background: disabled
-          ? "rgba(200,162,74,0.25)"
-          : "linear-gradient(135deg, var(--brass) 0%, #e8b84b 100%)",
+        background: disabled ? "rgba(200,162,74,0.25)" : "var(--brass)",
         color: disabled ? "rgba(11,16,38,0.5)" : "var(--bg)",
         fontSize: 16,
         fontWeight: 700,
         letterSpacing: "0.02em",
         fontFamily: "var(--font-ui, system-ui)",
         cursor: disabled ? "not-allowed" : "pointer",
-        transition: "box-shadow 0.18s ease, background 0.18s ease",
-        boxShadow: disabled ? "none" : "0 4px 20px rgba(200,162,74,0.3)",
+        transition: "background 0.18s ease, color 0.18s ease, transform 0.18s ease",
+        boxShadow: "none",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
