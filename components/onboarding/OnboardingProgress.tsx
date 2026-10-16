@@ -14,7 +14,7 @@ interface Props {
 
 export default function OnboardingProgress({ step, total = 3 }: Props) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+    <nav aria-label="Chart setup progress" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
       {/* Planet icons + connecting track */}
       <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
         {STEPS.map((s, i) => {
@@ -61,6 +61,7 @@ export default function OnboardingProgress({ step, total = 3 }: Props) {
                   )}
                 </div>
                 <span
+                  aria-current={active ? "step" : undefined}
                   style={{
                     fontSize: 10,
                     fontFamily: "var(--font-ui, system-ui)",
@@ -126,6 +127,6 @@ export default function OnboardingProgress({ step, total = 3 }: Props) {
       >
         Step {step + 1} of {total}
       </p>
-    </div>
+    </nav>
   );
 }
