@@ -278,3 +278,23 @@ input, textarea, select { font-size: 16px; }
 .badge-enemy        { background: rgba(224,112,112,0.12); color: var(--error); border: 1px solid rgba(224,112,112,0.4); }
 .badge-debilitated  { background: rgba(208,140,106,0.18); color: var(--weak); border: 1px solid var(--weak); }
 
+
+
+/* Birth-flow quality floor */
+.onboarding-screen:focus { outline: none; }
+.onboarding-screen input:focus-visible,
+.onboarding-screen button:focus-visible {
+  outline: 2px solid var(--brass-bright);
+  outline-offset: 3px;
+}
+.onboarding-screen button:disabled { cursor: not-allowed; }
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-screen *,
+  .onboarding-screen *::before,
+  .onboarding-screen *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
