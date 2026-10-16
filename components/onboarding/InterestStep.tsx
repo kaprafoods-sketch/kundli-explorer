@@ -68,7 +68,7 @@ export default function InterestStep({ value, onChange }: Props) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
       <div style={{ textAlign: "center" }}>
-        <p style={{ margin: "0 0 6px", fontSize: 28 }}>✨</p>
+        <p style={{ margin: "0 0 6px", fontSize: 28 }}>✦</p>
         <h2
           style={{
             margin: 0,
