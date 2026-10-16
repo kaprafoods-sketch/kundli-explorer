@@ -1,10 +1,10 @@
 "use client";
 
 const STEPS = [
-  { icon: "☀️", label: "Date" },
-  { icon: "🕒", label: "Time" },
-  { icon: "🪐", label: "Place" },
-  { icon: "✨", label: "Focus" },
+  { icon: "◷", label: "Date" },
+  { icon: "◌", label: "Time" },
+  { icon: "⊙", label: "Place" },
+  { icon: "✦", label: "Focus" },
 ];
 
 interface Props {
