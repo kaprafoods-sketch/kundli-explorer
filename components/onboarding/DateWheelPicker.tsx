@@ -44,7 +44,7 @@ export default function DateWheelPicker({ value, onChange }: Props) {
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0 }}>
+    <div role="group" aria-label="Birth date" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0 }}>
       {/* Column headers */}
       <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
         <ColLabel width={72}>Day</ColLabel>
