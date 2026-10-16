@@ -32,7 +32,6 @@ export const DEFAULT_INTEREST: InterestValue = {
 };
 
 const MAX_INTERESTS = 3;
-const MIN_INTERESTS = 2;
 
 // Short, friendly labels for the onboarding chips (KB labels can be long).
 const CHIP_LABEL: Partial<Record<LifeAreaId, string>> = {
