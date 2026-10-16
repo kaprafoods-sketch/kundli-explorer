@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import TimeWheelPicker, { type TimeValue } from "./TimeWheelPicker";
 
 export type TimeMode = "exact" | "approx" | "unknown";
