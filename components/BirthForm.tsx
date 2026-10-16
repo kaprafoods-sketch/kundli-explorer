@@ -212,7 +212,7 @@ function Screen1({ name, onName, date, onDate, onNext }: S1Props) {
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       {/* Hero copy */}
       <div style={{ textAlign: "center" }}>
-        <p style={{ margin: "0 0 6px", fontSize: 28 }}>✨</p>
+        <p style={{ margin: "0 0 6px", fontSize: 28 }}>◷</p>
         <h2
           style={{
             margin: 0,
@@ -297,7 +297,7 @@ function Screen2({ timeVal, onTimeVal, onNext, onBack }: S2Props) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       <div style={{ textAlign: "center" }}>
-        <p style={{ margin: "0 0 6px", fontSize: 28 }}>🕒</p>
+        <p style={{ margin: "0 0 6px", fontSize: 28 }}>◌</p>
         <h2
           style={{
             margin: 0,
@@ -339,7 +339,7 @@ function Screen3({ place, onPlace, onBack, onNext }: S3Props) {
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
       <div style={{ textAlign: "center" }}>
-        <p style={{ margin: "0 0 6px", fontSize: 28 }}>📍</p>
+        <p style={{ margin: "0 0 6px", fontSize: 28 }}>⊙</p>
         <h2
           style={{
             margin: 0,
