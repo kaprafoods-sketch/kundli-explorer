@@ -1,7 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 
-// ← one-line swap point
-export const GEMINI_MODEL = "gemini-2.5-flash";
+// ← one-line swap point (2.5-flash was retired for new API users; Google directs to 3.8-flash)
+export const GEMINI_MODEL = "gemini-3.8-flash";
 
 export function getGemini(): GoogleGenAI | null {
   if (!process.env.GEMINI_API_KEY?.trim()) return null;
