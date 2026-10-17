@@ -1,7 +1,15 @@
 import { NextRequest } from "next/server";
+import { cookies } from "next/headers";
 import { getGemini, GEMINI_MODEL } from "@/lib/gemini";
 import { supabase } from "@/lib/supabase";
 import { kb } from "@/lib/kb";
+import {
+  checkRateLimit,
+  rateLimitKey,
+  ipFromHeaders,
+  GRAHA_AI_RATE_LIMIT,
+  MAX_GRAHA_MESSAGE_CHARS,
+} from "@/lib/rateLimit";
 import {
   composePlanetInterpretation,
   composeHouseReading,
@@ -113,14 +121,39 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     chartId = body.chartId;
-    message = body.message;
+    message = String(body.message ?? "");
     focus = body.focus;
   } catch {
     return new Response("Invalid JSON", { status: 400 });
   }
 
-  if (!chartId || !message?.trim()) {
+  if (!chartId || !message.trim()) {
     return new Response("Missing chartId or message", { status: 400 });
+  }
+
+  // Server-side message cap (P5): trim before measuring, reject with 422.
+  // A pasted 100k-char message is otherwise a large token bill per request.
+  const trimmedMessage = message.trim();
+  if (trimmedMessage.length > MAX_GRAHA_MESSAGE_CHARS) {
+    return new Response("Message is too long. Please keep it under 2,000 characters.", {
+      status: 422,
+    });
+  }
+
+  // Rate limit (P5): per owner token, falling back to client IP, checked
+  // before any DB read or Gemini call so abuse burns nothing.
+  const cookieStore = await cookies();
+  const rlIdentity = rateLimitKey(
+    GRAHA_AI_RATE_LIMIT.prefix,
+    cookieStore.get("kx_owner")?.value,
+    ipFromHeaders(req.headers)
+  );
+  const rl = checkRateLimit(rlIdentity, GRAHA_AI_RATE_LIMIT.limit, GRAHA_AI_RATE_LIMIT.windowMs);
+  if (!rl.allowed) {
+    return new Response("Too many requests. Please wait a moment and try again.", {
+      status: 429,
+      headers: { "Retry-After": String(rl.retryAfter) },
+    });
   }
 
   const { data: record } = await supabase
@@ -130,6 +163,14 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (!record) return new Response("Chart not found", { status: 404 });
+
+  // Owner check (P3): only the chart's owner may use the AI tutor on it.
+  // A leaked /chart/<uuid> link must not expose birth details or burn this
+  // chart's Gemini quota. Same 404 as a missing chart — no existence oracle.
+  const ownerToken = cookieStore.get("kx_owner")?.value;
+  if (record.ownerToken && record.ownerToken !== ownerToken) {
+    return new Response("Chart not found", { status: 404 });
+  }
 
   const chart = record.data as NatalChart;
 
@@ -145,17 +186,17 @@ export async function POST(req: NextRequest) {
     .order("createdAt", { ascending: true })
     .limit(30);
 
-  // Persist user message before streaming
+  // Persist user message before streaming (uses the trimmed, capped text).
   await supabase
     .from("TutorMessage")
-    .insert({ chartId, role: "user", content: message });
+    .insert({ chartId, role: "user", content: trimmedMessage });
 
   const contents = [
     ...((history ?? []).map((m) => ({
       role: m.role === "assistant" ? "model" : "user",
       parts: [{ text: m.content as string }],
     }))),
-    { role: "user", parts: [{ text: message }] },
+    { role: "user", parts: [{ text: trimmedMessage }] },
   ];
 
   const response = await ai.models.generateContentStream({

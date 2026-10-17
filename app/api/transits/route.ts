@@ -5,6 +5,12 @@ export const runtime = "nodejs";
 
 export async function GET(req: NextRequest) {
   const lagnaSign = parseInt(req.nextUrl.searchParams.get("lagnaSign") ?? "1", 10);
+
+  // Validate: lagnaSign is a zodiac sign number, only 1–12 are meaningful.
+  if (Number.isNaN(lagnaSign) || lagnaSign < 1 || lagnaSign > 12) {
+    return NextResponse.json({ error: "lagnaSign must be an integer between 1 and 12" }, { status: 400 });
+  }
+
   const dateParam = req.nextUrl.searchParams.get("date"); // ISO "YYYY-MM-DD" or full ISO
   const date = dateParam ? new Date(dateParam) : undefined;
 

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import type { ChartRow } from "@/lib/supabase";
+import type { ChartRow } from "@/lib/types";
 
 interface Props {
   currentId: string;

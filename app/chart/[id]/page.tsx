@@ -10,7 +10,7 @@ import ChartExplorer from "@/components/chart/ChartExplorer";
 import ProfileSwitcher from "@/components/ProfileSwitcher";
 import Logo from "@/components/Logo";
 import { listMyProfiles } from "@/app/actions/profiles";
-import type { ChartRow } from "@/lib/supabase";
+import type { ChartRow } from "@/lib/types";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -25,6 +25,15 @@ export default async function ChartPage({ params }: Props) {
   ]);
 
   if (error || !record) notFound();
+
+  // Owner check (P3): a chart is viewable only by its owner. `kx_owner` is
+  // set at creation time by createChartAction. A leaked /chart/<uuid> link
+  // must not expose another person's birth details. Charts with no
+  // ownerToken are treated as unowned/shared and stay public.
+  // (`/chart/sample` is a static route that takes precedence over this
+  // dynamic route, so the sample page never reaches this code.)
+  const ownerToken = jar.get("kx_owner")?.value;
+  if (record.ownerToken && record.ownerToken !== ownerToken) notFound();
 
   const chart = record.data as NatalChart;
   const interests = (record.interests ?? []) as LifeAreaId[];

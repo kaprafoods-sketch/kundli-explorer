@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { supabase } from "@/lib/supabase";
-import type { ChartRow } from "@/lib/supabase";
+import type { ChartRow } from "@/lib/types";
 
 const COOKIE = "kx_owner";
 

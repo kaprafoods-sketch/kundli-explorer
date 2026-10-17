@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Markdown from "./Markdown";
 import ReadingFeedback from "./ReadingFeedback";
 import type { SuggestedQuestion } from "@/lib/suggestQuestions";
+import { MAX_GRAHA_MESSAGE_CHARS } from "@/lib/rateLimit";
 
 const ERROR_TEXT = "Something went wrong. Please try again.";
 
@@ -326,6 +327,7 @@ export default function GrahaAIChat({ chartId, focus, compact, interests, sugges
           onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && send(input)}
           placeholder={compact ? "Ask about this placement…" : "Ask about any placement in your chart…"}
           disabled={streaming}
+          maxLength={MAX_GRAHA_MESSAGE_CHARS} // client hint only; the server cap (422) is the enforcement
           className="flex-1 input-field"
           style={{ fontSize: "0.82rem" }}
         />

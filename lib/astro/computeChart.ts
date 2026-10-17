@@ -91,6 +91,7 @@ export interface NatalChart {
     current: {
       maha: DashaEntry;
       antar: DashaEntry;
+      antars: DashaEntry[]; // full antar timeline tiling [maha.start, maha.end]
     };
   };
 }
@@ -204,7 +205,12 @@ function computeDasha(
   let antarCursor = mahaStart;
   for (let i = 0; i < dashaOrder.length; i++) {
     const aLord = dashaOrder[(mahaLordIdx + i) % dashaOrder.length];
-    const aYears = (dashaYears[currentMaha.lord] / 120) * dashaYears[aLord];
+    // Base the antar lengths on the ACTUAL mahadasha duration (mahaEnd −
+    // mahaStart), not the lord's full year span: the birth mahadasha is
+    // partial, so the full-span base made antars spill past the real mahaEnd.
+    // For full mahadashas mahaDurationYears === dashaYears[lord], i.e. the
+    // classic formula, unchanged.
+    const aYears = (mahaDurationYears / 120) * dashaYears[aLord];
     const aEnd = antarCursor.plus({ years: aYears });
     antars.push({ lord: aLord, start: antarCursor.toISO()!, end: aEnd.toISO()! });
     antarCursor = aEnd;
@@ -219,7 +225,7 @@ function computeDasha(
     order: dashaOrder,
     years: dashaYears,
     timeline,
-    current: { maha: currentMaha, antar: currentAntar },
+    current: { maha: currentMaha, antar: currentAntar, antars },
   };
 }
 

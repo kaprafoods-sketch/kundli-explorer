@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import type { ChartRow } from "@/lib/supabase";
+import type { ChartRow } from "@/lib/types";
 import type { NatalChart } from "@/lib/astro/computeChart";
 import { GRAHA_GLYPHS } from "@/lib/kb";
 import { renameProfile, deleteProfile } from "@/app/actions/profiles";

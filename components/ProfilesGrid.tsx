@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { ChartRow } from "@/lib/supabase";
+import type { ChartRow } from "@/lib/types";
 import ProfileCard from "./ProfileCard";
 
 interface Props {

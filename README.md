@@ -49,6 +49,15 @@ npx prisma generate
 npm run dev
 ```
 
+### Troubleshooting
+
+**geo-tz `ENOENT` on first chart render (Turbopack dev):** `geo-tz` resolves its timezone data via `__dirname`, which Turbopack dev rewrites to a bogus `/ROOT/node_modules/...` path, so chart rendering crashes with `ENOENT: no such file or directory, open '.../geo-tz/data/timezones-1970.geojson.geo.dat'`. Point `geo-tz` at its real data files before starting the dev server:
+
+```bash
+export GEO_TZ_DATA_PATH="$PWD/node_modules/geo-tz/data"
+npm run dev
+```
+
 ## Engine validation
 
 ```bash

@@ -6,7 +6,7 @@ import AnimatedKundliHero from "@/components/AnimatedKundliHero";
 import ProfilesGrid from "@/components/ProfilesGrid";
 import Logo from "@/components/Logo";
 import { listMyProfiles } from "@/app/actions/profiles";
-import type { ChartRow } from "@/lib/supabase";
+import type { ChartRow } from "@/lib/types";
 
 export default async function Home() {
   // Read owner token to surface saved profiles

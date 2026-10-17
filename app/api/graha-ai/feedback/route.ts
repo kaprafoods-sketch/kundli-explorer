@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { supabase } from "@/lib/supabase";
 
 export const runtime = "nodejs";
@@ -43,6 +44,24 @@ export async function POST(req: NextRequest) {
   }
   if (ratingReason !== undefined && ratingReason !== null && !VALID_REASON.has(ratingReason)) {
     return NextResponse.json({ error: "Invalid ratingReason" }, { status: 400 });
+  }
+
+  // Owner check (P3): only the chart's owner may rate its assistant
+  // messages. The TutorMessage lookup below keys off an unguessable-but-
+  // leakable chartId, so authorize against the chart's ownerToken first.
+  // Same 404 as "no message to rate" — no existence oracle.
+  const ownerToken = (await cookies()).get("kx_owner")?.value;
+  const { data: chart, error: chartErr } = await supabase
+    .from("Chart")
+    .select("ownerToken")
+    .eq("id", chartId)
+    .single();
+  if (
+    chartErr ||
+    !chart ||
+    (chart.ownerToken && chart.ownerToken !== ownerToken)
+  ) {
+    return NextResponse.json({ error: "No assistant message to rate" }, { status: 404 });
   }
 
   // Most recent assistant message for this chart.
